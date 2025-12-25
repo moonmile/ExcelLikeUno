@@ -46,3 +46,29 @@ class XNamed(Protocol):
 class XSpreadsheetDocument(Protocol):
     def getSheets(self) -> Any:
         ...
+
+
+@runtime_checkable
+class BorderLine(Protocol):
+    Color: int
+    InnerLineWidth: int
+    OuterLineWidth: int
+    LineDistance: int
+
+
+@runtime_checkable
+class TableBorder(Protocol):
+    TopLine: BorderLine
+    IsTopLineValid: bool
+    BottomLine: BorderLine
+    IsBottomLineValid: bool
+    LeftLine: BorderLine
+    IsLeftLineValid: bool
+    RightLine: BorderLine
+    IsRightLineValid: bool
+    HorizontalLine: BorderLine
+    IsHorizontalLineValid: bool
+    VerticalLine: BorderLine
+    IsVerticalLineValid: bool
+    Distance: int
+    IsDistanceValid: bool

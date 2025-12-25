@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..core import InterfaceNames, UnoObject
-from ..typing import XCell, XPropertySet
+from ..typing import BorderLine, TableBorder, XCell, XPropertySet
 
 
 class CellProperties(UnoObject):
@@ -140,43 +140,43 @@ class Cell(UnoObject):
         self.properties.set_property("AsianVerticalMode", bool(value))
 
     @property
-    def TableBorder(self) -> Any:
-        return self.properties.get_property("TableBorder")
+    def TableBorder(self) -> TableBorder:
+        return cast(TableBorder, self.properties.get_property("TableBorder"))
 
     @TableBorder.setter
-    def TableBorder(self, value: Any) -> None:
+    def TableBorder(self, value: TableBorder) -> None:
         self.properties.set_property("TableBorder", value)
 
     @property
-    def TopBorder(self) -> Any:
-        return self.properties.get_property("TopBorder")
+    def TopBorder(self) -> BorderLine:
+        return cast(BorderLine, self.properties.get_property("TopBorder"))
 
     @TopBorder.setter
-    def TopBorder(self, value: Any) -> None:
+    def TopBorder(self, value: BorderLine) -> None:
         self.properties.set_property("TopBorder", value)
 
     @property
-    def BottomBorder(self) -> Any:
-        return self.properties.get_property("BottomBorder")
+    def BottomBorder(self) -> BorderLine:
+        return cast(BorderLine, self.properties.get_property("BottomBorder"))
 
     @BottomBorder.setter
-    def BottomBorder(self, value: Any) -> None:
+    def BottomBorder(self, value: BorderLine) -> None:
         self.properties.set_property("BottomBorder", value)
 
     @property
-    def LeftBorder(self) -> Any:
-        return self.properties.get_property("LeftBorder")
+    def LeftBorder(self) -> BorderLine:
+        return cast(BorderLine, self.properties.get_property("LeftBorder"))
 
     @LeftBorder.setter
-    def LeftBorder(self, value: Any) -> None:
+    def LeftBorder(self, value: BorderLine) -> None:
         self.properties.set_property("LeftBorder", value)
 
     @property
-    def RightBorder(self) -> Any:
-        return self.properties.get_property("RightBorder")
+    def RightBorder(self) -> BorderLine:
+        return cast(BorderLine, self.properties.get_property("RightBorder"))
 
     @RightBorder.setter
-    def RightBorder(self, value: Any) -> None:
+    def RightBorder(self, value: BorderLine) -> None:
         self.properties.set_property("RightBorder", value)
 
     @property

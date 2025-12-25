@@ -45,3 +45,31 @@ def test_cellproperties_attribute_passthrough():
         assert cell.IsTextWrapped is new_wrap
     finally:
         cell.IsTextWrapped = original_wrap
+
+
+def test_cell_topborder_roundtrip():
+    _, _, sheet = _connect_or_skip()
+    cell = sheet.cell(3, 2)
+
+    try:
+        import uno
+        from com.sun.star.table import BorderLine  # type: ignore
+    except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
+        pytest.skip(f"UNO runtime not available: {exc}")
+
+    # capture original border and prepare a new one
+    original_border = cell.TopBorder
+    new_border = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    new_border.Color = 0x123456
+    new_border.InnerLineWidth = 0
+    new_border.OuterLineWidth = 50
+    new_border.LineDistance = 0
+
+    try:
+        cell.TopBorder = new_border
+        updated = cell.TopBorder
+        assert updated.Color == 0x123456
+        # LibreOffice may normalize to the nearest supported width; allow small drift.
+        assert abs(int(updated.OuterLineWidth) - 50) <= 2
+    finally:
+        cell.TopBorder = original_border
