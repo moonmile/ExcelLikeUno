@@ -36,3 +36,15 @@ def test_props_passthrough():
     props.setPropertyValue("CellBackColor", 0x112233)
     assert props.getPropertyValue("CellBackColor") == 0x112233
     props.setPropertyValue("CellBackColor", original_color)
+
+
+def test_cellproperties_attribute_access():
+    _, _, sheet = _connect_or_skip()
+    cell = sheet.cell(2, 0)
+    original_color = cell.CellBackColor
+    new_color = 0x223344 if original_color != 0x223344 else 0x556677
+    try:
+        cell.CellBackColor = new_color
+        assert cell.CellBackColor == new_color
+    finally:
+        cell.CellBackColor = original_color

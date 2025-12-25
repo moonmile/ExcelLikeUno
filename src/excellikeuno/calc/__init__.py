@@ -1,4 +1,4 @@
-from .cell import Cell
+from .cell import Cell, CellProperties
 from .sheet import Sheet
 
-__all__ = ["Cell", "Sheet"]
+__all__ = ["Cell", "CellProperties", "Sheet"]
