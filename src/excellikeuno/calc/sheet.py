@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, List, cast
 
 from ..core import InterfaceNames, UnoObject
-from ..typing import XNamed, XPropertySet, XSpreadsheet
+from ..typing import XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet
 from .cell import Cell
+from .shape import Shape
 
 
 class Sheet(UnoObject):
@@ -12,6 +13,18 @@ class Sheet(UnoObject):
         sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
         return Cell(sheet.getCellByPosition(column, row))
 
+    def _draw_page(self):
+        supplier = cast(XDrawPageSupplier, self.iface(InterfaceNames.X_DRAW_PAGE_SUPPLIER))
+        return supplier.getDrawPage()
+
+    def shape(self, index: int) -> Shape:
+        draw_page = self._draw_page()
+        return Shape(draw_page.getByIndex(index))
+
+    def shapes(self) -> List[Shape]:
+        draw_page = self._draw_page()
+        return [Shape(draw_page.getByIndex(i)) for i in range(draw_page.getCount())]
+    
     @property
     def name(self) -> str:
         named = cast(XNamed, self.iface(InterfaceNames.X_NAMED))

@@ -35,6 +35,36 @@ class XSpreadsheet(Protocol):
 
 
 @runtime_checkable
+class XDrawPage(Protocol):
+    def getByIndex(self, index: int) -> Any:
+        ...
+
+    def getCount(self) -> int:
+        ...
+
+
+@runtime_checkable
+class XDrawPageSupplier(Protocol):
+    def getDrawPage(self) -> XDrawPage:
+        ...
+
+
+@runtime_checkable
+class XShape(Protocol):
+    def getPosition(self) -> Any:
+        ...
+
+    def setPosition(self, position: Any) -> None:
+        ...
+
+    def getSize(self) -> Any:
+        ...
+
+    def setSize(self, size: Any) -> None:
+        ...
+
+
+@runtime_checkable
 class XNamed(Protocol):
     def getName(self) -> str:
         ...

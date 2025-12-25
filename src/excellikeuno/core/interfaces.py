@@ -6,3 +6,5 @@ class InterfaceNames:
     X_NAMED = "com.sun.star.container.XNamed"
     X_SPREADSHEET = "com.sun.star.sheet.XSpreadsheet"
     X_SPREADSHEET_DOCUMENT = "com.sun.star.sheet.XSpreadsheetDocument"
+    X_DRAW_PAGE_SUPPLIER = "com.sun.star.drawing.XDrawPageSupplier"
+    X_SHAPE = "com.sun.star.drawing.XShape"
