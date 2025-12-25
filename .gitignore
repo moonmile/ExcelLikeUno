@@ -25,3 +25,5 @@ dist/
 
 # LibreOffice lock files
 ~$*.ods
+
+.fake

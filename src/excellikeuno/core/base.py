@@ -16,7 +16,25 @@ class UnoObject:
             query = getattr(self._obj, "queryInterface", None)
             if query is None:
                 raise AttributeError("UNO object missing queryInterface")
-            self._iface_cache[name] = query(name)
+            iface_obj: Any = None
+
+            # Prefer UNO type resolution when available (real UNO objects),
+            # but fall back to the provided name for lightweight test doubles.
+            try:
+                import uno  # type: ignore
+
+                try:
+                    iface_type = uno.getTypeByName(name)
+                    iface_obj = query(iface_type)
+                except Exception:
+                    iface_obj = None
+            except Exception:
+                iface_obj = None
+
+            if iface_obj is None:
+                iface_obj = query(name)
+
+            self._iface_cache[name] = iface_obj
         return self._iface_cache[name]
 
     @property

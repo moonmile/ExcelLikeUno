@@ -4,7 +4,7 @@
 		{
 			"label": "Test (LibreOffice Python)",
 			"type": "shell",
-			"command": "$env:PYTHONPATH='H:\\LibreOffice-ExcelLike\\src\\'; & 'C:\\Program Files\\LibreOffice\\program\\python' -m pytest tests/test_sample_core.py",
+			"command": "$env:PYTHONPATH='H:\\LibreOffice-ExcelLike\\src\\'; & 'C:\\Program Files\\LibreOffice\\program\\python' -m pytest tests",
 			"isBackground": false,
 			"problemMatcher": [
 				"$pytest"

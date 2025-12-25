@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any, Tuple
-
 from ..calc import Sheet
 from ..core import InterfaceNames, UnoObject
 
@@ -32,6 +31,36 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
     return desktop, document, Sheet(first_sheet)
+
+def connect_calc() -> Tuple[Any, Any, Sheet]:
+
+    try:
+        import uno
+        from com.sun.star.beans import PropertyValue
+    except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
+        raise RuntimeError("UNO runtime is not available") from exc
+
+    # UNO接続の準備
+    local_ctx = uno.getComponentContext()
+    resolver = local_ctx.ServiceManager.createInstanceWithContext(
+        "com.sun.star.bridge.UnoUrlResolver", local_ctx)
+
+    # LibreOfficeに接続
+    ctx = resolver.resolve(
+        "uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+
+    smgr = ctx.ServiceManager
+    desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+
+    # 現在開いているCalcドキュメントを取得し、UnoObject経由でインターフェースを解決
+    doc = desktop.getCurrentComponent()
+    doc_wrapper = UnoObject(doc)
+    spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
+    controller = spreadsheet_doc.getCurrentController()
+    sheet = controller.getActiveSheet()
+
+    return desktop, doc, Sheet(sheet)
+
 
 
 def wrap_sheet(sheet_obj: Any) -> Sheet:

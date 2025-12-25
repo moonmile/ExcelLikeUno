@@ -1,3 +1,3 @@
-from .bootstrap import open_calc_document, wrap_sheet
+from .bootstrap import connect_calc, open_calc_document, wrap_sheet
 
-__all__ = ["open_calc_document", "wrap_sheet"]
+__all__ = ["open_calc_document", "wrap_sheet", "connect_calc"]
