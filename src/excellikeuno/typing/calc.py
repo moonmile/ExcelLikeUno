@@ -34,6 +34,15 @@ class XSpreadsheet(Protocol):
 
 
 @runtime_checkable
+class XNamed(Protocol):
+    def getName(self) -> str:
+        ...
+
+    def setName(self, name: str) -> None:
+        ...
+
+
+@runtime_checkable
 class XSpreadsheetDocument(Protocol):
     def getSheets(self) -> Any:
         ...
