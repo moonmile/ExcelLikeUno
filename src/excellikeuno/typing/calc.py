@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import IntEnum
 from typing import Any, Protocol, runtime_checkable
 
 
@@ -72,3 +73,48 @@ class TableBorder(Protocol):
     IsVerticalLineValid: bool
     Distance: int
     IsDistanceValid: bool
+
+
+@runtime_checkable
+class BorderLine2(Protocol):
+    Color: int
+    InnerLineWidth: int
+    OuterLineWidth: int
+    LineDistance: int
+    LineStyle: int
+    LineWidth: int
+
+
+@runtime_checkable
+class TableBorder2(Protocol):
+    TopLine: BorderLine2
+    IsTopLineValid: bool
+    BottomLine: BorderLine2
+    IsBottomLineValid: bool
+    LeftLine: BorderLine2
+    IsLeftLineValid: bool
+    RightLine: BorderLine2
+    IsRightLineValid: bool
+    HorizontalLine: BorderLine2
+    IsHorizontalLineValid: bool
+    VerticalLine: BorderLine2
+    IsVerticalLineValid: bool
+    Distance: int
+    IsDistanceValid: bool
+
+
+class CellHoriJustify(IntEnum):
+    STANDARD = 0
+    LEFT = 1
+    CENTER = 2
+    RIGHT = 3
+    BLOCK = 4
+    REPEAT = 5
+
+
+class CellVertJustify(IntEnum):
+    STANDARD = 0
+    TOP = 1
+    CENTER = 2
+    BOTTOM = 3
+    BLOCK = 4

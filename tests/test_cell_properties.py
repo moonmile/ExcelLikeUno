@@ -73,3 +73,60 @@ def test_cell_topborder_roundtrip():
         assert abs(int(updated.OuterLineWidth) - 50) <= 2
     finally:
         cell.TopBorder = original_border
+
+
+def test_cell_topborder2_roundtrip():
+    _, _, sheet = _connect_or_skip()
+    cell = sheet.cell(4, 2)
+
+    try:
+        import uno
+        from com.sun.star.table import BorderLine2  # type: ignore
+    except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
+        pytest.skip(f"UNO runtime not available: {exc}")
+
+    original_border = cell.TopBorder2
+    new_border = uno.createUnoStruct("com.sun.star.table.BorderLine2")
+    new_border.Color = 0x654321
+    new_border.InnerLineWidth = 0
+    new_border.OuterLineWidth = 60
+    new_border.LineDistance = 0
+    new_border.LineStyle = 0
+    new_border.LineWidth = 60
+
+    try:
+        cell.TopBorder2 = new_border
+        updated = cell.TopBorder2
+        assert updated.Color == 0x654321
+        assert abs(int(updated.OuterLineWidth) - 60) <= 2
+        assert abs(int(updated.LineWidth) - 60) <= 2
+    finally:
+        cell.TopBorder2 = original_border
+
+
+def test_cell_horijustify_enum_roundtrip():
+    _, _, sheet = _connect_or_skip()
+    from excellikeuno.typing import CellHoriJustify
+
+    cell = sheet.cell(5, 2)
+    original = cell.HoriJustify
+    new_value = CellHoriJustify.LEFT if original != CellHoriJustify.LEFT else CellHoriJustify.RIGHT
+    try:
+        cell.HoriJustify = new_value
+        assert cell.HoriJustify == new_value
+    finally:
+        cell.HoriJustify = original
+
+
+def test_cell_vertjustify_enum_roundtrip():
+    _, _, sheet = _connect_or_skip()
+    from excellikeuno.typing import CellVertJustify
+
+    cell = sheet.cell(5, 3)
+    original = cell.VertJustify
+    new_value = CellVertJustify.TOP if original != CellVertJustify.TOP else CellVertJustify.BOTTOM
+    try:
+        cell.VertJustify = new_value
+        assert cell.VertJustify == new_value
+    finally:
+        cell.VertJustify = original

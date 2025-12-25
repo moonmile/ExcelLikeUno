@@ -3,7 +3,16 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..core import InterfaceNames, UnoObject
-from ..typing import BorderLine, TableBorder, XCell, XPropertySet
+from ..typing import (
+    BorderLine,
+    BorderLine2,
+    CellHoriJustify,
+    CellVertJustify,
+    TableBorder,
+    TableBorder2,
+    XCell,
+    XPropertySet,
+)
 
 
 class CellProperties(UnoObject):
@@ -76,20 +85,40 @@ class Cell(UnoObject):
         self.properties.set_property("IsCellBackgroundTransparent", bool(value))
 
     @property
-    def HoriJustify(self) -> Any:
-        return self.properties.get_property("HoriJustify")
+    def HoriJustify(self) -> CellHoriJustify:
+        raw = self.properties.get_property("HoriJustify")
+        if isinstance(raw, CellHoriJustify):
+            return raw
+        if hasattr(raw, "value"):
+            val = getattr(raw, "value")
+        else:
+            val = raw
+        try:
+            return CellHoriJustify(int(val))
+        except Exception:
+            return CellHoriJustify[val] if isinstance(val, str) else CellHoriJustify(val)
 
     @HoriJustify.setter
-    def HoriJustify(self, value: Any) -> None:
-        self.properties.set_property("HoriJustify", value)
+    def HoriJustify(self, value: CellHoriJustify | int) -> None:
+        self.properties.set_property("HoriJustify", int(value))
 
     @property
-    def VertJustify(self) -> Any:
-        return self.properties.get_property("VertJustify")
+    def VertJustify(self) -> CellVertJustify:
+        raw = self.properties.get_property("VertJustify")
+        if isinstance(raw, CellVertJustify):
+            return raw
+        if hasattr(raw, "value"):
+            val = getattr(raw, "value")
+        else:
+            val = raw
+        try:
+            return CellVertJustify(int(val))
+        except Exception:
+            return CellVertJustify[val] if isinstance(val, str) else CellVertJustify(val)
 
     @VertJustify.setter
-    def VertJustify(self, value: Any) -> None:
-        self.properties.set_property("VertJustify", value)
+    def VertJustify(self, value: CellVertJustify | int) -> None:
+        self.properties.set_property("VertJustify", int(value))
 
     @property
     def IsTextWrapped(self) -> bool:
@@ -236,43 +265,43 @@ class Cell(UnoObject):
         self.properties.set_property("ShrinkToFit", bool(value))
 
     @property
-    def TableBorder2(self) -> Any:
-        return self.properties.get_property("TableBorder2")
+    def TableBorder2(self) -> TableBorder2:
+        return cast(TableBorder2, self.properties.get_property("TableBorder2"))
 
     @TableBorder2.setter
-    def TableBorder2(self, value: Any) -> None:
+    def TableBorder2(self, value: TableBorder2) -> None:
         self.properties.set_property("TableBorder2", value)
 
     @property
-    def TopBorder2(self) -> Any:
-        return self.properties.get_property("TopBorder2")
+    def TopBorder2(self) -> BorderLine2:
+        return cast(BorderLine2, self.properties.get_property("TopBorder2"))
 
     @TopBorder2.setter
-    def TopBorder2(self, value: Any) -> None:
+    def TopBorder2(self, value: BorderLine2) -> None:
         self.properties.set_property("TopBorder2", value)
 
     @property
-    def BottomBorder2(self) -> Any:
-        return self.properties.get_property("BottomBorder2")
+    def BottomBorder2(self) -> BorderLine2:
+        return cast(BorderLine2, self.properties.get_property("BottomBorder2"))
 
     @BottomBorder2.setter
-    def BottomBorder2(self, value: Any) -> None:
+    def BottomBorder2(self, value: BorderLine2) -> None:
         self.properties.set_property("BottomBorder2", value)
 
     @property
-    def LeftBorder2(self) -> Any:
-        return self.properties.get_property("LeftBorder2")
+    def LeftBorder2(self) -> BorderLine2:
+        return cast(BorderLine2, self.properties.get_property("LeftBorder2"))
 
     @LeftBorder2.setter
-    def LeftBorder2(self, value: Any) -> None:
+    def LeftBorder2(self, value: BorderLine2) -> None:
         self.properties.set_property("LeftBorder2", value)
 
     @property
-    def RightBorder2(self) -> Any:
-        return self.properties.get_property("RightBorder2")
+    def RightBorder2(self) -> BorderLine2:
+        return cast(BorderLine2, self.properties.get_property("RightBorder2"))
 
     @RightBorder2.setter
-    def RightBorder2(self, value: Any) -> None:
+    def RightBorder2(self, value: BorderLine2) -> None:
         self.properties.set_property("RightBorder2", value)
 
     @property
