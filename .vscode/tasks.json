@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Test (LibreOffice Python)",
+			"type": "shell",
+			"command": "$env:PYTHONPATH='H:\\LibreOffice-ExcelLike\\src\\'; & 'C:\\Program Files\\LibreOffice\\program\\python' -m pytest tests/test_sample_core.py",
+			"isBackground": false,
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		}
+	]
+}
