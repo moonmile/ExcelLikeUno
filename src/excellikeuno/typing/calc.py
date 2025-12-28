@@ -133,6 +133,16 @@ class TableBorder2(Protocol):
     IsDistanceValid: bool
 
 
+@runtime_checkable
+class LineDash(Protocol):
+    Style: int
+    Dots: int
+    DotLen: int
+    Dashes: int
+    DashLen: int
+    Distance: int
+
+
 class CellHoriJustify(IntEnum):
     STANDARD = 0
     LEFT = 1
@@ -148,3 +158,17 @@ class CellVertJustify(IntEnum):
     CENTER = 2
     BOTTOM = 3
     BLOCK = 4
+
+
+class LineStyle(IntEnum):
+    SOLID = 0
+    DASH = 1
+    DOT = 2
+    DASHDOT = 3
+    DASHDOTDOT = 4
+    LONGDASH = 5
+    LONGDASHDOT = 6
+    LONGDASHDOTDOT = 7
+    # Some runtimes expose 8/9 for ROUND/LONGROUND variants; keep strict per IDL here.
+
+

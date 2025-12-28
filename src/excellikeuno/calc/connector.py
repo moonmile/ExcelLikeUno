@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Union
 
 from .shape import Shape
+from ..typing import LineDash, LineStyle
 
 
 class ConnectorShape(Shape):
@@ -49,6 +50,18 @@ class ConnectorShape(Shape):
         self._set_prop("EdgeKind", int(value))
 
     @property
+    def line_style(self) -> LineStyle:
+        value = self._get_prop("LineStyle")
+        try:
+            return LineStyle(int(value))
+        except Exception:
+            return LineStyle.SOLID
+
+    @line_style.setter
+    def line_style(self, value: Union[int, LineStyle]) -> None:
+        self._set_prop("LineStyle", int(LineStyle(value)))
+
+    @property
     def line_start_name(self) -> str:
         return str(self._get_prop("LineStartName"))
 
@@ -79,3 +92,11 @@ class ConnectorShape(Shape):
     @line_end_center.setter
     def line_end_center(self, value: bool) -> None:
         self._set_prop("LineEndCenter", bool(value))
+
+    @property
+    def line_dash(self) -> LineDash:
+        return self._get_prop("LineDash")
+
+    @line_dash.setter
+    def line_dash(self, value: LineDash) -> None:
+        self._set_prop("LineDash", value)
