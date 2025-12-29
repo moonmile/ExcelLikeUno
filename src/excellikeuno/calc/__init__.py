@@ -1,6 +1,6 @@
 from .cell import Cell, CellProperties
 from .shape import Shape
-from .connector import ConnectorShape
+from .connector_shape import ConnectorShape
 from .line_shape import LineShape
 from .rectangle_shape import RectangleShape
 from .ellipse_shape import EllipseShape
