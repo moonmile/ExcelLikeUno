@@ -51,6 +51,14 @@ class CellProperties(UnoObject):
 
 
 class Cell(UnoObject):
+    def _get_prop(self, name: str) -> Any:
+        props = cast(XPropertySet, self.iface(InterfaceNames.X_PROPERTY_SET))
+        return props.getPropertyValue(name)
+
+    def _set_prop(self, name: str, value: Any) -> None:
+        props = cast(XPropertySet, self.iface(InterfaceNames.X_PROPERTY_SET))
+        props.setPropertyValue(name, value)
+
     @property
     def properties(self) -> CellProperties:
         existing = self.__dict__.get("_properties")
@@ -62,31 +70,31 @@ class Cell(UnoObject):
     # CellProperties (public attributes) shortcuts for IDE completion
     @property
     def CellStyle(self) -> Any:
-        return self.properties.get_property("CellStyle")
+        return self._get_prop("CellStyle")
 
     @CellStyle.setter
     def CellStyle(self, value: Any) -> None:
-        self.properties.set_property("CellStyle", value)
+        self._set_prop("CellStyle", value)
 
     @property
     def CellBackColor(self) -> Any:
-        return self.properties.get_property("CellBackColor")
+        return self._get_prop("CellBackColor")
 
     @CellBackColor.setter
     def CellBackColor(self, value: Any) -> None:
-        self.properties.set_property("CellBackColor", value)
+        self._set_prop("CellBackColor", value)
 
     @property
     def IsCellBackgroundTransparent(self) -> bool:
-        return bool(self.properties.get_property("IsCellBackgroundTransparent"))
+        return bool(self._get_prop("IsCellBackgroundTransparent"))
 
     @IsCellBackgroundTransparent.setter
     def IsCellBackgroundTransparent(self, value: bool) -> None:
-        self.properties.set_property("IsCellBackgroundTransparent", bool(value))
+        self._set_prop("IsCellBackgroundTransparent", bool(value))
 
     @property
     def HoriJustify(self) -> CellHoriJustify:
-        raw = self.properties.get_property("HoriJustify")
+        raw = self._get_prop("HoriJustify")
         if isinstance(raw, CellHoriJustify):
             return raw
         if hasattr(raw, "value"):
@@ -100,11 +108,11 @@ class Cell(UnoObject):
 
     @HoriJustify.setter
     def HoriJustify(self, value: CellHoriJustify | int) -> None:
-        self.properties.set_property("HoriJustify", int(value))
+        self._set_prop("HoriJustify", int(value))
 
     @property
     def VertJustify(self) -> CellVertJustify:
-        raw = self.properties.get_property("VertJustify")
+        raw = self._get_prop("VertJustify")
         if isinstance(raw, CellVertJustify):
             return raw
         if hasattr(raw, "value"):
@@ -118,215 +126,215 @@ class Cell(UnoObject):
 
     @VertJustify.setter
     def VertJustify(self, value: CellVertJustify | int) -> None:
-        self.properties.set_property("VertJustify", int(value))
+        self._set_prop("VertJustify", int(value))
 
     @property
     def IsTextWrapped(self) -> bool:
-        return bool(self.properties.get_property("IsTextWrapped"))
+        return bool(self._get_prop("IsTextWrapped"))
 
     @IsTextWrapped.setter
     def IsTextWrapped(self, value: bool) -> None:
-        self.properties.set_property("IsTextWrapped", bool(value))
+        self._set_prop("IsTextWrapped", bool(value))
 
     @property
     def ParaIndent(self) -> Any:
-        return self.properties.get_property("ParaIndent")
+        return self._get_prop("ParaIndent")
 
     @ParaIndent.setter
     def ParaIndent(self, value: Any) -> None:
-        self.properties.set_property("ParaIndent", value)
+        self._set_prop("ParaIndent", value)
 
     @property
     def Orientation(self) -> Any:
-        return self.properties.get_property("Orientation")
+        return self._get_prop("Orientation")
 
     @Orientation.setter
     def Orientation(self, value: Any) -> None:
-        self.properties.set_property("Orientation", value)
+        self._set_prop("Orientation", value)
 
     @property
     def RotateAngle(self) -> Any:
-        return self.properties.get_property("RotateAngle")
+        return self._get_prop("RotateAngle")
 
     @RotateAngle.setter
     def RotateAngle(self, value: Any) -> None:
-        self.properties.set_property("RotateAngle", value)
+        self._set_prop("RotateAngle", value)
 
     @property
     def RotateReference(self) -> Any:
-        return self.properties.get_property("RotateReference")
+        return self._get_prop("RotateReference")
 
     @RotateReference.setter
     def RotateReference(self, value: Any) -> None:
-        self.properties.set_property("RotateReference", value)
+        self._set_prop("RotateReference", value)
 
     @property
     def AsianVerticalMode(self) -> bool:
-        return bool(self.properties.get_property("AsianVerticalMode"))
+        return bool(self._get_prop("AsianVerticalMode"))
 
     @AsianVerticalMode.setter
     def AsianVerticalMode(self, value: bool) -> None:
-        self.properties.set_property("AsianVerticalMode", bool(value))
+        self._set_prop("AsianVerticalMode", bool(value))
 
     @property
     def TableBorder(self) -> TableBorder:
-        return cast(TableBorder, self.properties.get_property("TableBorder"))
+        return cast(TableBorder, self._get_prop("TableBorder"))
 
     @TableBorder.setter
     def TableBorder(self, value: TableBorder) -> None:
-        self.properties.set_property("TableBorder", value)
+        self._set_prop("TableBorder", value)
 
     @property
     def TopBorder(self) -> BorderLine:
-        return cast(BorderLine, self.properties.get_property("TopBorder"))
+        return cast(BorderLine, self._get_prop("TopBorder"))
 
     @TopBorder.setter
     def TopBorder(self, value: BorderLine) -> None:
-        self.properties.set_property("TopBorder", value)
+        self._set_prop("TopBorder", value)
 
     @property
     def BottomBorder(self) -> BorderLine:
-        return cast(BorderLine, self.properties.get_property("BottomBorder"))
+        return cast(BorderLine, self._get_prop("BottomBorder"))
 
     @BottomBorder.setter
     def BottomBorder(self, value: BorderLine) -> None:
-        self.properties.set_property("BottomBorder", value)
+        self._set_prop("BottomBorder", value)
 
     @property
     def LeftBorder(self) -> BorderLine:
-        return cast(BorderLine, self.properties.get_property("LeftBorder"))
+        return cast(BorderLine, self._get_prop("LeftBorder"))
 
     @LeftBorder.setter
     def LeftBorder(self, value: BorderLine) -> None:
-        self.properties.set_property("LeftBorder", value)
+        self._set_prop("LeftBorder", value)
 
     @property
     def RightBorder(self) -> BorderLine:
-        return cast(BorderLine, self.properties.get_property("RightBorder"))
+        return cast(BorderLine, self._get_prop("RightBorder"))
 
     @RightBorder.setter
     def RightBorder(self, value: BorderLine) -> None:
-        self.properties.set_property("RightBorder", value)
+        self._set_prop("RightBorder", value)
 
     @property
     def NumberFormat(self) -> Any:
-        return self.properties.get_property("NumberFormat")
+        return self._get_prop("NumberFormat")
 
     @NumberFormat.setter
     def NumberFormat(self, value: Any) -> None:
-        self.properties.set_property("NumberFormat", value)
+        self._set_prop("NumberFormat", value)
 
     @property
     def ShadowFormat(self) -> Any:
-        return self.properties.get_property("ShadowFormat")
+        return self._get_prop("ShadowFormat")
 
     @ShadowFormat.setter
     def ShadowFormat(self, value: Any) -> None:
-        self.properties.set_property("ShadowFormat", value)
+        self._set_prop("ShadowFormat", value)
 
     @property
     def CellProtection(self) -> Any:
-        return self.properties.get_property("CellProtection")
+        return self._get_prop("CellProtection")
 
     @CellProtection.setter
     def CellProtection(self, value: Any) -> None:
-        self.properties.set_property("CellProtection", value)
+        self._set_prop("CellProtection", value)
 
     @property
     def UserDefinedAttributes(self) -> Any:
-        return self.properties.get_property("UserDefinedAttributes")
+        return self._get_prop("UserDefinedAttributes")
 
     @UserDefinedAttributes.setter
     def UserDefinedAttributes(self, value: Any) -> None:
-        self.properties.set_property("UserDefinedAttributes", value)
+        self._set_prop("UserDefinedAttributes", value)
 
     @property
     def DiagonalTLBR(self) -> Any:
-        return self.properties.get_property("DiagonalTLBR")
+        return self._get_prop("DiagonalTLBR")
 
     @DiagonalTLBR.setter
     def DiagonalTLBR(self, value: Any) -> None:
-        self.properties.set_property("DiagonalTLBR", value)
+        self._set_prop("DiagonalTLBR", value)
 
     @property
     def DiagonalBLTR(self) -> Any:
-        return self.properties.get_property("DiagonalBLTR")
+        return self._get_prop("DiagonalBLTR")
 
     @DiagonalBLTR.setter
     def DiagonalBLTR(self, value: Any) -> None:
-        self.properties.set_property("DiagonalBLTR", value)
+        self._set_prop("DiagonalBLTR", value)
 
     @property
     def ShrinkToFit(self) -> bool:
-        return bool(self.properties.get_property("ShrinkToFit"))
+        return bool(self._get_prop("ShrinkToFit"))
 
     @ShrinkToFit.setter
     def ShrinkToFit(self, value: bool) -> None:
-        self.properties.set_property("ShrinkToFit", bool(value))
+        self._set_prop("ShrinkToFit", bool(value))
 
     @property
     def TableBorder2(self) -> TableBorder2:
-        return cast(TableBorder2, self.properties.get_property("TableBorder2"))
+        return cast(TableBorder2, self._get_prop("TableBorder2"))
 
     @TableBorder2.setter
     def TableBorder2(self, value: TableBorder2) -> None:
-        self.properties.set_property("TableBorder2", value)
+        self._set_prop("TableBorder2", value)
 
     @property
     def TopBorder2(self) -> BorderLine2:
-        return cast(BorderLine2, self.properties.get_property("TopBorder2"))
+        return cast(BorderLine2, self._get_prop("TopBorder2"))
 
     @TopBorder2.setter
     def TopBorder2(self, value: BorderLine2) -> None:
-        self.properties.set_property("TopBorder2", value)
+        self._set_prop("TopBorder2", value)
 
     @property
     def BottomBorder2(self) -> BorderLine2:
-        return cast(BorderLine2, self.properties.get_property("BottomBorder2"))
+        return cast(BorderLine2, self._get_prop("BottomBorder2"))
 
     @BottomBorder2.setter
     def BottomBorder2(self, value: BorderLine2) -> None:
-        self.properties.set_property("BottomBorder2", value)
+        self._set_prop("BottomBorder2", value)
 
     @property
     def LeftBorder2(self) -> BorderLine2:
-        return cast(BorderLine2, self.properties.get_property("LeftBorder2"))
+        return cast(BorderLine2, self._get_prop("LeftBorder2"))
 
     @LeftBorder2.setter
     def LeftBorder2(self, value: BorderLine2) -> None:
-        self.properties.set_property("LeftBorder2", value)
+        self._set_prop("LeftBorder2", value)
 
     @property
     def RightBorder2(self) -> BorderLine2:
-        return cast(BorderLine2, self.properties.get_property("RightBorder2"))
+        return cast(BorderLine2, self._get_prop("RightBorder2"))
 
     @RightBorder2.setter
     def RightBorder2(self, value: BorderLine2) -> None:
-        self.properties.set_property("RightBorder2", value)
+        self._set_prop("RightBorder2", value)
 
     @property
     def DiagonalTLBR2(self) -> Any:
-        return self.properties.get_property("DiagonalTLBR2")
+        return self._get_prop("DiagonalTLBR2")
 
     @DiagonalTLBR2.setter
     def DiagonalTLBR2(self, value: Any) -> None:
-        self.properties.set_property("DiagonalTLBR2", value)
+        self._set_prop("DiagonalTLBR2", value)
 
     @property
     def DiagonalBLTR2(self) -> Any:
-        return self.properties.get_property("DiagonalBLTR2")
+        return self._get_prop("DiagonalBLTR2")
 
     @DiagonalBLTR2.setter
     def DiagonalBLTR2(self, value: Any) -> None:
-        self.properties.set_property("DiagonalBLTR2", value)
+        self._set_prop("DiagonalBLTR2", value)
 
     @property
     def CellInteropGrabBag(self) -> Any:
-        return self.properties.get_property("CellInteropGrabBag")
+        return self._get_prop("CellInteropGrabBag")
 
     @CellInteropGrabBag.setter
     def CellInteropGrabBag(self, value: Any) -> None:
-        self.properties.set_property("CellInteropGrabBag", value)
+        self._set_prop("CellInteropGrabBag", value)
 
     @property
     def value(self) -> float:

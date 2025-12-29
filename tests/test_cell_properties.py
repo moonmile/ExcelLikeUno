@@ -52,18 +52,13 @@ def test_cell_topborder_roundtrip():
     cell = sheet.cell(3, 2)
 
     try:
-        import uno
-        from com.sun.star.table import BorderLine  # type: ignore
+        from excellikeuno.utils import make_border_line
     except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
         pytest.skip(f"UNO runtime not available: {exc}")
 
     # capture original border and prepare a new one
     original_border = cell.TopBorder
-    new_border = uno.createUnoStruct("com.sun.star.table.BorderLine")
-    new_border.Color = 0x123456
-    new_border.InnerLineWidth = 0
-    new_border.OuterLineWidth = 50
-    new_border.LineDistance = 0
+    new_border = make_border_line(color=0x123456, outer_line_width=50)
 
     try:
         cell.TopBorder = new_border
@@ -80,19 +75,12 @@ def test_cell_topborder2_roundtrip():
     cell = sheet.cell(4, 2)
 
     try:
-        import uno
-        from com.sun.star.table import BorderLine2  # type: ignore
+        from excellikeuno.utils import make_border_line2
     except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
         pytest.skip(f"UNO runtime not available: {exc}")
 
     original_border = cell.TopBorder2
-    new_border = uno.createUnoStruct("com.sun.star.table.BorderLine2")
-    new_border.Color = 0x654321
-    new_border.InnerLineWidth = 0
-    new_border.OuterLineWidth = 60
-    new_border.LineDistance = 0
-    new_border.LineStyle = 0
-    new_border.LineWidth = 60
+    new_border = make_border_line2(color=0x654321, outer_line_width=60, line_width=60)
 
     try:
         cell.TopBorder2 = new_border
