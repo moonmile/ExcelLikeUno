@@ -44,6 +44,21 @@ class XDrawPage(Protocol):
 
 
 @runtime_checkable
+class XShapes(Protocol):
+    def getCount(self) -> int:
+        ...
+
+    def getByIndex(self, index: int) -> Any:
+        ...
+
+    def add(self, shape: Any) -> None:
+        ...
+
+    def remove(self, shape: Any) -> None:
+        ...
+
+
+@runtime_checkable
 class XDrawPageSupplier(Protocol):
     def getDrawPage(self) -> XDrawPage:
         ...

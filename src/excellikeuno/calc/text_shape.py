@@ -14,4 +14,4 @@ class TextShape(Shape):
     @string.setter
     def string(self, value: str) -> None:
         self._set_prop("String", value)
-*** End File
+

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Tuple
-from ..calc import Sheet
+from ..calc import Sheet, Document
 from ..core import InterfaceNames, UnoObject
 
 
@@ -57,7 +57,7 @@ def connect_calc() -> Tuple[Any, Any, Sheet]:
         if doc is None:
             raise RuntimeError("No active Calc document found")
 
-        doc_wrapper = UnoObject(doc)
+        doc_wrapper = Document(doc)
         spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
         controller = spreadsheet_doc.getCurrentController()
         sheet = controller.getActiveSheet()

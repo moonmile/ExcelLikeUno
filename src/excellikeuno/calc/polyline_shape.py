@@ -15,4 +15,4 @@ class PolyLineShape(Shape):
     @poly_polygon.setter
     def poly_polygon(self, value: Any) -> None:
         self._set_prop("PolyPolygon", value)
-*** End File
+

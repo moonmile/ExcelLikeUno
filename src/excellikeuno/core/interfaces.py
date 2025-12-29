@@ -8,3 +8,8 @@ class InterfaceNames:
     X_SPREADSHEET_DOCUMENT = "com.sun.star.sheet.XSpreadsheetDocument"
     X_DRAW_PAGE_SUPPLIER = "com.sun.star.drawing.XDrawPageSupplier"
     X_SHAPE = "com.sun.star.drawing.XShape"
+    X_SHAPES = "com.sun.star.drawing.XShapes"
+    FILL_PROPERTIES = "com.sun.star.drawing.FillProperties"
+    LINE_PROPERTIES = "com.sun.star.drawing.LineProperties"
+    SHADOW_PROPERTIES = "com.sun.star.drawing.ShadowProperties"
+    TEXT_PROPERTIES = "com.sun.star.drawing.TextProperties"
