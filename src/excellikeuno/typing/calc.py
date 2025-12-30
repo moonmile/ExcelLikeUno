@@ -4,6 +4,10 @@ from enum import IntEnum
 from typing import Any, Protocol, runtime_checkable
 
 
+# UNO long alias for color values
+Color = int
+
+
 @runtime_checkable
 class XCell(Protocol):
     def getValue(self) -> float:
@@ -221,6 +225,21 @@ class CellVertJustify(IntEnum):
     CENTER = 2
     BOTTOM = 3
     BLOCK = 4
+
+
+class CellOrientation(IntEnum):
+    STANDARD = 0
+    TOPBOTTOM = 1
+    BOTTOMTOP = 2
+    STACKED = 3
+
+
+class ShadowLocation(IntEnum):
+    NONE = 0
+    TOP_LEFT = 1
+    TOP_RIGHT = 2
+    BOTTOM_LEFT = 3
+    BOTTOM_RIGHT = 4
 
 
 class LineStyle(IntEnum):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any
+from .calc import Color, ShadowLocation
 
 
 @dataclass
@@ -97,6 +98,22 @@ class TableBorder2Struct:
     IsVerticalLineValid: bool = False
     Distance: int = 0
     IsDistanceValid: bool = False
+
+
+@dataclass
+class ShadowFormatStruct:
+    Location: ShadowLocation = ShadowLocation.NONE
+    ShadowWidth: int = 0
+    ShadowColor: Color = 0
+    IsTransparent: bool = False
+
+
+@dataclass
+class CellProtectionStruct:
+    IsLocked: bool = False
+    IsFormulaHidden: bool = False
+    IsHidden: bool = False
+    IsPrintHidden: bool = False
 
 
 __all__ = [

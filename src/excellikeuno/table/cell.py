@@ -4,9 +4,11 @@ from typing import Any, cast
 
 from ..core import UnoObject
 from ..typing import (
+    Color,
     BorderLine,
     BorderLine2,
     CellHoriJustify,
+    CellOrientation,
     CellVertJustify,
     InterfaceNames,
     TableBorder,
@@ -70,19 +72,19 @@ class Cell(UnoObject):
 
     # CellProperties (public attributes) shortcuts for IDE completion
     @property
-    def CellStyle(self) -> Any:
+    def CellStyle(self) -> str:
         return self._get_prop("CellStyle")
 
     @CellStyle.setter
-    def CellStyle(self, value: Any) -> None:
+    def CellStyle(self, value: str) -> None:
         self._set_prop("CellStyle", value)
 
     @property
-    def CellBackColor(self) -> Any:
+    def CellBackColor(self) -> Color:
         return self._get_prop("CellBackColor")
 
     @CellBackColor.setter
-    def CellBackColor(self, value: Any) -> None:
+    def CellBackColor(self, value: Color) -> None:
         self._set_prop("CellBackColor", value)
 
     @property
@@ -138,35 +140,35 @@ class Cell(UnoObject):
         self._set_prop("IsTextWrapped", bool(value))
 
     @property
-    def ParaIndent(self) -> Any:
+    def ParaIndent(self) -> int:
         return self._get_prop("ParaIndent")
 
     @ParaIndent.setter
-    def ParaIndent(self, value: Any) -> None:
+    def ParaIndent(self, value: int) -> None:
         self._set_prop("ParaIndent", value)
 
     @property
-    def Orientation(self) -> Any:
+    def Orientation(self) -> CellOrientation:
         return self._get_prop("Orientation")
 
     @Orientation.setter
-    def Orientation(self, value: Any) -> None:
+    def Orientation(self, value: CellOrientation) -> None:
         self._set_prop("Orientation", value)
 
     @property
-    def RotateAngle(self) -> Any:
+    def RotateAngle(self) -> int:
         return self._get_prop("RotateAngle")
 
     @RotateAngle.setter
-    def RotateAngle(self, value: Any) -> None:
+    def RotateAngle(self, value: int) -> None:
         self._set_prop("RotateAngle", value)
 
     @property
-    def RotateReference(self) -> Any:
+    def RotateReference(self) -> int:
         return self._get_prop("RotateReference")
 
     @RotateReference.setter
-    def RotateReference(self, value: Any) -> None:
+    def RotateReference(self, value: int) -> None:
         self._set_prop("RotateReference", value)
 
     @property
@@ -218,27 +220,27 @@ class Cell(UnoObject):
         self._set_prop("RightBorder", value)
 
     @property
-    def NumberFormat(self) -> Any:
+    def NumberFormat(self) -> int:
         return self._get_prop("NumberFormat")
 
     @NumberFormat.setter
-    def NumberFormat(self, value: Any) -> None:
+    def NumberFormat(self, value: int) -> None:
         self._set_prop("NumberFormat", value)
 
     @property
-    def ShadowFormat(self) -> Any:
+    def ShadowFormat(self) -> ShadowFormat:
         return self._get_prop("ShadowFormat")
 
     @ShadowFormat.setter
-    def ShadowFormat(self, value: Any) -> None:
+    def ShadowFormat(self, value: ShadowFormat) -> None:
         self._set_prop("ShadowFormat", value)
 
     @property
-    def CellProtection(self) -> Any:
+    def CellProtection(self) -> CellProtection:
         return self._get_prop("CellProtection")
 
     @CellProtection.setter
-    def CellProtection(self, value: Any) -> None:
+    def CellProtection(self, value: CellProtection) -> None:
         self._set_prop("CellProtection", value)
 
     @property
@@ -250,19 +252,19 @@ class Cell(UnoObject):
         self._set_prop("UserDefinedAttributes", value)
 
     @property
-    def DiagonalTLBR(self) -> Any:
+    def DiagonalTLBR(self) -> BorderLine:
         return self._get_prop("DiagonalTLBR")
 
     @DiagonalTLBR.setter
-    def DiagonalTLBR(self, value: Any) -> None:
+    def DiagonalTLBR(self, value: BorderLine) -> None:
         self._set_prop("DiagonalTLBR", value)
 
     @property
-    def DiagonalBLTR(self) -> Any:
+    def DiagonalBLTR(self) -> BorderLine:
         return self._get_prop("DiagonalBLTR")
 
     @DiagonalBLTR.setter
-    def DiagonalBLTR(self, value: Any) -> None:
+    def DiagonalBLTR(self, value: BorderLine) -> None:
         self._set_prop("DiagonalBLTR", value)
 
     @property
@@ -314,19 +316,19 @@ class Cell(UnoObject):
         self._set_prop("RightBorder2", value)
 
     @property
-    def DiagonalTLBR2(self) -> Any:
+    def DiagonalTLBR2(self) -> RightBorder2:
         return self._get_prop("DiagonalTLBR2")
 
     @DiagonalTLBR2.setter
-    def DiagonalTLBR2(self, value: Any) -> None:
+    def DiagonalTLBR2(self, value: RightBorder2) -> None:
         self._set_prop("DiagonalTLBR2", value)
 
     @property
-    def DiagonalBLTR2(self) -> Any:
+    def DiagonalBLTR2(self) -> RightBorder2:
         return self._get_prop("DiagonalBLTR2")
 
     @DiagonalBLTR2.setter
-    def DiagonalBLTR2(self, value: Any) -> None:
+    def DiagonalBLTR2(self, value: RightBorder2) -> None:
         self._set_prop("DiagonalBLTR2", value)
 
     @property

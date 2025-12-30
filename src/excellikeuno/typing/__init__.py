@@ -1,8 +1,11 @@
 from .calc import (
+    Color,
     BorderLine,
     BorderLine2,
     CellHoriJustify,
+    CellOrientation,
     CellVertJustify,
+    ShadowLocation,
     LineDash,
     LineStyle,
     TableBorder,
@@ -32,17 +35,22 @@ from .structs import (
     TableBorder2Struct,
     TableBorderStruct,
     TableSortFieldStruct,
+    ShadowFormatStruct,
+    CellProtectionStruct,
 )
 
 __all__ = [
     "BorderLine",
     "BorderLine2",
     "CellHoriJustify",
+    "CellOrientation",
     "CellVertJustify",
+    "ShadowLocation",
     "LineDash",
     "LineStyle",
     "TableBorder",
     "TableBorder2",
+    "Color",
     "XCell",
     "XCellRange",
     "XTableColumns",
@@ -66,4 +74,6 @@ __all__ = [
     "TableBorderStruct",
     "TableBorder2Struct",
     "TableSortFieldStruct",
+    "ShadowFormatStruct",
+    "CellProtectionStruct",
 ]
