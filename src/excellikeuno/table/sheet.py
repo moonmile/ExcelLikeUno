@@ -5,9 +5,11 @@ from typing import Any, List, cast
 
 from ..core import UnoObject
 from ..drawing import Shape
-from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet
+from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
+from .columns import TableColumns
 from .range import Range
+from .rows import TableRows
 
 
 class Sheet(UnoObject):
@@ -159,3 +161,13 @@ class Sheet(UnoObject):
     def conditional_formats(self, value: Any) -> None:
         props = cast(XPropertySet, self.iface(InterfaceNames.X_PROPERTY_SET))
         props.setPropertyValue("ConditionalFormats", value)
+
+    @property
+    def rows(self) -> XTableRows:
+        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
+        return TableRows(sheet.getRows())
+
+    @property
+    def columns(self) -> XTableColumns:
+        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
+        return TableColumns(sheet.getColumns())

@@ -36,6 +36,12 @@ class XSpreadsheet(Protocol):
     def getCellRangeByPosition(self, start_column: int, start_row: int, end_column: int, end_row: int) -> Any:
         ...
 
+    def getRows(self) -> Any:
+        ...
+
+    def getColumns(self) -> Any:
+        ...
+
 
 @runtime_checkable
 class XCellRange(Protocol):
@@ -43,6 +49,36 @@ class XCellRange(Protocol):
         ...
 
     def getCellRangeByPosition(self, start_column: int, start_row: int, end_column: int, end_row: int) -> Any:
+        ...
+
+    def getRows(self) -> Any:
+        ...
+
+    def getColumns(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class XTableRows(Protocol):
+    def getCount(self) -> int:
+        ...
+
+    def insertByIndex(self, index: int, count: int) -> None:
+        ...
+
+    def removeByIndex(self, index: int, count: int) -> None:
+        ...
+
+
+@runtime_checkable
+class XTableColumns(Protocol):
+    def getCount(self) -> int:
+        ...
+
+    def insertByIndex(self, index: int, count: int) -> None:
+        ...
+
+    def removeByIndex(self, index: int, count: int) -> None:
         ...
 
 

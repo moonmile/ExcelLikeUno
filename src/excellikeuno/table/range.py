@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..core import UnoObject
-from ..typing import InterfaceNames, XCellRange
+from ..typing import InterfaceNames, XCellRange, XTableRows, XTableColumns
 from .cell import Cell
+from .columns import TableColumns
+from .rows import TableRows
 
 
 class Range(UnoObject):
@@ -21,6 +23,16 @@ class Range(UnoObject):
     # Convenience aliases matching spreadsheet terminology
     getCellByPosition = cell  # noqa: N815 - UNO-style alias
     getCellRangeByPosition = subrange  # noqa: N815 - UNO-style alias
+
+    @property
+    def rows(self) -> XTableRows:
+        rng = cast(XCellRange, self.iface(InterfaceNames.X_CELL_RANGE))
+        return TableRows(rng.getRows())
+
+    @property
+    def columns(self) -> XTableColumns:
+        rng = cast(XCellRange, self.iface(InterfaceNames.X_CELL_RANGE))
+        return TableColumns(rng.getColumns())
 
     def __iter__(self):
         # Iterate rows then columns by yielding Cell wrappers
