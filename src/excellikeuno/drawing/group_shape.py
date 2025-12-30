@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import List, cast
 
-from ..core import InterfaceNames, UnoObject
-from ..typing import XShapes
+from ..core import UnoObject
+from ..typing import InterfaceNames, XShapes
 from .shape import Shape
 
 

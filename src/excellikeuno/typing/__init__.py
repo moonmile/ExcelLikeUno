@@ -17,6 +17,19 @@ from .calc import (
     XSpreadsheet,
     XSpreadsheetDocument,
 )
+from .interfaces import InterfaceNames
+from .structs import (
+    BarCodeStruct,
+    BezierPointStruct,
+    BorderLine2Struct,
+    BorderLineStruct,
+    CellAddressStruct,
+    CellRangeAddressStruct,
+    PointStruct,
+    TableBorder2Struct,
+    TableBorderStruct,
+    TableSortFieldStruct,
+)
 
 __all__ = [
     "BorderLine",
@@ -36,4 +49,15 @@ __all__ = [
     "XPropertySet",
     "XSpreadsheet",
     "XSpreadsheetDocument",
+    "InterfaceNames",
+    "BorderLineStruct",
+    "BorderLine2Struct",
+    "BarCodeStruct",
+    "BezierPointStruct",
+    "CellAddressStruct",
+    "CellRangeAddressStruct",
+    "PointStruct",
+    "TableBorderStruct",
+    "TableBorder2Struct",
+    "TableSortFieldStruct",
 ]

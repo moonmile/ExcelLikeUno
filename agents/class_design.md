@@ -2,14 +2,40 @@
 
 ## 名前空間
 
-calc.Spreadsheet
-table.BorderLine
-table.BorderLine2
-table.LineStyle
-drawing.Shape
-drawing.ConnectorShape
-drawing.LineShape
-drawing.TextShape
++ core              ; LibreOffice UNO インターフェース定義
+    + CalcDocument    ; Calc 文書
+    + WriterDocument  ; Writer 文書
++ table             ; Calc 関係
+    - Cell
+    - Sheet
++ drawing           ; 図形関連
+    - Shape
+    - ConnectorShape
+    - RectangleShape
+    - EllipseShape
+    - LineShape
+    - TextShape
+    - ClosedBezierShape
+    - OpenBezierShape
+    - PolyLineShape
+    - PolyPolygonShape
+    - PolyPolygonBezierShape
+    - GroupShape
+    - CustomShape
+    - ControlShape
+    - MeasureShape
++ chart            ; グラフ関連
+    - Chart
++ typing            ; 型ヒント定義
+    - BorderLine
+    - BorderLine2
+    - Position
+    - Size
+    - Color
+    - LineStyle
+    - LineDash
+    - CellHoriJustify
+
 
 
 ## クラス図
@@ -17,10 +43,9 @@ drawing.TextShape
 ```mermaid
 classDiagram
 
-    class Document {
+    class CalcDocument {
         +Shapes: List[Shape]
         +Charts: List[Chart]
-        +PivodTables: List[PivotTable]  
     }
 
     class Sheet {

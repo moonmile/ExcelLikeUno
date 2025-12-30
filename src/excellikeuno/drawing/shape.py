@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from ..core import InterfaceNames, UnoObject
-from ..typing import LineDash, LineStyle, XPropertySet, XShape
+from ..core import UnoObject
+from ..typing import InterfaceNames, LineDash, LineStyle, XPropertySet, XShape
 
 
 class Shape(UnoObject):

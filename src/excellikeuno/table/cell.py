@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from ..core import InterfaceNames, UnoObject
+from ..core import UnoObject
 from ..typing import (
     BorderLine,
     BorderLine2,
     CellHoriJustify,
     CellVertJustify,
+    InterfaceNames,
     TableBorder,
     TableBorder2,
     XCell,

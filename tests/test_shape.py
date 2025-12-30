@@ -1,13 +1,13 @@
 import pytest
 
 from excellikeuno.connection import connect_calc
-from excellikeuno.calc import (
+from excellikeuno.drawing import (
     ConnectorShape,
-    LineShape,
-    RectangleShape,
     EllipseShape,
+    LineShape,
     PolyLineShape,
     PolyPolygonShape,
+    RectangleShape,
     TextShape,
 )
 

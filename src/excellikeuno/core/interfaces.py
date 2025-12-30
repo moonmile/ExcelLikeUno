@@ -1,15 +1,1 @@
-class InterfaceNames:
-    """String constants for common UNO interfaces used by Calc."""
-
-    X_CELL = "com.sun.star.table.XCell"
-    X_PROPERTY_SET = "com.sun.star.beans.XPropertySet"
-    X_NAMED = "com.sun.star.container.XNamed"
-    X_SPREADSHEET = "com.sun.star.sheet.XSpreadsheet"
-    X_SPREADSHEET_DOCUMENT = "com.sun.star.sheet.XSpreadsheetDocument"
-    X_DRAW_PAGE_SUPPLIER = "com.sun.star.drawing.XDrawPageSupplier"
-    X_SHAPE = "com.sun.star.drawing.XShape"
-    X_SHAPES = "com.sun.star.drawing.XShapes"
-    FILL_PROPERTIES = "com.sun.star.drawing.FillProperties"
-    LINE_PROPERTIES = "com.sun.star.drawing.LineProperties"
-    SHADOW_PROPERTIES = "com.sun.star.drawing.ShadowProperties"
-    TEXT_PROPERTIES = "com.sun.star.drawing.TextProperties"
+from ..typing import InterfaceNames

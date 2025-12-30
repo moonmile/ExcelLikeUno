@@ -1,10 +1,48 @@
-from .calc import Cell, Sheet
 from .connection import connect_calc, open_calc_document, wrap_sheet
-from .core import InterfaceNames, UnoObject
+from .core import UnoObject
+from .core.calc_document import Document
+from .typing import InterfaceNames
+from .drawing import (
+    ClosedBezierShape,
+    ConnectorShape,
+    ControlShape,
+    CustomShape,
+    EllipseShape,
+    GroupShape,
+    LineShape,
+    MeasureShape,
+    OpenBezierShape,
+    PageShape,
+    PolyLineShape,
+    PolyPolygonBezierShape,
+    PolyPolygonShape,
+    RectangleShape,
+    Shape,
+    TextShape,
+)
+from .table import Cell, CellProperties, Sheet
 
 __all__ = [
     "Cell",
+    "CellProperties",
     "Sheet",
+    "Shape",
+    "ConnectorShape",
+    "LineShape",
+    "RectangleShape",
+    "EllipseShape",
+    "PolyLineShape",
+    "PolyPolygonShape",
+    "PolyPolygonBezierShape",
+    "TextShape",
+    "ClosedBezierShape",
+    "ControlShape",
+    "CustomShape",
+    "GroupShape",
+    "MeasureShape",
+    "OpenBezierShape",
+    "PageShape",
+    "Document",
     "connect_calc",
     "open_calc_document",
     "wrap_sheet",

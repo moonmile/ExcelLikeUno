@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from typing import Any, Tuple
-from ..calc import Sheet, Document
-from ..core import InterfaceNames, UnoObject
+from ..core import UnoObject
+from ..core.calc_document import Document
+from ..typing import InterfaceNames
+from ..table import Sheet
 
 
 def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:

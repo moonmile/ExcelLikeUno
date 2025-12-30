@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Any, List, cast
 
-from ..core import InterfaceNames, UnoObject
-from ..typing import XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet
+from ..core import UnoObject
+from ..drawing import Shape
+from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet
 from .cell import Cell
-from .shape import Shape
 
 
 class Sheet(UnoObject):

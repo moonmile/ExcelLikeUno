@@ -1,11 +1,11 @@
 # Copilot Instructions
 
 - Purpose: wrap LibreOffice Calc UNO API with Excel/VBA-like Python classes so migration from Excel macros is easy; see [README.md](README.md#L1-L3).
-- Architecture intent: every Calc concept is a class built on a shared UNO-wrapper base; see [agents/設計方針.md](agents/%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D.md#L1-L52).
-- Base pattern: subclass a cached-interface holder like `UnoObject.iface(name)` to query and memoize UNO interfaces; mirror the example in [agents/設計方針.md](agents/%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D.md#L15-L27).
-- Cell wrapper expectations: expose properties `value`, `formula`, and `props` that delegate to `com.sun.star.table.XCell` or `com.sun.star.beans.XPropertySet`; keep setter/getter symmetry shown in [agents/設計方針.md](agents/%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D.md#L29-L52).
-- Usage style goal: enable simple flows like creating a sheet handle then `sheet.cell(1, 0).value = 200`; example in [agents/設計方針.md](agents/%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D.md#L54-L70).
-- Planned layout: see [agents/フォルダー構成.md](agents/%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80%E3%83%BC%E6%A7%8B%E6%88%90.md#L1-L18); modules are stubbed today (core, calc, connection, typing, utils) and should be populated following that map.
+- Architecture intent: every Calc concept is a class built on a shared UNO-wrapper base; see [agents/design_guidelines.md](agents/design_guidelines.md#L1-L52).
+- Base pattern: subclass a cached-interface holder like `UnoObject.iface(name)` to query and memoize UNO interfaces; mirror the example in [agents/design_guidelines.md](agents/design_guidelines.md#L15-L27).
+- Cell wrapper expectations: expose properties `value`, `formula`, and `props` that delegate to `com.sun.star.table.XCell` or `com.sun.star.beans.XPropertySet`; keep setter/getter symmetry shown in [agents/design_guidelines.md](agents/design_guidelines.md#L29-L52).
+- Usage style goal: enable simple flows like creating a sheet handle then `sheet.cell(1, 0).value = 200`; example in [agents/design_guidelines.md](agents/design_guidelines.md#L54-L70).
+- Planned layout: see [agents/folder_structure.md](agents/folder_structure.md#L1-L18); modules are stubbed today (core, calc, connection, typing, utils) and should be populated following that map.
 - Module boundaries to keep: `core` for the base UNO wrapper and shared helpers; `calc` for sheet/range/cell domain objects; `connection` for bootstrap/desktop/document wiring; `typing` for Protocol-based IDE-friendly hints; `utils` for small cross-cutting helpers.
 - Interface naming: prefer constants/enums for UNO interface strings (per design doc) to get IDE completion and reduce typos.
 - Type hints: define `Protocol` classes for UNO interfaces to make wrapped attributes discoverable; avoid raw `Any` when you can map to UNO surfaces.
@@ -13,9 +13,9 @@
 - UNO reference docs live at [agents/tasks.md](agents/tasks.md#L1-L11); local SDK docs path `C:\Program Files\LibreOffice\sdk\docs\`.
 - Testing: `tests/` is empty; add pytest cases that exercise wrappers against a LibreOffice instance (may need headless mode or a mocked UNO bridge) and wire them to the task above.
 - Coding style: stick to ASCII unless UNO names require otherwise; keep comments brief and only when intent is non-obvious.
-- Japanese docs: Calc operation spec [agents/操作仕様書.md](agents/%E6%93%8D%E4%BD%9C%E4%BB%95%E6%A7%98%E6%9B%B8.md) and naming rules [agents/命名規約.md](agents/%E5%91%BD%E5%90%8D%E8%A6%8F%E7%B4%84.md) are stubs—populate them instead of inventing ad-hoc rules in code.
+- Japanese docs: Calc operation spec [agents/operation_spec.md](agents/operation_spec.md) and naming rules [agents/naming_rules.md](agents/naming_rules.md) are stubs—populate them instead of inventing ad-hoc rules in code.
 - Preferred contribution order: design the UNO surface in `typing` → implement the base in `core` → add Calc domain wrappers in `calc` → wire connection/bootstrap utilities in `connection` → add user-facing helpers in `utils` → cover with pytest.
 - External deps: rely on LibreOffice UNO runtime; avoid pulling heavy third-party libs unless necessary for UNO interop.
 - Cross-platform note: paths in docs are Windows-centric; if supporting other OSes, gate path handling and document it.
-- When adding examples in docs or tests, mirror the VBA-like style (`sheet.cell(col, row)`) shown in [agents/設計方針.md](agents/%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D.md#L54-L70).
+- When adding examples in docs or tests, mirror the VBA-like style (`sheet.cell(col, row)`) shown in [agents/design_guidelines.md](agents/design_guidelines.md#L54-L70).
 - Keep repository docs in `agents/` as the single source of truth; update them alongside code changes so future agents can follow the same patterns.
