@@ -33,6 +33,18 @@ class XSpreadsheet(Protocol):
     def getCellByPosition(self, column: int, row: int) -> Any:
         ...
 
+    def getCellRangeByPosition(self, start_column: int, start_row: int, end_column: int, end_row: int) -> Any:
+        ...
+
+
+@runtime_checkable
+class XCellRange(Protocol):
+    def getCellByPosition(self, column: int, row: int) -> Any:
+        ...
+
+    def getCellRangeByPosition(self, start_column: int, start_row: int, end_column: int, end_row: int) -> Any:
+        ...
+
 
 @runtime_checkable
 class XDrawPage(Protocol):

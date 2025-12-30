@@ -358,6 +358,16 @@ class Cell(UnoObject):
         cell.setFormula(formula)
 
     @property
+    def text(self) -> str:
+        cell = cast(XCell, self.iface(InterfaceNames.X_CELL))
+        return cell.getFormula()
+
+    @text.setter
+    def text(self, text: str) -> None:
+        cell = cast(XCell, self.iface(InterfaceNames.X_CELL))
+        cell.setFormula(text)
+
+    @property
     def props(self) -> CellProperties:
         return self.properties
 

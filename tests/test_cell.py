@@ -48,3 +48,24 @@ def test_cellproperties_attribute_access():
         assert cell.CellBackColor == new_color
     finally:
         cell.CellBackColor = original_color
+
+
+def test_cell_a1_alias():
+    _, _, sheet = _connect_or_skip()
+    a1 = sheet.cell("A1")
+    zero_zero = sheet.cell(0, 0)
+    a1.value = 99.0
+    try:
+        assert a1.value == zero_zero.value == 99.0
+    finally:
+        a1.value = 0.0
+
+
+def test_cell_a1_with_dollar():
+    _, _, sheet = _connect_or_skip()
+    b3 = sheet.cell("$B$3")
+    b3.text = "hello"
+    try:
+        assert b3.text == "hello"
+    finally:
+        b3.text = ""

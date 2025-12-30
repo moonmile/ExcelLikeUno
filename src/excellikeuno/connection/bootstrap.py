@@ -16,16 +16,38 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
 
     try:
         import uno
+        import unohelper
         from com.sun.star.beans import PropertyValue
     except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
         raise RuntimeError("UNO runtime is not available") from exc
 
-    ctx = uno.getComponentContext()
+    ctx = None
+    boot_exc = None
+    try:
+        # bootstrap spins up a LibreOffice instance and returns a live component context
+        ctx = unohelper.Bootstrap.bootstrap()
+    except Exception as exc:  # pragma: no cover - defensive guard
+        boot_exc = exc
+
+    if ctx is None:
+        try:
+            # fallback: connect to an already-running soffice accepting sockets
+            local_ctx = uno.getComponentContext()
+            resolver = local_ctx.ServiceManager.createInstanceWithContext(
+                "com.sun.star.bridge.UnoUrlResolver", local_ctx)
+            ctx = resolver.resolve(
+                "uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+        except Exception:
+            pass
+
+    if ctx is None:  # pragma: no cover - depends on runtime
+        raise RuntimeError("Failed to bootstrap or connect to LibreOffice UNO") from boot_exc
+
     smgr = ctx.getServiceManager()
     desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
 
     url = uno.systemPathToFileUrl(path)
-    properties = tuple([PropertyValue("Hidden", 0, True, 0)])
+    properties = (PropertyValue("Hidden", 0, True, 0),)
     document = desktop.loadComponentFromURL(url, "_blank", 0, properties)
 
     doc_wrapper = UnoObject(document)
