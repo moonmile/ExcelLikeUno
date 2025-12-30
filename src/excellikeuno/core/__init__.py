@@ -1,5 +1,5 @@
 from .base import UnoObject
 from ..typing import InterfaceNames
-from .calc_document import Document
+from .calc_document import CalcDocument
 
-__all__ = ["UnoObject", "InterfaceNames", "Document"]
+__all__ = ["UnoObject", "InterfaceNames", "CalcDocument"]

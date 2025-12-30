@@ -1,4 +1,5 @@
-from .cell import Cell, CellProperties
+from .cell import Cell
+from .cell_properties import CellProperties
 from .columns import TableColumns
 from .range import Range
 from .rows import TableRows

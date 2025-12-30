@@ -1,6 +1,6 @@
 from .connection import connect_calc, open_calc_document, wrap_sheet
 from .core import UnoObject
-from .core.calc_document import Document
+from .core.calc_document import CalcDocument
 from .typing import InterfaceNames
 from .drawing import (
     ClosedBezierShape,
@@ -42,7 +42,7 @@ __all__ = [
     "MeasureShape",
     "OpenBezierShape",
     "PageShape",
-    "Document",
+    "CalcDocument",
     "connect_calc",
     "open_calc_document",
     "wrap_sheet",

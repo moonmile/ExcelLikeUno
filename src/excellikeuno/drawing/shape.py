@@ -4,6 +4,10 @@ from typing import Any, cast
 
 from ..core import UnoObject
 from ..typing import InterfaceNames, LineDash, LineStyle, XPropertySet, XShape
+from .fill_properties import FillProperties
+from .line_properties import LineProperties
+from .shadow_properties import ShadowProperties
+from .text_properties import TextProperties
 
 
 class Shape(UnoObject):
@@ -18,22 +22,22 @@ class Shape(UnoObject):
         props.setPropertyValue(name, value)
 
     @property
-    def position(self) -> Any:
+    def Position(self) -> Any:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         return shape.getPosition()
 
-    @position.setter
-    def position(self, value: Any) -> None:
+    @Position.setter
+    def Position(self, value: Any) -> None:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         shape.setPosition(value)
 
     @property
-    def size(self) -> Any:
+    def Size(self) -> Any:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         return shape.getSize()
 
-    @size.setter
-    def size(self, value: Any) -> None:
+    @Size.setter
+    def Size(self, value: Any) -> None:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         shape.setSize(value)
 
@@ -42,634 +46,650 @@ class Shape(UnoObject):
         return cast(XPropertySet, self.iface(InterfaceNames.X_PROPERTY_SET))
 
     @property
-    def fill_properties(self) -> XPropertySet:
-        return cast(XPropertySet, self.iface(InterfaceNames.FILL_PROPERTIES))
+    def fill_properties(self) -> FillProperties:
+        existing = self.__dict__.get("_fill_properties")
+        if existing is None:
+            existing = FillProperties(self.iface(InterfaceNames.FILL_PROPERTIES))
+            object.__setattr__(self, "_fill_properties", existing)
+        return cast(FillProperties, existing)
 
     @property
-    def line_properties(self) -> XPropertySet:
-        return cast(XPropertySet, self.iface(InterfaceNames.LINE_PROPERTIES))
+    def line_properties(self) -> LineProperties:
+        existing = self.__dict__.get("_line_properties")
+        if existing is None:
+            existing = LineProperties(self.iface(InterfaceNames.LINE_PROPERTIES))
+            object.__setattr__(self, "_line_properties", existing)
+        return cast(LineProperties, existing)
 
     @property
-    def shadow_properties(self) -> XPropertySet:
-        return cast(XPropertySet, self.iface(InterfaceNames.SHADOW_PROPERTIES))
+    def shadow_properties(self) -> ShadowProperties:
+        existing = self.__dict__.get("_shadow_properties")
+        if existing is None:
+            existing = ShadowProperties(self.iface(InterfaceNames.SHADOW_PROPERTIES))
+            object.__setattr__(self, "_shadow_properties", existing)
+        return cast(ShadowProperties, existing)
 
     @property
-    def text_properties(self) -> XPropertySet:
-        return cast(XPropertySet, self.iface(InterfaceNames.TEXT_PROPERTIES))
+    def text_properties(self) -> TextProperties:
+        existing = self.__dict__.get("_text_properties")
+        if existing is None:
+            existing = TextProperties(self.iface(InterfaceNames.TEXT_PROPERTIES))
+            object.__setattr__(self, "_text_properties", existing)
+        return cast(TextProperties, existing)
 
     @property
-    def is_numbering(self) -> bool:
-        return bool(self._get_prop("IsNumbering"))
+    def IsNumbering(self) -> bool:
+        return bool(self.text_properties.IsNumbering)
 
-    @is_numbering.setter
-    def is_numbering(self, value: bool) -> None:
-        self._set_prop("IsNumbering", bool(value))
-
-    @property
-    def text_auto_grow_height(self) -> bool:
-        return bool(self._get_prop("TextAutoGrowHeight"))
-
-    @text_auto_grow_height.setter
-    def text_auto_grow_height(self, value: bool) -> None:
-        self._set_prop("TextAutoGrowHeight", bool(value))
+    @IsNumbering.setter
+    def IsNumbering(self, value: bool) -> None:
+        self.text_properties.IsNumbering = bool(value)
 
     @property
-    def text_auto_grow_width(self) -> bool:
-        return bool(self._get_prop("TextAutoGrowWidth"))
+    def TextAutoGrowHeight(self) -> bool:
+        return bool(self.text_properties.TextAutoGrowHeight)
 
-    @text_auto_grow_width.setter
-    def text_auto_grow_width(self, value: bool) -> None:
-        self._set_prop("TextAutoGrowWidth", bool(value))
-
-    @property
-    def text_left_distance(self) -> int:
-        return int(self._get_prop("TextLeftDistance"))
-
-    @text_left_distance.setter
-    def text_left_distance(self, value: int) -> None:
-        self._set_prop("TextLeftDistance", int(value))
+    @TextAutoGrowHeight.setter
+    def TextAutoGrowHeight(self, value: bool) -> None:
+        self.text_properties.TextAutoGrowHeight = bool(value)
 
     @property
-    def text_right_distance(self) -> int:
-        return int(self._get_prop("TextRightDistance"))
+    def TextAutoGrowWidth(self) -> bool:
+        return bool(self.text_properties.TextAutoGrowWidth)
 
-    @text_right_distance.setter
-    def text_right_distance(self, value: int) -> None:
-        self._set_prop("TextRightDistance", int(value))
-
-    @property
-    def text_upper_distance(self) -> int:
-        return int(self._get_prop("TextUpperDistance"))
-
-    @text_upper_distance.setter
-    def text_upper_distance(self, value: int) -> None:
-        self._set_prop("TextUpperDistance", int(value))
+    @TextAutoGrowWidth.setter
+    def TextAutoGrowWidth(self, value: bool) -> None:
+        self.text_properties.TextAutoGrowWidth = bool(value)
 
     @property
-    def text_lower_distance(self) -> int:
-        return int(self._get_prop("TextLowerDistance"))
+    def TextLeftDistance(self) -> int:
+        return int(self.text_properties.TextLeftDistance)
 
-    @text_lower_distance.setter
-    def text_lower_distance(self, value: int) -> None:
-        self._set_prop("TextLowerDistance", int(value))
-
-    @property
-    def line_color(self) -> int:
-        return int(self._get_prop("LineColor"))
-
-    @line_color.setter
-    def line_color(self, value: int) -> None:
-        self._set_prop("LineColor", int(value))
+    @TextLeftDistance.setter
+    def TextLeftDistance(self, value: int) -> None:
+        self.text_properties.TextLeftDistance = int(value)
 
     @property
-    def line_style(self) -> LineStyle:
-        return LineStyle(int(self._get_prop("LineStyle")))
+    def TextRightDistance(self) -> int:
+        return int(self.text_properties.TextRightDistance)
 
-    @line_style.setter
-    def line_style(self, value: LineStyle | int) -> None:
-        self._set_prop("LineStyle", int(value))
-
-    @property
-    def line_width(self) -> int:
-        return int(self._get_prop("LineWidth"))
-
-    @line_width.setter
-    def line_width(self, value: int) -> None:
-        self._set_prop("LineWidth", int(value))
+    @TextRightDistance.setter
+    def TextRightDistance(self, value: int) -> None:
+        self.text_properties.TextRightDistance = int(value)
 
     @property
-    def line_transparence(self) -> int:
-        return int(self._get_prop("LineTransparence"))
+    def TextUpperDistance(self) -> int:
+        return int(self.text_properties.TextUpperDistance)
 
-    @line_transparence.setter
-    def line_transparence(self, value: int) -> None:
-        self._set_prop("LineTransparence", int(value))
-
-    @property
-    def line_dash_name(self) -> str:
-        return cast(str, self._get_prop("LineDashName"))
-
-    @line_dash_name.setter
-    def line_dash_name(self, value: str) -> None:
-        self._set_prop("LineDashName", value)
+    @TextUpperDistance.setter
+    def TextUpperDistance(self, value: int) -> None:
+        self.text_properties.TextUpperDistance = int(value)
 
     @property
-    def line_dash(self) -> LineDash:
-        return cast(LineDash, self._get_prop("LineDash"))
+    def TextLowerDistance(self) -> int:
+        return int(self.text_properties.TextLowerDistance)
 
-    @line_dash.setter
-    def line_dash(self, value: LineDash) -> None:
-        self._set_prop("LineDash", value)
-
-    @property
-    def shadow(self) -> bool:
-        return bool(self._get_prop("Shadow"))
-
-    @shadow.setter
-    def shadow(self, value: bool) -> None:
-        self._set_prop("Shadow", bool(value))
+    @TextLowerDistance.setter
+    def TextLowerDistance(self, value: int) -> None:
+        self.text_properties.TextLowerDistance = int(value)
 
     @property
-    def shadow_color(self) -> int:
-        return int(self._get_prop("ShadowColor"))
+    def LineColor(self) -> int:
+        return int(self.line_properties.LineColor)
 
-    @shadow_color.setter
-    def shadow_color(self, value: int) -> None:
-        self._set_prop("ShadowColor", int(value))
-
-    @property
-    def shadow_transparence(self) -> int:
-        return int(self._get_prop("ShadowTransparence"))
-
-    @shadow_transparence.setter
-    def shadow_transparence(self, value: int) -> None:
-        self._set_prop("ShadowTransparence", int(value))
+    @LineColor.setter
+    def LineColor(self, value: int) -> None:
+        self.line_properties.LineColor = int(value)
 
     @property
-    def shadow_x_distance(self) -> int:
-        return int(self._get_prop("ShadowXDistance"))
+    def LineStyle(self) -> LineStyle:
+        return LineStyle(int(self.line_properties.LineStyle))
 
-    @shadow_x_distance.setter
-    def shadow_x_distance(self, value: int) -> None:
-        self._set_prop("ShadowXDistance", int(value))
-
-    @property
-    def shadow_y_distance(self) -> int:
-        return int(self._get_prop("ShadowYDistance"))
-
-    @shadow_y_distance.setter
-    def shadow_y_distance(self, value: int) -> None:
-        self._set_prop("ShadowYDistance", int(value))
+    @LineStyle.setter
+    def LineStyle(self, value: LineStyle | int) -> None:
+        self.line_properties.LineStyle = int(value)
 
     @property
-    def fill_color(self) -> int:
-        return int(self._get_prop("FillColor"))
+    def LineWidth(self) -> int:
+        return int(self.line_properties.LineWidth)
 
-    @fill_color.setter
-    def fill_color(self, value: int) -> None:
-        self._set_prop("FillColor", int(value))
-
-    @property
-    def fill_style(self) -> Any:
-        return self._get_prop("FillStyle")
-
-    @fill_style.setter
-    def fill_style(self, value: Any) -> None:
-        self._set_prop("FillStyle", value)
+    @LineWidth.setter
+    def LineWidth(self, value: int) -> None:
+        self.line_properties.LineWidth = int(value)
 
     @property
-    def fill_transparence(self) -> int:
-        return int(self._get_prop("FillTransparence"))
+    def LineTransparence(self) -> int:
+        return int(self.line_properties.LineTransparence)
 
-    @fill_transparence.setter
-    def fill_transparence(self, value: int) -> None:
-        self._set_prop("FillTransparence", int(value))
-
-    @property
-    def fill_gradient_name(self) -> str:
-        return cast(str, self._get_prop("FillGradientName"))
-
-    @fill_gradient_name.setter
-    def fill_gradient_name(self, value: str) -> None:
-        self._set_prop("FillGradientName", value)
+    @LineTransparence.setter
+    def LineTransparence(self, value: int) -> None:
+        self.line_properties.LineTransparence = int(value)
 
     @property
-    def fill_hatch_name(self) -> str:
-        return cast(str, self._get_prop("FillHatchName"))
+    def LineDashName(self) -> str:
+        return cast(str, self.line_properties.LineDashName)
 
-    @fill_hatch_name.setter
-    def fill_hatch_name(self, value: str) -> None:
-        self._set_prop("FillHatchName", value)
-
-    @property
-    def fill_bitmap_name(self) -> str:
-        return cast(str, self._get_prop("FillBitmapName"))
-
-    @fill_bitmap_name.setter
-    def fill_bitmap_name(self, value: str) -> None:
-        self._set_prop("FillBitmapName", value)
+    @LineDashName.setter
+    def LineDashName(self, value: str) -> None:
+        self.line_properties.LineDashName = value
 
     @property
-    def fill_bitmap_mode(self) -> int:
-        return int(self._get_prop("FillBitmapMode"))
+    def LineDash(self) -> LineDash:
+        return cast(LineDash, self.line_properties.LineDash)
 
-    @fill_bitmap_mode.setter
-    def fill_bitmap_mode(self, value: int) -> None:
-        self._set_prop("FillBitmapMode", int(value))
-
-    @property
-    def fill_bitmap_offset_x(self) -> int:
-        return int(self._get_prop("FillBitmapOffsetX"))
-
-    @fill_bitmap_offset_x.setter
-    def fill_bitmap_offset_x(self, value: int) -> None:
-        self._set_prop("FillBitmapOffsetX", int(value))
+    @LineDash.setter
+    def LineDash(self, value: LineDash) -> None:
+        self.line_properties.LineDash = value
 
     @property
-    def fill_bitmap_offset_y(self) -> int:
-        return int(self._get_prop("FillBitmapOffsetY"))
+    def Shadow(self) -> bool:
+        return bool(self.shadow_properties.Shadow)
 
-    @fill_bitmap_offset_y.setter
-    def fill_bitmap_offset_y(self, value: int) -> None:
-        self._set_prop("FillBitmapOffsetY", int(value))
-
-    @property
-    def fill_bitmap_position_x(self) -> int:
-        return int(self._get_prop("FillBitmapPositionX"))
-
-    @fill_bitmap_position_x.setter
-    def fill_bitmap_position_x(self, value: int) -> None:
-        self._set_prop("FillBitmapPositionX", int(value))
+    @Shadow.setter
+    def Shadow(self, value: bool) -> None:
+        self.shadow_properties.Shadow = bool(value)
 
     @property
-    def fill_bitmap_position_y(self) -> int:
-        return int(self._get_prop("FillBitmapPositionY"))
+    def ShadowColor(self) -> int:
+        return int(self.shadow_properties.ShadowColor)
 
-    @fill_bitmap_position_y.setter
-    def fill_bitmap_position_y(self, value: int) -> None:
-        self._set_prop("FillBitmapPositionY", int(value))
-
-    @property
-    def fill_bitmap_size_x(self) -> int:
-        return int(self._get_prop("FillBitmapSizeX"))
-
-    @fill_bitmap_size_x.setter
-    def fill_bitmap_size_x(self, value: int) -> None:
-        self._set_prop("FillBitmapSizeX", int(value))
+    @ShadowColor.setter
+    def ShadowColor(self, value: int) -> None:
+        self.shadow_properties.ShadowColor = int(value)
 
     @property
-    def fill_bitmap_size_y(self) -> int:
-        return int(self._get_prop("FillBitmapSizeY"))
+    def ShadowTransparence(self) -> int:
+        return int(self.shadow_properties.ShadowTransparence)
 
-    @fill_bitmap_size_y.setter
-    def fill_bitmap_size_y(self, value: int) -> None:
-        self._set_prop("FillBitmapSizeY", int(value))
+    @ShadowTransparence.setter
+    def ShadowTransparence(self, value: int) -> None:
+        self.shadow_properties.ShadowTransparence = int(value)
 
     @property
-    def fill_background(self) -> bool:
-        return bool(self._get_prop("FillBackground"))
+    def ShadowXDistance(self) -> int:
+        return int(self.shadow_properties.ShadowXDistance)
 
-    @fill_background.setter
-    def fill_background(self, value: bool) -> None:
-        self._set_prop("FillBackground", bool(value))
+    @ShadowXDistance.setter
+    def ShadowXDistance(self, value: int) -> None:
+        self.shadow_properties.ShadowXDistance = int(value)
+
+    @property
+    def ShadowYDistance(self) -> int:
+        return int(self.shadow_properties.ShadowYDistance)
+
+    @ShadowYDistance.setter
+    def ShadowYDistance(self, value: int) -> None:
+        self.shadow_properties.ShadowYDistance = int(value)
+
+    @property
+    def FillColor(self) -> int:
+        return int(self.fill_properties.FillColor)
+
+    @FillColor.setter
+    def FillColor(self, value: int) -> None:
+        self.fill_properties.FillColor = int(value)
+
+    @property
+    def FillStyle(self) -> Any:
+        return self.fill_properties.FillStyle
+
+    @FillStyle.setter
+    def FillStyle(self, value: Any) -> None:
+        self.fill_properties.FillStyle = value
+
+    @property
+    def FillTransparence(self) -> int:
+        return int(self.fill_properties.FillTransparence)
+
+    @FillTransparence.setter
+    def FillTransparence(self, value: int) -> None:
+        self.fill_properties.FillTransparence = int(value)
+
+    @property
+    def FillGradientName(self) -> str:
+        return cast(str, self.fill_properties.FillGradientName)
+
+    @FillGradientName.setter
+    def FillGradientName(self, value: str) -> None:
+        self.fill_properties.FillGradientName = value
+
+    @property
+    def FillHatchName(self) -> str:
+        return cast(str, self.fill_properties.FillHatchName)
+
+    @FillHatchName.setter
+    def FillHatchName(self, value: str) -> None:
+        self.fill_properties.FillHatchName = value
+
+    @property
+    def FillBitmapName(self) -> str:
+        return cast(str, self.fill_properties.FillBitmapName)
+
+    @FillBitmapName.setter
+    def FillBitmapName(self, value: str) -> None:
+        self.fill_properties.FillBitmapName = value
+
+    @property
+    def FillBitmapMode(self) -> int:
+        return int(self.fill_properties.FillBitmapMode)
+
+    @FillBitmapMode.setter
+    def FillBitmapMode(self, value: int) -> None:
+        self.fill_properties.FillBitmapMode = int(value)
+
+    @property
+    def FillBitmapOffsetX(self) -> int:
+        return int(self.fill_properties.FillBitmapOffsetX)
+
+    @FillBitmapOffsetX.setter
+    def FillBitmapOffsetX(self, value: int) -> None:
+        self.fill_properties.FillBitmapOffsetX = int(value)
+
+    @property
+    def FillBitmapOffsetY(self) -> int:
+        return int(self.fill_properties.FillBitmapOffsetY)
+
+    @FillBitmapOffsetY.setter
+    def FillBitmapOffsetY(self, value: int) -> None:
+        self.fill_properties.FillBitmapOffsetY = int(value)
+
+    @property
+    def FillBitmapPositionX(self) -> int:
+        return int(self.fill_properties.FillBitmapPositionX)
+
+    @FillBitmapPositionX.setter
+    def FillBitmapPositionX(self, value: int) -> None:
+        self.fill_properties.FillBitmapPositionX = int(value)
+
+    @property
+    def FillBitmapPositionY(self) -> int:
+        return int(self.fill_properties.FillBitmapPositionY)
+
+    @FillBitmapPositionY.setter
+    def FillBitmapPositionY(self, value: int) -> None:
+        self.fill_properties.FillBitmapPositionY = int(value)
+
+    @property
+    def FillBitmapSizeX(self) -> int:
+        return int(self.fill_properties.FillBitmapSizeX)
+
+    @FillBitmapSizeX.setter
+    def FillBitmapSizeX(self, value: int) -> None:
+        self.fill_properties.FillBitmapSizeX = int(value)
+
+    @property
+    def FillBitmapSizeY(self) -> int:
+        return int(self.fill_properties.FillBitmapSizeY)
+
+    @FillBitmapSizeY.setter
+    def FillBitmapSizeY(self, value: int) -> None:
+        self.fill_properties.FillBitmapSizeY = int(value)
+
+    @property
+    def FillBackground(self) -> bool:
+        return bool(self.fill_properties.FillBackground)
+
+    @FillBackground.setter
+    def FillBackground(self, value: bool) -> None:
+        self.fill_properties.FillBackground = bool(value)
 
     # Common Shape properties
     @property
-    def name(self) -> str:
+    def Name(self) -> str:
         return cast(str, self._get_prop("Name"))
 
-    @name.setter
-    def name(self, value: str) -> None:
+    @Name.setter
+    def Name(self, value: str) -> None:
         self._set_prop("Name", value)
 
     @property
-    def title(self) -> str:
+    def Title(self) -> str:
         return cast(str, self._get_prop("Title"))
 
-    @title.setter
-    def title(self, value: str) -> None:
+    @Title.setter
+    def Title(self, value: str) -> None:
         self._set_prop("Title", value)
 
     @property
-    def description(self) -> str:
+    def Description(self) -> str:
         return cast(str, self._get_prop("Description"))
 
-    @description.setter
-    def description(self, value: str) -> None:
+    @Description.setter
+    def Description(self, value: str) -> None:
         self._set_prop("Description", value)
 
     @property
-    def visible(self) -> bool:
+    def Visible(self) -> bool:
         return bool(self._get_prop("Visible"))
 
-    @visible.setter
-    def visible(self, value: bool) -> None:
+    @Visible.setter
+    def Visible(self, value: bool) -> None:
         self._set_prop("Visible", bool(value))
 
     @property
-    def printable(self) -> bool:
+    def Printable(self) -> bool:
         return bool(self._get_prop("Printable"))
 
-    @printable.setter
-    def printable(self, value: bool) -> None:
+    @Printable.setter
+    def Printable(self, value: bool) -> None:
         self._set_prop("Printable", bool(value))
 
     @property
-    def move_protect(self) -> bool:
+    def MoveProtect(self) -> bool:
         return bool(self._get_prop("MoveProtect"))
 
-    @move_protect.setter
-    def move_protect(self, value: bool) -> None:
+    @MoveProtect.setter
+    def MoveProtect(self, value: bool) -> None:
         self._set_prop("MoveProtect", bool(value))
 
     @property
-    def size_protect(self) -> bool:
+    def SizeProtect(self) -> bool:
         return bool(self._get_prop("SizeProtect"))
 
-    @size_protect.setter
-    def size_protect(self, value: bool) -> None:
+    @SizeProtect.setter
+    def SizeProtect(self, value: bool) -> None:
         self._set_prop("SizeProtect", bool(value))
 
     @property
-    def z_order(self) -> int:
+    def ZOrder(self) -> int:
         return int(self._get_prop("ZOrder"))
 
-    @z_order.setter
-    def z_order(self, value: int) -> None:
+    @ZOrder.setter
+    def ZOrder(self, value: int) -> None:
         self._set_prop("ZOrder", int(value))
 
     @property
-    def layer_id(self) -> int:
+    def LayerID(self) -> int:
         return int(self._get_prop("LayerID"))
 
-    @layer_id.setter
-    def layer_id(self, value: int) -> None:
+    @LayerID.setter
+    def LayerID(self, value: int) -> None:
         self._set_prop("LayerID", int(value))
 
     @property
-    def layer_name(self) -> str:
+    def LayerName(self) -> str:
         return cast(str, self._get_prop("LayerName"))
 
-    @layer_name.setter
-    def layer_name(self, value: str) -> None:
+    @LayerName.setter
+    def LayerName(self, value: str) -> None:
         self._set_prop("LayerName", value)
 
     @property
-    def hyperlink(self) -> str:
+    def Hyperlink(self) -> str:
         return cast(str, self._get_prop("Hyperlink"))
 
-    @hyperlink.setter
-    def hyperlink(self, value: str) -> None:
+    @Hyperlink.setter
+    def Hyperlink(self, value: str) -> None:
         self._set_prop("Hyperlink", value)
 
     @property
-    def navigation_order(self) -> int:
+    def NavigationOrder(self) -> int:
         return int(self._get_prop("NavigationOrder"))
 
-    @navigation_order.setter
-    def navigation_order(self, value: int) -> None:
+    @NavigationOrder.setter
+    def NavigationOrder(self, value: int) -> None:
         self._set_prop("NavigationOrder", int(value))
 
     @property
-    def style(self) -> Any:
+    def Style(self) -> Any:
         return self._get_prop("Style")
 
-    @style.setter
-    def style(self, value: Any) -> None:
+    @Style.setter
+    def Style(self, value: Any) -> None:
         self._set_prop("Style", value)
 
     @property
-    def transformation(self) -> Any:
+    def Transformation(self) -> Any:
         return self._get_prop("Transformation")
 
-    @transformation.setter
-    def transformation(self, value: Any) -> None:
+    @Transformation.setter
+    def Transformation(self, value: Any) -> None:
         self._set_prop("Transformation", value)
 
     @property
-    def shape_user_defined_attributes(self) -> Any:
+    def ShapeUserDefinedAttributes(self) -> Any:
         return self._get_prop("ShapeUserDefinedAttributes")
 
-    @shape_user_defined_attributes.setter
-    def shape_user_defined_attributes(self, value: Any) -> None:
+    @ShapeUserDefinedAttributes.setter
+    def ShapeUserDefinedAttributes(self, value: Any) -> None:
         self._set_prop("ShapeUserDefinedAttributes", value)
 
     @property
-    def relative_height(self) -> int:
+    def RelativeHeight(self) -> int:
         return int(self._get_prop("RelativeHeight"))
 
-    @relative_height.setter
-    def relative_height(self, value: int) -> None:
+    @RelativeHeight.setter
+    def RelativeHeight(self, value: int) -> None:
         self._set_prop("RelativeHeight", int(value))
 
     @property
-    def relative_width(self) -> int:
+    def RelativeWidth(self) -> int:
         return int(self._get_prop("RelativeWidth"))
 
-    @relative_width.setter
-    def relative_width(self, value: int) -> None:
+    @RelativeWidth.setter
+    def RelativeWidth(self, value: int) -> None:
         self._set_prop("RelativeWidth", int(value))
 
     @property
-    def relative_height_relation(self) -> int:
+    def RelativeHeightRelation(self) -> int:
         return int(self._get_prop("RelativeHeightRelation"))
 
-    @relative_height_relation.setter
-    def relative_height_relation(self, value: int) -> None:
+    @RelativeHeightRelation.setter
+    def RelativeHeightRelation(self, value: int) -> None:
         self._set_prop("RelativeHeightRelation", int(value))
 
     @property
-    def relative_width_relation(self) -> int:
+    def RelativeWidthRelation(self) -> int:
         return int(self._get_prop("RelativeWidthRelation"))
 
-    @relative_width_relation.setter
-    def relative_width_relation(self, value: int) -> None:
+    @RelativeWidthRelation.setter
+    def RelativeWidthRelation(self, value: int) -> None:
         self._set_prop("RelativeWidthRelation", int(value))
 
     @property
-    def decorative(self) -> bool:
+    def Decorative(self) -> bool:
         return bool(self._get_prop("Decorative"))
 
-    @decorative.setter
-    def decorative(self, value: bool) -> None:
+    @Decorative.setter
+    def Decorative(self, value: bool) -> None:
         self._set_prop("Decorative", bool(value))
 
     @property
-    def interop_grab_bag(self) -> Any:
+    def InteropGrabBag(self) -> Any:
         return self._get_prop("InteropGrabBag")
 
-    @interop_grab_bag.setter
-    def interop_grab_bag(self, value: Any) -> None:
+    @InteropGrabBag.setter
+    def InteropGrabBag(self, value: Any) -> None:
         self._set_prop("InteropGrabBag", value)
 
     # Text anchoring and wrap related properties
     @property
-    def anchor_page_no(self) -> int:
+    def AnchorPageNo(self) -> int:
         return int(self._get_prop("AnchorPageNo"))
 
-    @anchor_page_no.setter
-    def anchor_page_no(self, value: int) -> None:
+    @AnchorPageNo.setter
+    def AnchorPageNo(self, value: int) -> None:
         self._set_prop("AnchorPageNo", int(value))
 
     @property
-    def anchor_type(self) -> Any:
+    def AnchorType(self) -> Any:
         return self._get_prop("AnchorType")
 
-    @anchor_type.setter
-    def anchor_type(self, value: Any) -> None:
+    @AnchorType.setter
+    def AnchorType(self, value: Any) -> None:
         self._set_prop("AnchorType", value)
 
     @property
-    def anchor_frame(self) -> Any:
+    def AnchorFrame(self) -> Any:
         return self._get_prop("AnchorFrame")
 
-    @anchor_frame.setter
-    def anchor_frame(self, value: Any) -> None:
+    @AnchorFrame.setter
+    def AnchorFrame(self, value: Any) -> None:
         self._set_prop("AnchorFrame", value)
 
     @property
-    def text_range(self) -> Any:
+    def TextRange(self) -> Any:
         return self._get_prop("TextRange")
 
-    @text_range.setter
-    def text_range(self, value: Any) -> None:
+    @TextRange.setter
+    def TextRange(self, value: Any) -> None:
         self._set_prop("TextRange", value)
 
     @property
-    def surround(self) -> Any:
+    def Surround(self) -> Any:
         return self._get_prop("Surround")
 
-    @surround.setter
-    def surround(self, value: Any) -> None:
+    @Surround.setter
+    def Surround(self, value: Any) -> None:
         self._set_prop("Surround", value)
 
     @property
-    def surround_anchor_only(self) -> bool:
+    def SurroundAnchorOnly(self) -> bool:
         return bool(self._get_prop("SurroundAnchorOnly"))
 
-    @surround_anchor_only.setter
-    def surround_anchor_only(self, value: bool) -> None:
+    @SurroundAnchorOnly.setter
+    def SurroundAnchorOnly(self, value: bool) -> None:
         self._set_prop("SurroundAnchorOnly", bool(value))
 
     @property
-    def surround_contour(self) -> bool:
+    def SurroundContour(self) -> bool:
         return bool(self._get_prop("SurroundContour"))
 
-    @surround_contour.setter
-    def surround_contour(self, value: bool) -> None:
+    @SurroundContour.setter
+    def SurroundContour(self, value: bool) -> None:
         self._set_prop("SurroundContour", bool(value))
 
     @property
-    def contour_outside(self) -> bool:
+    def ContourOutside(self) -> bool:
         return bool(self._get_prop("ContourOutside"))
 
-    @contour_outside.setter
-    def contour_outside(self, value: bool) -> None:
+    @ContourOutside.setter
+    def ContourOutside(self, value: bool) -> None:
         self._set_prop("ContourOutside", bool(value))
 
     @property
-    def opaque(self) -> bool:
+    def Opaque(self) -> bool:
         return bool(self._get_prop("Opaque"))
 
-    @opaque.setter
-    def opaque(self, value: bool) -> None:
+    @Opaque.setter
+    def Opaque(self, value: bool) -> None:
         self._set_prop("Opaque", bool(value))
 
     @property
-    def wrap_influence_on_position(self) -> int:
+    def WrapInfluenceOnPosition(self) -> int:
         return int(self._get_prop("WrapInfluenceOnPosition"))
 
-    @wrap_influence_on_position.setter
-    def wrap_influence_on_position(self, value: int) -> None:
+    @WrapInfluenceOnPosition.setter
+    def WrapInfluenceOnPosition(self, value: int) -> None:
         self._set_prop("WrapInfluenceOnPosition", int(value))
 
     # Orientation and positioning
     @property
-    def hori_orient(self) -> int:
+    def HoriOrient(self) -> int:
         return int(self._get_prop("HoriOrient"))
 
-    @hori_orient.setter
-    def hori_orient(self, value: int) -> None:
+    @HoriOrient.setter
+    def HoriOrient(self, value: int) -> None:
         self._set_prop("HoriOrient", int(value))
 
     @property
-    def hori_orient_position(self) -> int:
+    def HoriOrientPosition(self) -> int:
         return int(self._get_prop("HoriOrientPosition"))
 
-    @hori_orient_position.setter
-    def hori_orient_position(self, value: int) -> None:
+    @HoriOrientPosition.setter
+    def HoriOrientPosition(self, value: int) -> None:
         self._set_prop("HoriOrientPosition", int(value))
 
     @property
-    def hori_orient_relation(self) -> int:
+    def HoriOrientRelation(self) -> int:
         return int(self._get_prop("HoriOrientRelation"))
 
-    @hori_orient_relation.setter
-    def hori_orient_relation(self, value: int) -> None:
+    @HoriOrientRelation.setter
+    def HoriOrientRelation(self, value: int) -> None:
         self._set_prop("HoriOrientRelation", int(value))
 
     @property
-    def vert_orient(self) -> int:
+    def VertOrient(self) -> int:
         return int(self._get_prop("VertOrient"))
 
-    @vert_orient.setter
-    def vert_orient(self, value: int) -> None:
+    @VertOrient.setter
+    def VertOrient(self, value: int) -> None:
         self._set_prop("VertOrient", int(value))
 
     @property
-    def vert_orient_position(self) -> int:
+    def VertOrientPosition(self) -> int:
         return int(self._get_prop("VertOrientPosition"))
 
-    @vert_orient_position.setter
-    def vert_orient_position(self, value: int) -> None:
+    @VertOrientPosition.setter
+    def VertOrientPosition(self, value: int) -> None:
         self._set_prop("VertOrientPosition", int(value))
 
     @property
-    def vert_orient_relation(self) -> int:
+    def VertOrientRelation(self) -> int:
         return int(self._get_prop("VertOrientRelation"))
 
-    @vert_orient_relation.setter
-    def vert_orient_relation(self, value: int) -> None:
+    @VertOrientRelation.setter
+    def VertOrientRelation(self, value: int) -> None:
         self._set_prop("VertOrientRelation", int(value))
 
     @property
-    def left_margin(self) -> int:
+    def LeftMargin(self) -> int:
         return int(self._get_prop("LeftMargin"))
 
-    @left_margin.setter
-    def left_margin(self, value: int) -> None:
+    @LeftMargin.setter
+    def LeftMargin(self, value: int) -> None:
         self._set_prop("LeftMargin", int(value))
 
     @property
-    def right_margin(self) -> int:
+    def RightMargin(self) -> int:
         return int(self._get_prop("RightMargin"))
 
-    @right_margin.setter
-    def right_margin(self, value: int) -> None:
+    @RightMargin.setter
+    def RightMargin(self, value: int) -> None:
         self._set_prop("RightMargin", int(value))
 
     @property
-    def top_margin(self) -> int:
+    def TopMargin(self) -> int:
         return int(self._get_prop("TopMargin"))
 
-    @top_margin.setter
-    def top_margin(self, value: int) -> None:
+    @TopMargin.setter
+    def TopMargin(self, value: int) -> None:
         self._set_prop("TopMargin", int(value))
 
     @property
-    def bottom_margin(self) -> int:
+    def BottomMargin(self) -> int:
         return int(self._get_prop("BottomMargin"))
 
-    @bottom_margin.setter
-    def bottom_margin(self, value: int) -> None:
+    @BottomMargin.setter
+    def BottomMargin(self, value: int) -> None:
         self._set_prop("BottomMargin", int(value))
 
     # Layout direction helpers
     @property
-    def transformation_in_hori_l2r(self) -> Any:
+    def TransformationInHoriL2R(self) -> Any:
         return self._get_prop("TransformationInHoriL2R")
 
     @property
-    def position_layout_dir(self) -> int:
+    def PositionLayoutDir(self) -> int:
         return int(self._get_prop("PositionLayoutDir"))
 
-    @position_layout_dir.setter
-    def position_layout_dir(self, value: int) -> None:
+    @PositionLayoutDir.setter
+    def PositionLayoutDir(self, value: int) -> None:
         self._set_prop("PositionLayoutDir", int(value))
 
     @property
-    def start_position_in_hori_l2r(self) -> Any:
+    def StartPositionInHoriL2R(self) -> Any:
         return self._get_prop("StartPositionInHoriL2R")
 
     @property
-    def end_position_in_hori_l2r(self) -> Any:
+    def EndPositionInHoriL2R(self) -> Any:
         return self._get_prop("EndPositionInHoriL2R")
 
     # Overlap handling
     @property
-    def allow_overlap(self) -> bool:
+    def AllowOverlap(self) -> bool:
         return bool(self._get_prop("AllowOverlap"))
 
-    @allow_overlap.setter
-    def allow_overlap(self, value: bool) -> None:
+    @AllowOverlap.setter
+    def AllowOverlap(self, value: bool) -> None:
         self._set_prop("AllowOverlap", bool(value))

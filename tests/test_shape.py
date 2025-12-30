@@ -80,8 +80,8 @@ def test_shapes_collection_wraps_draw_page():
         rect_pos = rect.getPosition()
         rect_size = rect.getSize()
         def _same_geom(shape):
-            pos = shape.position
-            size = shape.size
+            pos = shape.Position
+            size = shape.Size
             return (pos.X, pos.Y, size.Width, size.Height) == (
                 rect_pos.X,
                 rect_pos.Y,
@@ -104,10 +104,10 @@ def test_shape_position_and_size_roundtrip():
         wrapper = sheet.shapes()[-1]
         new_pos = Point(rect.getPosition().X + 200, rect.getPosition().Y + 150)
         new_size = Size(rect.getSize().Width + 200, rect.getSize().Height + 100)
-        wrapper.position = new_pos
-        wrapper.size = new_size
-        updated_pos = wrapper.position
-        updated_size = wrapper.size
+        wrapper.Position = new_pos
+        wrapper.Size = new_size
+        updated_pos = wrapper.Position
+        updated_size = wrapper.Size
         assert (updated_pos.X, updated_pos.Y) == (new_pos.X, new_pos.Y)
         assert (updated_size.Width, updated_size.Height) == (new_size.Width, new_size.Height)
     finally:
@@ -157,23 +157,23 @@ def test_shape_basic_properties_roundtrip():
     original_printable = None
     try:
         shape = sheet.shapes()[-1]
-        original_name = shape.name
-        original_visible = shape.visible
-        original_printable = shape.printable
+        original_name = shape.Name
+        original_visible = shape.Visible
+        original_printable = shape.Printable
 
-        shape.name = "Rect_Test"
-        shape.visible = not original_visible
-        shape.printable = not original_printable
+        shape.Name = "Rect_Test"
+        shape.Visible = not original_visible
+        shape.Printable = not original_printable
 
-        assert shape.name == "Rect_Test"
-        assert shape.visible is (not original_visible)
-        assert shape.printable is (not original_printable)
+        assert shape.Name == "Rect_Test"
+        assert shape.Visible is (not original_visible)
+        assert shape.Printable is (not original_printable)
     finally:
         # restore to reduce UI churn
         if shape is not None and original_name is not None:
-            shape.name = original_name
-            shape.visible = original_visible
-            shape.printable = original_printable
+            shape.Name = original_name
+            shape.Visible = original_visible
+            shape.Printable = original_printable
         draw_page.remove(rect)
 
 

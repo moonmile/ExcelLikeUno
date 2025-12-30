@@ -12,6 +12,10 @@ from .polyline_shape import PolyLineShape
 from .polypolygon_bezier_shape import PolyPolygonBezierShape
 from .polypolygon_shape import PolyPolygonShape
 from .rectangle_shape import RectangleShape
+from .fill_properties import FillProperties
+from .line_properties import LineProperties
+from .shadow_properties import ShadowProperties
+from .text_properties import TextProperties
 from .shape import Shape
 from .text_shape import TextShape
 
@@ -32,4 +36,8 @@ __all__ = [
     "MeasureShape",
     "OpenBezierShape",
     "PageShape",
+    "LineProperties",
+    "ShadowProperties",
+    "TextProperties",
+    "FillProperties",
 ]

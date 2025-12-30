@@ -7,7 +7,7 @@ from ..typing import InterfaceNames, XSpreadsheet, XSpreadsheetDocument
 from .base import UnoObject
 
 
-class Document(UnoObject):
+class CalcDocument(UnoObject):
     """Wraps a Calc XSpreadsheetDocument."""
 
     def _sheets(self):
