@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from ..core import UnoObject
-from ..typing import InterfaceNames, XCellRange, XTableRows, XTableColumns
+from ..typing import InterfaceNames, XCellRange, XTableColumns, XTableRows
 from .cell import Cell
-from .columns import TableColumns
-from .rows import TableRows
-
 
 class Range(UnoObject):
     """Wraps a UNO cell range and exposes cell-level access."""
@@ -26,13 +23,23 @@ class Range(UnoObject):
 
     @property
     def rows(self) -> XTableRows:
+        from .rows import TableRows  # local import to avoid circular dependency
+
         rng = cast(XCellRange, self.iface(InterfaceNames.X_CELL_RANGE))
         return TableRows(rng.getRows())
 
+    def row(self, index: int) -> "TableRow":
+        return self.rows.getByIndex(index)
+
     @property
     def columns(self) -> XTableColumns:
+        from .columns import TableColumns  # local import to avoid circular dependency
+
         rng = cast(XCellRange, self.iface(InterfaceNames.X_CELL_RANGE))
         return TableColumns(rng.getColumns())
+
+    def column(self, index: int) -> "TableColumn":
+        return self.columns.getByIndex(index)
 
     def __iter__(self):
         # Iterate rows then columns by yielding Cell wrappers
@@ -56,3 +63,11 @@ class Range(UnoObject):
 
     def __repr__(self) -> str:  # pragma: no cover - debugging helper
         return f"Range({self.raw!r})"
+
+
+class TableRow(Range):
+    """Lightweight wrapper for a single table row range."""
+
+
+class TableColumn(Range):
+    """Lightweight wrapper for a single table column range."""

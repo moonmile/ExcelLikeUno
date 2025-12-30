@@ -7,10 +7,9 @@ from ..core import UnoObject
 from ..drawing import Shape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
-from .columns import TableColumns
-from .range import Range
+from .range import Range, TableRow, TableColumn
 from .rows import TableRows
-
+from .columns import TableColumns
 
 class Sheet(UnoObject):
     def _a1_to_pos(self, ref: str) -> tuple[int, int]:
@@ -167,7 +166,13 @@ class Sheet(UnoObject):
         sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
         return TableRows(sheet.getRows())
 
+    def row(self, index: int) -> TableRow:
+        return self.rows.getByIndex(index)
+
     @property
     def columns(self) -> XTableColumns:
         sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
         return TableColumns(sheet.getColumns())
+
+    def column(self, index: int) -> TableColumn:
+        return self.columns.getByIndex(index)

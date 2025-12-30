@@ -58,12 +58,11 @@ import uno
 import excellikeuno as elu
 
 (desktop, document, sheet) = uno.connect_to_calc()
-cell = sheet.getCellByPosition(0, 0)  # A1 セルを取得
+cell = sheet.cell(0, 0)  # A1 セルを取得
 cell.value = 100
 cell.formula = "=A1+B1"
 
-print(cell.props.getPropertyValue("CellBackColor"))  # props 経由で取得
-print(cell.CellBackColor) # 直接取得も可能
+print(cell.CellBackColor) # プロパティで取得
 
 sheet.cell(1, 0).value = 200  # B1 セルを取得して値を設定
 sheet.cell(2, 0).formula = "=A1+B1"  # C1 セルに数式を設定
