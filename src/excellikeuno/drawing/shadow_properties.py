@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..core import UnoObject
-from ..typing import XPropertySet
+from ..typing import ShadowLocation, XPropertySet
 
 
 class ShadowProperties(UnoObject):
@@ -17,6 +17,55 @@ class ShadowProperties(UnoObject):
 
     def set_property(self, name: str, value: Any) -> None:
         self._props().setPropertyValue(name, value)
+
+    # Common ShadowProperties for convenience
+    @property
+    def Shadow(self) -> bool:
+        return bool(self.get_property("Shadow"))
+
+    @Shadow.setter
+    def Shadow(self, value: bool) -> None:
+        self.set_property("Shadow", bool(value))
+
+    @property
+    def ShadowColor(self) -> int:
+        return int(self.get_property("ShadowColor"))
+
+    @ShadowColor.setter
+    def ShadowColor(self, value: int) -> None:
+        self.set_property("ShadowColor", int(value))
+
+    @property
+    def ShadowTransparence(self) -> int:
+        return int(self.get_property("ShadowTransparence"))
+
+    @ShadowTransparence.setter
+    def ShadowTransparence(self, value: int) -> None:
+        self.set_property("ShadowTransparence", int(value))
+
+    @property
+    def ShadowXDistance(self) -> int:
+        return int(self.get_property("ShadowXDistance"))
+
+    @ShadowXDistance.setter
+    def ShadowXDistance(self, value: int) -> None:
+        self.set_property("ShadowXDistance", int(value))
+
+    @property
+    def ShadowYDistance(self) -> int:
+        return int(self.get_property("ShadowYDistance"))
+
+    @ShadowYDistance.setter
+    def ShadowYDistance(self, value: int) -> None:
+        self.set_property("ShadowYDistance", int(value))
+
+    @property
+    def ShadowLocation(self) -> ShadowLocation:
+        return ShadowLocation(int(self.get_property("ShadowLocation")))
+
+    @ShadowLocation.setter
+    def ShadowLocation(self, value: ShadowLocation | int) -> None:
+        self.set_property("ShadowLocation", int(value))
 
     def getPropertyValue(self, name: str) -> Any:  # noqa: N802 - UNO naming
         return self.get_property(name)

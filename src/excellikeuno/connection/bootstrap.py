@@ -50,11 +50,11 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
     properties = (PropertyValue("Hidden", 0, True, 0),)
     document = desktop.loadComponentFromURL(url, "_blank", 0, properties)
 
-    doc_wrapper = UnoObject(document)
+    doc_wrapper = CalcDocument(document)
     spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
-    return desktop, document, Sheet(first_sheet)
+    return desktop, doc_wrapper, Sheet(first_sheet)
 
 def connect_calc() -> Tuple[Any, Any, Sheet]:
     try:
@@ -86,7 +86,7 @@ def connect_calc() -> Tuple[Any, Any, Sheet]:
         controller = spreadsheet_doc.getCurrentController()
         sheet = controller.getActiveSheet()
 
-        return desktop, doc, Sheet(sheet)
+        return desktop, doc_wrapper, Sheet(sheet)
     except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
         raise RuntimeError("Failed to connect to Calc") from exc
 

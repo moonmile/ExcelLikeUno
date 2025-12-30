@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..core import UnoObject
-from ..typing import XPropertySet
+from ..typing import LineDash, LineStyle, XPropertySet
 
 
 class LineProperties(UnoObject):
@@ -17,6 +17,55 @@ class LineProperties(UnoObject):
 
     def set_property(self, name: str, value: Any) -> None:
         self._props().setPropertyValue(name, value)
+
+    # Common LineProperties for convenience
+    @property
+    def LineColor(self) -> int:
+        return int(self.get_property("LineColor"))
+
+    @LineColor.setter
+    def LineColor(self, value: int) -> None:
+        self.set_property("LineColor", int(value))
+
+    @property
+    def LineStyle(self) -> LineStyle:
+        return LineStyle(int(self.get_property("LineStyle")))
+
+    @LineStyle.setter
+    def LineStyle(self, value: LineStyle | int) -> None:
+        self.set_property("LineStyle", int(value))
+
+    @property
+    def LineWidth(self) -> int:
+        return int(self.get_property("LineWidth"))
+
+    @LineWidth.setter
+    def LineWidth(self, value: int) -> None:
+        self.set_property("LineWidth", int(value))
+
+    @property
+    def LineTransparence(self) -> int:
+        return int(self.get_property("LineTransparence"))
+
+    @LineTransparence.setter
+    def LineTransparence(self, value: int) -> None:
+        self.set_property("LineTransparence", int(value))
+
+    @property
+    def LineDashName(self) -> str:
+        return cast(str, self.get_property("LineDashName"))
+
+    @LineDashName.setter
+    def LineDashName(self, value: str) -> None:
+        self.set_property("LineDashName", value)
+
+    @property
+    def LineDash(self) -> LineDash:
+        return cast(LineDash, self.get_property("LineDash"))
+
+    @LineDash.setter
+    def LineDash(self, value: LineDash) -> None:
+        self.set_property("LineDash", value)
 
     def getPropertyValue(self, name: str) -> Any:  # noqa: N802 - UNO naming
         return self.get_property(name)

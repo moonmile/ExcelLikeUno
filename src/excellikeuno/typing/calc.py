@@ -254,3 +254,40 @@ class LineStyle(IntEnum):
     # Some runtimes expose 8/9 for ROUND/LONGROUND variants; keep strict per IDL here.
 
 
+class FontSlant(IntEnum):
+    NONE = 0
+    OBLIQUE = 1
+    ITALIC = 2
+
+
+class FontUnderline(IntEnum):
+    NONE = 0
+    SINGLE = 1
+    DOUBLE = 2
+    DOTTED = 3
+    DONTKNOW = 4
+    DASH = 5
+    LONGDASH = 6
+    DASHDOT = 7
+    DASHDOTDOT = 8
+    SMALLWAVE = 9
+    WAVE = 10
+    DOUBLEWAVE = 11
+    BOLD = 12
+    BOLDDOTTED = 13
+    BOLDDASH = 14
+    BOLDLONGDASH = 15
+    BOLDDASHDOT = 16
+    BOLDDASHDOTDOT = 17
+    BOLDWAVE = 18
+
+
+class FontStrikeout(IntEnum):
+    NONE = 0
+    SINGLE = 1
+    DOUBLE = 2
+    BOLD = 3
+    SLASH = 4
+    X = 5
+
+
