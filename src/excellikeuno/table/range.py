@@ -20,6 +20,7 @@ from ..typing import (
     XSheetCellRange,
     XTableColumns,
     XTableRows,
+    XMergeable,
 )
 from .cell import Cell
 from .cell_properties import CellProperties
@@ -402,6 +403,25 @@ class Range(UnoObject):
                 row_cells.append(Cell(rng.getCellByPosition(col_idx, row_idx)))
             cells.append(row_cells)
         return cells
+
+    # セル結合/解除
+    def merge(self, merged: bool = True) -> None:
+        iface_name = InterfaceNames.X_MERGEABLE
+        # Prefer interface if available, otherwise call raw.merge when provided.
+        raw_merge = getattr(self.raw, "merge", None)
+        if callable(raw_merge):
+            raw_merge(bool(merged))
+            return
+        raise AttributeError("merge not supported on this range")
+
+    def unmerge(self) -> None:
+        self.merge(False)
+
+    def is_merged(self) -> bool:
+        raw_is_merged = getattr(self.raw, "isMerged", None)
+        if callable(raw_is_merged):
+            return bool(raw_is_merged())
+        raise AttributeError("isMerged not supported on this range")
 
     @property
     def cells(self) -> list[list[Cell]]:

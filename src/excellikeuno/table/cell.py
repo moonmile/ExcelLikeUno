@@ -19,6 +19,7 @@ from ..typing import (
     XPropertySet,
 )
 from .cell_properties import CellProperties
+from ..style.character_properties import CharacterProperties
 
 
 class Cell(UnoObject):
@@ -37,6 +38,14 @@ class Cell(UnoObject):
             existing = CellProperties(self.iface(InterfaceNames.X_PROPERTY_SET))
             object.__setattr__(self, "_properties", existing)
         return cast(CellProperties, existing)
+    
+    @property
+    def character_properties(self) -> CharacterProperties:
+        existing = self.__dict__.get("_character_properties")
+        if existing is None:
+            existing = CharacterProperties(self.iface(InterfaceNames.X_PROPERTY_SET))
+            object.__setattr__(self, "_character_properties", existing)
+        return cast(CharacterProperties, existing)
 
     # CellProperties (public attributes) shortcuts for IDE completion
     @property
@@ -286,6 +295,229 @@ class Cell(UnoObject):
     @CellInteropGrabBag.setter
     def CellInteropGrabBag(self, value: Any) -> None:
         self.properties.CellInteropGrabBag = value
+
+    # CharacterProperties (public attributes) shortcuts for IDE completion
+    @property
+    def CharFontName(self) -> str:
+        return self.character_properties.CharFontName
+
+    @CharFontName.setter
+    def CharFontName(self, value: str) -> None:
+        self.character_properties.CharFontName = value
+
+    @property
+    def CharHeight(self) -> float:
+        return self.character_properties.CharHeight
+
+    @CharHeight.setter
+    def CharHeight(self, value: float) -> None:
+        self.character_properties.CharHeight = value
+
+    @property
+    def CharWeight(self) -> float:
+        return self.character_properties.CharWeight
+
+    @CharWeight.setter
+    def CharWeight(self, value: float) -> None:
+        self.character_properties.CharWeight = value
+
+    @property
+    def CharPosture(self) -> int:
+        return int(self.character_properties.CharPosture)
+
+    @CharPosture.setter
+    def CharPosture(self, value: int) -> None:
+        self.character_properties.CharPosture = value
+
+    @property
+    def CharUnderline(self) -> int:
+        return int(self.character_properties.CharUnderline)
+
+    @CharUnderline.setter
+    def CharUnderline(self, value: int) -> None:
+        self.character_properties.CharUnderline = value
+
+    @property
+    def CharStrikeout(self) -> int:
+        return int(self.character_properties.CharStrikeout)
+
+    @CharStrikeout.setter
+    def CharStrikeout(self, value: int) -> None:
+        self.character_properties.CharStrikeout = value
+
+    @property
+    def CharColor(self) -> Color:
+        return self.character_properties.CharColor
+
+    @CharColor.setter
+    def CharColor(self, value: Color) -> None:
+        self.character_properties.CharColor = value
+
+    @property
+    def CharUnderlineHasColor(self) -> bool:
+        return self.character_properties.CharUnderlineHasColor
+
+    @CharUnderlineHasColor.setter
+    def CharUnderlineHasColor(self, value: bool) -> None:
+        self.character_properties.CharUnderlineHasColor = value
+
+    @property
+    def CharUnderlineColor(self) -> Color:
+        return self.character_properties.CharUnderlineColor
+
+    @CharUnderlineColor.setter
+    def CharUnderlineColor(self, value: Color) -> None:
+        self.character_properties.CharUnderlineColor = value
+
+    @property
+    def CharShadowed(self) -> bool:
+        return self.character_properties.CharShadowed
+
+    @CharShadowed.setter
+    def CharShadowed(self, value: bool) -> None:
+        self.character_properties.CharShadowed = value
+
+    @property
+    def CharContoured(self) -> bool:
+        return self.character_properties.CharContoured
+
+    @CharContoured.setter
+    def CharContoured(self, value: bool) -> None:
+        self.character_properties.CharContoured = value
+
+    @property
+    def CharCaseMap(self) -> int:
+        return self.character_properties.CharCaseMap
+
+    @CharCaseMap.setter
+    def CharCaseMap(self, value: int) -> None:
+        self.character_properties.CharCaseMap = value
+
+    @property
+    def CharKerning(self) -> int:
+        return self.character_properties.CharKerning
+
+    @CharKerning.setter
+    def CharKerning(self, value: int) -> None:
+        self.character_properties.CharKerning = value
+
+    @property
+    def CharAutoKerning(self) -> bool:
+        return self.character_properties.CharAutoKerning
+
+    @CharAutoKerning.setter
+    def CharAutoKerning(self, value: bool) -> None:
+        self.character_properties.CharAutoKerning = value
+
+    @property
+    def CharWordMode(self) -> bool:
+        return self.character_properties.CharWordMode
+
+    @CharWordMode.setter
+    def CharWordMode(self, value: bool) -> None:
+        self.character_properties.CharWordMode = value
+
+    @property
+    def CharRotation(self) -> int:
+        return self.character_properties.CharRotation
+
+    @CharRotation.setter
+    def CharRotation(self, value: int) -> None:
+        self.character_properties.CharRotation = value
+
+    @property
+    def CharScaleWidth(self) -> int:
+        return self.character_properties.CharScaleWidth
+
+    @CharScaleWidth.setter
+    def CharScaleWidth(self, value: int) -> None:
+        self.character_properties.CharScaleWidth = value
+
+    @property
+    def CharRelief(self) -> int:
+        return self.character_properties.CharRelief
+
+    @CharRelief.setter
+    def CharRelief(self, value: int) -> None:
+        self.character_properties.CharRelief = value
+
+    @property
+    def CharEscapement(self) -> int:
+        return self.character_properties.CharEscapement
+
+    @CharEscapement.setter
+    def CharEscapement(self, value: int) -> None:
+        self.character_properties.CharEscapement = value
+
+    @property
+    def CharEscapementHeight(self) -> int:
+        return self.character_properties.CharEscapementHeight
+
+    @CharEscapementHeight.setter
+    def CharEscapementHeight(self, value: int) -> None:
+        self.character_properties.CharEscapementHeight = value
+
+    @property
+    def CharLocale(self) -> Any:
+        return self.character_properties.CharLocale
+
+    @CharLocale.setter
+    def CharLocale(self, value: Any) -> None:
+        self.character_properties.CharLocale = value
+
+    @property
+    def CharLocaleAsian(self) -> Any:
+        return self.character_properties.CharLocaleAsian
+
+    @CharLocaleAsian.setter
+    def CharLocaleAsian(self, value: Any) -> None:
+        self.character_properties.CharLocaleAsian = value
+
+    @property
+    def CharLocaleComplex(self) -> Any:
+        return self.character_properties.CharLocaleComplex
+
+    @CharLocaleComplex.setter
+    def CharLocaleComplex(self, value: Any) -> None:
+        self.character_properties.CharLocaleComplex = value
+
+    @property
+    def CharFontFamily(self) -> int:
+        return self.character_properties.CharFontFamily
+
+    @CharFontFamily.setter
+    def CharFontFamily(self, value: int) -> None:
+        self.character_properties.CharFontFamily = value
+
+    @property
+    def CharFontCharSet(self) -> int:
+        return self.character_properties.CharFontCharSet
+
+    @CharFontCharSet.setter
+    def CharFontCharSet(self, value: int) -> None:
+        self.character_properties.CharFontCharSet = value
+
+    @property
+    def CharFontPitch(self) -> int:
+        return self.character_properties.CharFontPitch
+
+    @CharFontPitch.setter
+    def CharFontPitch(self, value: int) -> None:
+        self.character_properties.CharFontPitch = value
+
+    # Aliases
+    font_size = CharHeight
+    font_name = CharFontName
+    font_weight = CharWeight
+    font_color = CharColor
+    font_back_color = CellBackColor
+    font_italic = CharPosture
+    font_underline = CharUnderline
+    font_strikeout = CharStrikeout
+    font_bold = CharWeight
+    font_strikethrough = CharStrikeout
+    font_subscript = CharEscapement
+    font_superscript = CharEscapement
 
     @property
     def value(self) -> float:

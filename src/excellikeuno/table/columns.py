@@ -34,3 +34,8 @@ class TableColumns(UnoObject):
 
     insertByIndex = insert  # noqa: N815 - UNO naming alias
     removeByIndex = remove  # noqa: N815 - UNO naming alias
+
+class TableColumn(UnoObject):
+    """Lightweight wrapper for a single table column."""
+
+    # Additional methods and properties for TableColumn can be added here

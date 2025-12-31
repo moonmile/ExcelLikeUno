@@ -29,6 +29,7 @@ from .calc import (
     XSpreadsheetDocument,
     XColumnRowRange,
     XCellRangeAddressable,
+    XMergeable,
 )
 from .interfaces import InterfaceNames
 from .structs import (
@@ -77,6 +78,7 @@ __all__ = [
     "XSpreadsheet",
     "XSpreadsheetDocument",
     "XColumnRowRange",
+    "XMergeable",
     "InterfaceNames",
     "BorderLineStruct",
     "BorderLine2Struct",

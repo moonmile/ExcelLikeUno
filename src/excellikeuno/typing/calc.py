@@ -167,6 +167,26 @@ class XSpreadsheetDocument(Protocol):
     def getSheets(self) -> Any:
         ...
 
+@runtime_checkable
+class XMergeable(Protocol):
+    def merge(self, other: bool) -> None:
+        ...
+
+    def isMerged(self) -> bool:
+        ...
+@runtime_checkable
+class XMergeableCellRange(Protocol):
+    def merge(self, merged: bool) -> None:
+        ...
+    def isMerged(self) -> bool:
+        ...
+@runtime_checkable
+class XMergeableCell (Protocol):
+    def merge(self, merged: bool) -> None:
+        ...
+    def isMerged(self) -> bool:
+        ...
+
 
 @runtime_checkable
 class BorderLine(Protocol):

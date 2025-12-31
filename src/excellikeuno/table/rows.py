@@ -35,3 +35,8 @@ class TableRows(UnoObject):
     # UNO-style aliases
     insertByIndex = insert  # noqa: N815 - UNO naming alias
     removeByIndex = remove  # noqa: N815 - UNO naming alias
+
+class TableRow(UnoObject):
+    """Lightweight wrapper for a single table row."""
+
+    # Additional methods and properties for TableRow can be added here
