@@ -297,6 +297,10 @@ class Cell(UnoObject):
         cell = cast(XCell, self.iface(InterfaceNames.X_CELL))
         cell.setValue(value)
 
+    @value.setter
+    def value(self, value: str) -> None:
+        self.text = value
+
     @property
     def formula(self) -> str:
         cell = cast(XCell, self.iface(InterfaceNames.X_CELL))

@@ -55,12 +55,34 @@ class XCellRange(Protocol):
     def getCellRangeByPosition(self, start_column: int, start_row: int, end_column: int, end_row: int) -> Any:
         ...
 
-    def getRows(self) -> Any:
+@runtime_checkable
+class XSheetCellRange(Protocol):
+    def getCells(self) -> Any:
+        ...
+    def getRangeAddressesAsString(self) -> Any:
+        ...
+    def getRangeAddresses (self) -> Any:
         ...
 
+
+@runtime_checkable
+class XSheetCellRanges(Protocol):
+    def getCells(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class XCellRangeAddressable(Protocol):
+    def getRangeAddress(self) -> Any:
+        ...
+
+@runtime_checkable
+class XColumnRowRange(Protocol):
     def getColumns(self) -> Any:
         ...
 
+    def getRows(self) -> Any:
+        ...
 
 @runtime_checkable
 class XTableRows(Protocol):

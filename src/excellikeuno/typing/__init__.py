@@ -23,8 +23,12 @@ from .calc import (
     XShape,
     XNamed,
     XPropertySet,
+    XSheetCellRange,
+    XSheetCellRanges,
     XSpreadsheet,
     XSpreadsheetDocument,
+    XColumnRowRange,
+    XCellRangeAddressable,
 )
 from .interfaces import InterfaceNames
 from .structs import (
@@ -67,8 +71,12 @@ __all__ = [
     "XShape",
     "XNamed",
     "XPropertySet",
+    "XSheetCellRange",
+    "XSheetCellRanges",
+    "XCellRangeAddressable",
     "XSpreadsheet",
     "XSpreadsheetDocument",
+    "XColumnRowRange",
     "InterfaceNames",
     "BorderLineStruct",
     "BorderLine2Struct",
