@@ -332,4 +332,17 @@ class FontStrikeout(IntEnum):
     SLASH = 4
     X = 5
 
+class CellHoriJustify(IntEnum):
+    STANDARD = 0
+    LEFT = 1
+    CENTER = 2
+    RIGHT = 3
+    BLOCK = 4
+    REPEAT = 5
 
+class CellVertJustify(IntEnum):
+    STANDARD = 0
+    TOP = 1
+    CENTER = 2
+    BOTTOM = 3
+    BLOCK = 4

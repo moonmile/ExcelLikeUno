@@ -55,7 +55,7 @@ class Range(UnoObject):
 
     # --- row/column grouping -------------------------------------------------
     @property
-    def rows(self) -> XTableRows:
+    def rows(self) -> TableRows:
         from .rows import TableRows  # local import to avoid cycles
 
         colrow = self.iface(InterfaceNames.X_COLUMN_ROW_RANGE)
@@ -422,6 +422,22 @@ class Range(UnoObject):
         if callable(raw_is_merged):
             return bool(raw_is_merged())
         raise AttributeError("isMerged not supported on this range")
+
+    # 行の高さ
+    @property
+    def row_height(self) -> int:
+        # 先頭行の高さを返す
+        rows = self.rows
+        first_row = rows.getByIndex(0)
+        return first_row.Height
+    
+    @row_height.setter
+    def row_height(self, height: int) -> None:
+        # 範囲内のすべての行の高さを設定する
+        row_count = self.rows.count
+        for i in range(row_count):
+            row = self.rows.getByIndex(i)
+            row.Height = height
 
     @property
     def cells(self) -> list[list[Cell]]:

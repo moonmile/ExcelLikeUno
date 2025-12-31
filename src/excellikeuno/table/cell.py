@@ -20,6 +20,7 @@ from ..typing import (
 )
 from .cell_properties import CellProperties
 from ..style.character_properties import CharacterProperties
+from .rows import TableRows
 
 
 class Cell(UnoObject):
@@ -518,6 +519,46 @@ class Cell(UnoObject):
     font_strikethrough = CharStrikeout
     font_subscript = CharEscapement
     font_superscript = CharEscapement
+
+    # 行の高さ
+    @property
+    def row_height(self) -> int:
+        # Resolve the parent sheet via XSheetCellRange and read the row's Height property (1/100 mm)
+        sheet_range = self.iface(InterfaceNames.X_SHEET_CELL_RANGE)
+        if sheet_range is None:
+            raise AttributeError("XSheetCellRange not available for this cell")
+
+        sheet = sheet_range.getSpreadsheet()
+        row_idx = self.raw.getCellAddress().Row
+        rows = TableRows(sheet.getRows())
+        row = rows.getByIndex(row_idx)
+        try:
+            return int(row.raw.getPropertyValue("Height"))
+        except Exception:
+            # Some UNO implementations expose Height as a direct attribute
+            return int(getattr(row.raw, "Height"))
+    
+    @row_height.setter
+    def row_height(self, height: int) -> None:
+        sheet_range = self.iface(InterfaceNames.X_SHEET_CELL_RANGE)
+        if sheet_range is None:
+            raise AttributeError("XSheetCellRange not available for this cell")
+
+        sheet = sheet_range.getSpreadsheet()
+        row_idx = self.raw.getCellAddress().Row
+        rows = TableRows(sheet.getRows())
+        row = rows.getByIndex(row_idx)
+
+        # Disable optimal height before setting an explicit height when available
+        try:
+            row.raw.setPropertyValue("OptimalHeight", False)
+        except Exception:
+            pass
+
+        try:
+            row.raw.setPropertyValue("Height", int(height))
+        except Exception:
+            setattr(row.raw, "Height", int(height))
 
     @property
     def value(self) -> float:
