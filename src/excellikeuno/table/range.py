@@ -430,7 +430,6 @@ class Range(UnoObject):
         rows = self.rows
         first_row = rows.getByIndex(0)
         return first_row.Height
-    
     @row_height.setter
     def row_height(self, height: int) -> None:
         # 範囲内のすべての行の高さを設定する
@@ -438,6 +437,21 @@ class Range(UnoObject):
         for i in range(row_count):
             row = self.rows.getByIndex(i)
             row.Height = height
+
+    # 列の幅
+    @property
+    def column_width(self) -> int:
+        # 先頭列の幅を返す
+        columns = self.columns
+        first_column = columns.getByIndex(0)
+        return first_column.Width
+    @column_width.setter
+    def column_width(self, width: int) -> None:
+        # 範囲内のすべての列の幅を設定する
+        column_count = self.columns.count
+        for i in range(column_count):
+            column = self.columns.getByIndex(i)
+            column.Width = width
 
     @property
     def cells(self) -> list[list[Cell]]:

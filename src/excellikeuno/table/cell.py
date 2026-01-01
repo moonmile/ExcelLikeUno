@@ -561,6 +561,45 @@ class Cell(UnoObject):
             setattr(row.raw, "Height", int(height))
 
     @property
+    def column_width(self) -> int:
+        # Resolve the parent sheet via XSheetCellRange and read the column's Width property (1/100 mm)
+        sheet_range = self.iface(InterfaceNames.X_SHEET_CELL_RANGE)
+        if sheet_range is None:
+            raise AttributeError("XSheetCellRange not available for this cell")
+
+        sheet = sheet_range.getSpreadsheet()
+        col_idx = self.raw.getCellAddress().Column
+        columns = TableRows(sheet.getColumns())
+        column = columns.getByIndex(col_idx)
+        try:
+            return int(column.raw.getPropertyValue("Width"))
+        except Exception:
+            # Some UNO implementations expose Width as a direct attribute
+            return int(getattr(column.raw, "Width"))
+        
+    @column_width.setter
+    def column_width(self, width: int) -> None:
+        sheet_range = self.iface(InterfaceNames.X_SHEET_CELL_RANGE)
+        if sheet_range is None:
+            raise AttributeError("XSheetCellRange not available for this cell")
+
+        sheet = sheet_range.getSpreadsheet()
+        col_idx = self.raw.getCellAddress().Column
+        columns = TableRows(sheet.getColumns())
+        column = columns.getByIndex(col_idx)
+
+        # Disable optimal width before setting an explicit width when available
+        try:
+            column.raw.setPropertyValue("OptimalWidth", False)
+        except Exception:
+            pass
+
+        try:
+            column.raw.setPropertyValue("Width", int(width))
+        except Exception:
+            setattr(column.raw, "Width", int(width))
+
+    @property
     def value(self) -> float:
         cell = cast(XCell, self.iface(InterfaceNames.X_CELL))
         return cell.getValue()
