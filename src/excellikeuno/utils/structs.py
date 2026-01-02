@@ -10,6 +10,7 @@ from ..typing.structs import (
     CellAddressStruct,
     CellRangeAddressStruct,
     PointStruct,
+    SizeStruct,
     TableBorder2Struct,
     TableBorderStruct,
     TableSortFieldStruct,
@@ -67,6 +68,14 @@ def make_point(x: int = 0, y: int = 0) -> Any:
         struct = PointStruct()
     struct.X = x
     struct.Y = y
+    return struct
+
+def make_size(width: int = 0, height: int = 0) -> Any:
+    struct = _try_uno_struct("com.sun.star.awt.Size")
+    if struct is None:
+        struct = SizeStruct()
+    struct.Width = width
+    struct.Height = height
     return struct
 
 

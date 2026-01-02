@@ -1,17 +1,25 @@
 from __future__ import annotations
 
 import re
-from typing import Any, List, cast
+from typing import Any, List, cast, TYPE_CHECKING
 
 from ..core import UnoObject
-from ..drawing import Shape
+from ..drawing import Shape, EllipseShape
+from ..utils.structs import make_point, make_size
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
 from .range import Range, TableRow, TableColumn
 from .rows import TableRows
 from .columns import TableColumns
 
+if TYPE_CHECKING:  # pragma: no cover - only for type hints
+    from ..core.calc_document import CalcDocument
+
 class Sheet(UnoObject):
+    def __init__(self, sheet_obj: Any, document: "CalcDocument | None" = None) -> None:
+        super().__init__(sheet_obj)
+        self._document = document
+
     def _a1_to_pos(self, ref: str) -> tuple[int, int]:
         match = re.fullmatch(r"\$?([A-Za-z]+)\$?([1-9][0-9]*)", ref)
         if not match:
@@ -90,7 +98,11 @@ class Sheet(UnoObject):
     def shapes(self) -> List[Shape]:
         draw_page = self._draw_page()
         return [Shape(draw_page.getByIndex(i)) for i in range(draw_page.getCount())]
-    
+
+    @property
+    def shapes(self) -> "Shapes":
+        return Shapes(self)
+
     @property
     def name(self) -> str:
         named = cast(XNamed, self.iface(InterfaceNames.X_NAMED))
@@ -176,3 +188,67 @@ class Sheet(UnoObject):
 
     def column(self, index: int) -> TableColumn:
         return self.columns.getByIndex(index)
+
+    @property
+    def document(self) -> "CalcDocument":
+        if self._document is not None:
+            return self._document
+        raise AttributeError("Sheet has no associated document; construct Sheet with document reference")
+
+
+class Shapes:
+    """Helper for creating and managing shapes on a sheet's draw page."""
+
+    def __init__(self, sheet: Sheet) -> None:
+        self.sheet = sheet
+
+    def __call__(self) -> List[Shape]:
+        """Return all shapes on the sheet as wrapped Shape objects."""
+        draw_page = self.sheet._draw_page()
+        return [Shape(draw_page.getByIndex(i)) for i in range(draw_page.getCount())]
+
+    def add_ellipse_shape(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        fill_color: int | None = None,
+        line_color: int | None = None,
+    ) -> EllipseShape:
+        def _try_set_color(obj: Any, name: str, value: int | None) -> None:
+            if value is None:
+                return
+            setter = getattr(obj, "setPropertyValue", None)
+            if callable(setter):
+                try:
+                    setter(name, int(value))
+                    return
+                except Exception:
+                    pass
+            try:
+                setattr(obj, name, int(value))
+            except Exception:
+                # If even direct setattr fails, ignore so creation still succeeds
+                pass
+
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        ellipse_raw = doc.createInstance("com.sun.star.drawing.EllipseShape")
+        ellipse = EllipseShape(ellipse_raw)
+
+        # Position and size (1/100 mm)
+        point = make_point(x, y)
+        size = make_size(width, height)
+        ellipse.Position = point
+        ellipse.Size = size
+        if fill_color is not None:
+            ellipse.FillColor = int(fill_color)
+        if line_color is not None:
+            ellipse.LineColor = int(line_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(ellipse_raw)
+
+        return ellipse
+    

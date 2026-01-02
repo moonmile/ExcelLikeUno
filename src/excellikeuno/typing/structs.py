@@ -24,6 +24,10 @@ class PointStruct:
     X: int = 0
     Y: int = 0
 
+@dataclass
+class SizeStruct:
+    Width: int = 0
+    Height: int = 0
 
 @dataclass
 class CellAddressStruct:

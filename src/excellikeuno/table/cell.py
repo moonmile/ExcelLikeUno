@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from excellikeuno.typing.structs import PointStruct
+
 from ..core import UnoObject
 from ..typing import (
     Color,
@@ -18,6 +20,7 @@ from ..typing import (
     XCell,
     XPropertySet,
 )
+from ..typing.structs import PointStruct
 from .cell_properties import CellProperties
 from ..style.character_properties import CharacterProperties
 from .rows import TableRows
@@ -613,6 +616,11 @@ class Cell(UnoObject):
             column.raw.setPropertyValue("Width", int(width))
         except Exception:
             setattr(column.raw, "Width", int(width))
+
+    @property 
+    def position(self) -> PointStruct:
+        pos = self.properties.getPropertyValue("Position")
+        return PointStruct(X=pos.X, Y=pos.Y)
 
     @property
     def value(self) -> float:

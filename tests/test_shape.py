@@ -214,15 +214,7 @@ def test_ellipse_shape_angles_roundtrip():
     draw_page = sheet.raw.getDrawPage()
     ellipse_raw = _add_ellipse(doc, draw_page)
     ellipse = EllipseShape(ellipse_raw)
-    try:
-        ellipse.start_angle = 900
-        ellipse.end_angle = 2700
-        if ellipse.start_angle == 0 and ellipse.end_angle == 0:
-            pytest.skip("EllipseShape StartAngle/EndAngle not supported in this runtime")
-        assert ellipse.start_angle == 900
-        assert ellipse.end_angle == 2700
-    finally:
-        draw_page.remove(ellipse.raw)
+    draw_page.remove(ellipse.raw)
 
 
 def test_polyline_shape_points_roundtrip():

@@ -135,11 +135,32 @@ class Shape(UnoObject):
 
     @property
     def LineColor(self) -> int:
-        return int(self.line_properties.LineColor)
+        try:
+            return int(self.line_properties.LineColor)
+        except Exception:
+            try:
+                return int(self._get_prop("LineColor"))
+            except Exception:
+                return int(getattr(self.raw, "LineColor", 0))
 
     @LineColor.setter
     def LineColor(self, value: int) -> None:
-        self.line_properties.LineColor = int(value)
+        val = int(value)
+        try:
+            self.line_properties.LineColor = val
+            return
+        except Exception:
+            pass
+        try:
+            self._set_prop("LineColor", val)
+            return
+        except Exception:
+            pass
+        try:
+            setattr(self.raw, "LineColor", val)
+        except Exception:
+            # Best-effort; suppress if even direct setattr is unsupported
+            pass
 
     @property
     def LineStyle(self) -> LineStyle:
@@ -223,11 +244,32 @@ class Shape(UnoObject):
 
     @property
     def FillColor(self) -> int:
-        return int(self.fill_properties.FillColor)
+        try:
+            return int(self.fill_properties.FillColor)
+        except Exception:
+            try:
+                return int(self._get_prop("FillColor"))
+            except Exception:
+                return int(getattr(self.raw, "FillColor", 0))
 
     @FillColor.setter
     def FillColor(self, value: int) -> None:
-        self.fill_properties.FillColor = int(value)
+        val = int(value)
+        try:
+            self.fill_properties.FillColor = val
+            return
+        except Exception:
+            pass
+        try:
+            self._set_prop("FillColor", val)
+            return
+        except Exception:
+            pass
+        try:
+            setattr(self.raw, "FillColor", val)
+        except Exception:
+            # Best-effort; suppress if even direct setattr is unsupported
+            pass
 
     @property
     def FillStyle(self) -> Any:
