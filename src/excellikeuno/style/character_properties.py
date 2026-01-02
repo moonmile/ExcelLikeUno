@@ -35,7 +35,15 @@ class CharacterProperties(UnoObject):
 
     @CharHeight.setter
     def CharHeight(self, value: float) -> None:
-        self.set_property("CharHeight", float(value))
+        # Set height for all script variants when available (Western/CJK/CTL)
+        height = float(value)
+        self.set_property("CharHeight", height)
+        for alt in ("CharHeightAsian", "CharHeightComplex"):
+            try:
+                self.set_property(alt, height)
+            except Exception:
+                # Ignore when the property is not supported by the current object
+                pass
 
     @property
     def CharWeight(self) -> float:

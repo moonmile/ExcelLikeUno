@@ -5,6 +5,7 @@ from typing import Any, cast
 from ..core import UnoObject
 from ..typing import (
     BorderLine,
+    BorderLineStruct,
     BorderLine2,
     CellHoriJustify,
     CellOrientation,
@@ -16,6 +17,7 @@ from ..typing import (
     TableBorder2,
     XPropertySet,
 )
+from ..utils.structs import make_border_line
 
 
 class CellProperties(UnoObject):
@@ -133,7 +135,14 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("TopBorder"))
 
     @TopBorder.setter
-    def TopBorder(self, value: BorderLine) -> None:
+    def TopBorder(self, value: BorderLine | BorderLineStruct) -> None:
+        if isinstance(value, BorderLineStruct):
+            value = make_border_line(
+                color=value.Color,
+                inner_line_width=value.InnerLineWidth,
+                outer_line_width=value.OuterLineWidth,
+                line_distance=value.LineDistance,
+            )
         self.set_property("TopBorder", value)
 
     @property
@@ -141,7 +150,14 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("BottomBorder"))
 
     @BottomBorder.setter
-    def BottomBorder(self, value: BorderLine) -> None:
+    def BottomBorder(self, value: BorderLine | BorderLineStruct) -> None:
+        if isinstance(value, BorderLineStruct):
+            value = make_border_line(
+                color=value.Color,
+                inner_line_width=value.InnerLineWidth,
+                outer_line_width=value.OuterLineWidth,
+                line_distance=value.LineDistance,
+            )
         self.set_property("BottomBorder", value)
 
     @property
@@ -149,7 +165,14 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("LeftBorder"))
 
     @LeftBorder.setter
-    def LeftBorder(self, value: BorderLine) -> None:
+    def LeftBorder(self, value: BorderLine | BorderLineStruct) -> None:
+        if isinstance(value, BorderLineStruct):
+            value = make_border_line(
+                color=value.Color,
+                inner_line_width=value.InnerLineWidth,
+                outer_line_width=value.OuterLineWidth,
+                line_distance=value.LineDistance,
+            )
         self.set_property("LeftBorder", value)
 
     @property
@@ -157,7 +180,14 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("RightBorder"))
 
     @RightBorder.setter
-    def RightBorder(self, value: BorderLine) -> None:
+    def RightBorder(self, value: BorderLine | BorderLineStruct) -> None:
+        if isinstance(value, BorderLineStruct):
+            value = make_border_line(
+                color=value.Color,
+                inner_line_width=value.InnerLineWidth,
+                outer_line_width=value.OuterLineWidth,
+                line_distance=value.LineDistance,
+            )
         self.set_property("RightBorder", value)
 
     @property
@@ -296,6 +326,13 @@ class CellProperties(UnoObject):
     def __setattr__(self, name: str, value: Any) -> None:
         if name.startswith("_"):
             return object.__setattr__(self, name, value)
+        cls_attr = getattr(type(self), name, None)
+        if isinstance(cls_attr, property):
+            setter = cls_attr.fset
+            if setter is None:
+                raise AttributeError(f"can't set attribute {name}")
+            setter(self, value)
+            return
         try:
             self.set_property(name, value)
         except Exception as exc:  # pragma: no cover - UNO failures bubble up

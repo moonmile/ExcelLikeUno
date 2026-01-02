@@ -420,11 +420,26 @@ class Cell(UnoObject):
 
     @property
     def CharRotation(self) -> int:
-        return self.character_properties.CharRotation
+        # Prefer character property when available; fallback to cell RotateAngle (1/100 deg)
+        try:
+            return int(self.character_properties.CharRotation)
+        except Exception:
+            try:
+                return int(self.properties.RotateAngle)
+            except Exception:
+                raise
 
     @CharRotation.setter
     def CharRotation(self, value: int) -> None:
-        self.character_properties.CharRotation = value
+        # Accept degrees; convert to 1/100 degrees when value looks like plain degrees.
+        degrees_hundredths = int(round(value * 100)) if -360 <= value <= 360 else int(value)
+        try:
+            self.character_properties.CharRotation = degrees_hundredths
+            return
+        except Exception:
+            pass
+        # Fallback to cell rotation (RotateAngle) when CharRotation is not supported.
+        self.properties.RotateAngle = degrees_hundredths
 
     @property
     def CharScaleWidth(self) -> int:
