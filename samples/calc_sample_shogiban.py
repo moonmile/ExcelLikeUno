@@ -1,7 +1,7 @@
 # 将棋盤を作る
 from excellikeuno.connection.bootstrap import connect_calc
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
-from excellikeuno.typing.structs import BorderLineStruct
+from excellikeuno.typing.structs import BorderLine
 
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "将棋盤"
@@ -11,7 +11,7 @@ ban.row_height = 1000  # 行の高さを設定 20 mm
 ban.column_width = 1000  # 列の幅を設定 20 mm
 # 罫線を設定
 for cell in [c for row in ban.cells for c in row]:
-    borderline = BorderLineStruct()
+    borderline = BorderLine()
     borderline.Color = 0x000000
     borderline.OuterLineWidth = 50
     borderline.InnerLineWidth = 0

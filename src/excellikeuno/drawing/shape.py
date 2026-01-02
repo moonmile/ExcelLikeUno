@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from excellikeuno.typing.structs import Point, Size
+
 from ..core import UnoObject
 from ..typing import InterfaceNames, LineDash, LineStyle, XPropertySet, XShape
 from .fill_properties import FillProperties
@@ -24,22 +26,42 @@ class Shape(UnoObject):
     @property
     def Position(self) -> Any:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
-        return shape.getPosition()
+        pos = shape.getPosition()
+        try:
+            return Point(pos.X, pos.Y)
+        except Exception:
+            return pos
 
     @Position.setter
     def Position(self, value: Any) -> None:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
-        shape.setPosition(value)
+        target = value
+        if hasattr(value, "to_raw"):
+            try:
+                target = value.to_raw()
+            except Exception:
+                target = value
+        shape.setPosition(target)
 
     @property
     def Size(self) -> Any:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
-        return shape.getSize()
+        size = shape.getSize()
+        try:
+            return Size(size.Width, size.Height)
+        except Exception:
+            return size
 
     @Size.setter
     def Size(self, value: Any) -> None:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
-        shape.setSize(value)
+        target = value
+        if hasattr(value, "to_raw"):
+            try:
+                target = value.to_raw()
+            except Exception:
+                target = value
+        shape.setSize(target)
 
     @property
     def props(self) -> XPropertySet:

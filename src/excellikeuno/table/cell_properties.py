@@ -5,19 +5,47 @@ from typing import Any, cast
 from ..core import UnoObject
 from ..typing import (
     BorderLine,
-    BorderLineStruct,
+    BorderLine,
+    BorderLine2,
     BorderLine2,
     CellHoriJustify,
     CellOrientation,
-    CellProtectionStruct,
+    CellProtection,
     CellVertJustify,
     Color,
-    ShadowFormatStruct,
+    ShadowFormat,
     TableBorder,
     TableBorder2,
     XPropertySet,
 )
-from ..utils.structs import make_border_line
+def _border_line_from_struct(value: BorderLine) -> Any:
+    try:
+        import uno  # type: ignore
+
+        struct = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    except Exception:
+        struct = BorderLine()
+    struct.Color = value.Color
+    struct.InnerLineWidth = value.InnerLineWidth
+    struct.OuterLineWidth = value.OuterLineWidth
+    struct.LineDistance = value.LineDistance
+    return struct
+
+
+def _border_line2_from_struct(value: BorderLine2) -> Any:
+    try:
+        import uno  # type: ignore
+
+        struct = uno.createUnoStruct("com.sun.star.table.BorderLine2")
+    except Exception:
+        struct = BorderLine2()
+    struct.Color = value.Color
+    struct.InnerLineWidth = value.InnerLineWidth
+    struct.OuterLineWidth = value.OuterLineWidth
+    struct.LineDistance = value.LineDistance
+    struct.LineStyle = value.LineStyle
+    struct.LineWidth = value.LineWidth
+    return struct
 
 
 class CellProperties(UnoObject):
@@ -60,7 +88,24 @@ class CellProperties(UnoObject):
 
     @property
     def HoriJustify(self) -> CellHoriJustify:
-        return CellHoriJustify(int(self.get_property("HoriJustify")))
+        val = self.get_property("HoriJustify")
+        if isinstance(val, CellHoriJustify):
+            return val
+        name = getattr(val, "name", None)
+        if isinstance(name, str) and name in CellHoriJustify.__members__:
+            return CellHoriJustify[name]
+        try:
+            return CellHoriJustify(int(val))
+        except Exception:
+            pass
+        value_attr = getattr(val, "value", None)
+        if isinstance(value_attr, str) and value_attr in CellHoriJustify.__members__:
+            return CellHoriJustify[value_attr]
+        if isinstance(value_attr, (int, float)):
+            return CellHoriJustify(int(value_attr))
+        if isinstance(val, str) and val in CellHoriJustify.__members__:
+            return CellHoriJustify[val]
+        return CellHoriJustify.STANDARD
 
     @HoriJustify.setter
     def HoriJustify(self, value: CellHoriJustify | int) -> None:
@@ -135,14 +180,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("TopBorder"))
 
     @TopBorder.setter
-    def TopBorder(self, value: BorderLine | BorderLineStruct) -> None:
-        if isinstance(value, BorderLineStruct):
-            value = make_border_line(
-                color=value.Color,
-                inner_line_width=value.InnerLineWidth,
-                outer_line_width=value.OuterLineWidth,
-                line_distance=value.LineDistance,
-            )
+    def TopBorder(self, value: BorderLine | BorderLine) -> None:
+        if isinstance(value, BorderLine):
+            value = _border_line_from_struct(value)
         self.set_property("TopBorder", value)
 
     @property
@@ -150,14 +190,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("BottomBorder"))
 
     @BottomBorder.setter
-    def BottomBorder(self, value: BorderLine | BorderLineStruct) -> None:
-        if isinstance(value, BorderLineStruct):
-            value = make_border_line(
-                color=value.Color,
-                inner_line_width=value.InnerLineWidth,
-                outer_line_width=value.OuterLineWidth,
-                line_distance=value.LineDistance,
-            )
+    def BottomBorder(self, value: BorderLine | BorderLine) -> None:
+        if isinstance(value, BorderLine):
+            value = _border_line_from_struct(value)
         self.set_property("BottomBorder", value)
 
     @property
@@ -165,14 +200,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("LeftBorder"))
 
     @LeftBorder.setter
-    def LeftBorder(self, value: BorderLine | BorderLineStruct) -> None:
-        if isinstance(value, BorderLineStruct):
-            value = make_border_line(
-                color=value.Color,
-                inner_line_width=value.InnerLineWidth,
-                outer_line_width=value.OuterLineWidth,
-                line_distance=value.LineDistance,
-            )
+    def LeftBorder(self, value: BorderLine | BorderLine) -> None:
+        if isinstance(value, BorderLine):
+            value = _border_line_from_struct(value)
         self.set_property("LeftBorder", value)
 
     @property
@@ -180,14 +210,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine, self.get_property("RightBorder"))
 
     @RightBorder.setter
-    def RightBorder(self, value: BorderLine | BorderLineStruct) -> None:
-        if isinstance(value, BorderLineStruct):
-            value = make_border_line(
-                color=value.Color,
-                inner_line_width=value.InnerLineWidth,
-                outer_line_width=value.OuterLineWidth,
-                line_distance=value.LineDistance,
-            )
+    def RightBorder(self, value: BorderLine | BorderLine) -> None:
+        if isinstance(value, BorderLine):
+            value = _border_line_from_struct(value)
         self.set_property("RightBorder", value)
 
     @property
@@ -199,19 +224,19 @@ class CellProperties(UnoObject):
         self.set_property("NumberFormat", int(value))
 
     @property
-    def ShadowFormat(self) -> ShadowFormatStruct:
-        return cast(ShadowFormatStruct, self.get_property("ShadowFormat"))
+    def ShadowFormat(self) -> ShadowFormat:
+        return cast(ShadowFormat, self.get_property("ShadowFormat"))
 
     @ShadowFormat.setter
-    def ShadowFormat(self, value: ShadowFormatStruct) -> None:
+    def ShadowFormat(self, value: ShadowFormat) -> None:
         self.set_property("ShadowFormat", value)
 
     @property
-    def CellProtection(self) -> CellProtectionStruct:
-        return cast(CellProtectionStruct, self.get_property("CellProtection"))
+    def CellProtection(self) -> CellProtection:
+        return cast(CellProtection, self.get_property("CellProtection"))
 
     @CellProtection.setter
-    def CellProtection(self, value: CellProtectionStruct) -> None:
+    def CellProtection(self, value: CellProtection) -> None:
         self.set_property("CellProtection", value)
 
     @property
@@ -259,7 +284,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine2, self.get_property("TopBorder2"))
 
     @TopBorder2.setter
-    def TopBorder2(self, value: BorderLine2) -> None:
+    def TopBorder2(self, value: BorderLine2 | BorderLine2) -> None:
+        if isinstance(value, BorderLine2):
+            value = _border_line2_from_struct(value)
         self.set_property("TopBorder2", value)
 
     @property
@@ -267,7 +294,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine2, self.get_property("BottomBorder2"))
 
     @BottomBorder2.setter
-    def BottomBorder2(self, value: BorderLine2) -> None:
+    def BottomBorder2(self, value: BorderLine2 | BorderLine2) -> None:
+        if isinstance(value, BorderLine2):
+            value = _border_line2_from_struct(value)
         self.set_property("BottomBorder2", value)
 
     @property
@@ -275,7 +304,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine2, self.get_property("LeftBorder2"))
 
     @LeftBorder2.setter
-    def LeftBorder2(self, value: BorderLine2) -> None:
+    def LeftBorder2(self, value: BorderLine2 | BorderLine2) -> None:
+        if isinstance(value, BorderLine2):
+            value = _border_line2_from_struct(value)
         self.set_property("LeftBorder2", value)
 
     @property
@@ -283,7 +314,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine2, self.get_property("RightBorder2"))
 
     @RightBorder2.setter
-    def RightBorder2(self, value: BorderLine2) -> None:
+    def RightBorder2(self, value: BorderLine2 | BorderLine2) -> None:
+        if isinstance(value, BorderLine2):
+            value = _border_line2_from_struct(value)
         self.set_property("RightBorder2", value)
 
     @property
@@ -291,7 +324,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine2, self.get_property("DiagonalTLBR2"))
 
     @DiagonalTLBR2.setter
-    def DiagonalTLBR2(self, value: BorderLine2) -> None:
+    def DiagonalTLBR2(self, value: BorderLine2 | BorderLine2) -> None:
+        if isinstance(value, BorderLine2):
+            value = _border_line2_from_struct(value)
         self.set_property("DiagonalTLBR2", value)
 
     @property
@@ -299,7 +334,9 @@ class CellProperties(UnoObject):
         return cast(BorderLine2, self.get_property("DiagonalBLTR2"))
 
     @DiagonalBLTR2.setter
-    def DiagonalBLTR2(self, value: BorderLine2) -> None:
+    def DiagonalBLTR2(self, value: BorderLine2 | BorderLine2) -> None:
+        if isinstance(value, BorderLine2):
+            value = _border_line2_from_struct(value)
         self.set_property("DiagonalBLTR2", value)
 
     @property

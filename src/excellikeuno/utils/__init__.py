@@ -9,16 +9,6 @@ from .structs import (
 	TableBorder2Struct,
 	TableBorderStruct,
 	TableSortFieldStruct,
-	make_border_line,
-	make_border_line2,
-	make_bar_code,
-	make_bezier_point,
-	make_cell_address,
-	make_cell_range_address,
-	make_point,
-	make_table_sort_field,
-	make_table_border,
-	make_table_border2,
 )
 
 __all__ = [
@@ -32,14 +22,4 @@ __all__ = [
 	"TableBorderStruct",
 	"TableBorder2Struct",
 	"TableSortFieldStruct",
-	"make_border_line",
-	"make_border_line2",
-	"make_bar_code",
-	"make_bezier_point",
-	"make_cell_address",
-	"make_cell_range_address",
-	"make_point",
-	"make_table_sort_field",
-	"make_table_border",
-	"make_table_border2",
 ]

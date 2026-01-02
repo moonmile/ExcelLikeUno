@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from excellikeuno.typing.structs import PointStruct
+from excellikeuno.typing.structs import Point
 
 from ..core import UnoObject
 from ..typing import (
@@ -12,15 +12,15 @@ from ..typing import (
     CellHoriJustify,
     CellOrientation,
     CellVertJustify,
-    CellProtectionStruct,
+    CellProtection,
     InterfaceNames,
-    ShadowFormatStruct,
+    ShadowFormat,
     TableBorder,
     TableBorder2,
     XCell,
     XPropertySet,
 )
-from ..typing.structs import PointStruct
+from ..typing.structs import Point
 from .cell_properties import CellProperties
 from ..style.character_properties import CharacterProperties
 from .rows import TableRows
@@ -189,19 +189,19 @@ class Cell(UnoObject):
         self.properties.NumberFormat = value
 
     @property
-    def ShadowFormat(self) -> ShadowFormatStruct:
+    def ShadowFormat(self) -> ShadowFormat:
         return self.properties.ShadowFormat
 
     @ShadowFormat.setter
-    def ShadowFormat(self, value: ShadowFormatStruct) -> None:
+    def ShadowFormat(self, value: ShadowFormat) -> None:
         self.properties.ShadowFormat = value
 
     @property
-    def CellProtection(self) -> CellProtectionStruct:
+    def CellProtection(self) -> CellProtection:
         return self.properties.CellProtection
 
     @CellProtection.setter
-    def CellProtection(self, value: CellProtectionStruct) -> None:
+    def CellProtection(self, value: CellProtection) -> None:
         self.properties.CellProtection = value
 
     @property
@@ -618,9 +618,9 @@ class Cell(UnoObject):
             setattr(column.raw, "Width", int(width))
 
     @property 
-    def position(self) -> PointStruct:
+    def position(self) -> Point:
         pos = self.properties.getPropertyValue("Position")
-        return PointStruct(X=pos.X, Y=pos.Y)
+        return Point(pos.X, pos.Y)
 
     @property
     def value(self) -> float:

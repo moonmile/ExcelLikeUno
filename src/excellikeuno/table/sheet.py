@@ -3,9 +3,10 @@ from __future__ import annotations
 import re
 from typing import Any, List, cast, TYPE_CHECKING
 
+from excellikeuno.typing.structs import Point, Size
+
 from ..core import UnoObject
 from ..drawing import Shape, EllipseShape
-from ..utils.structs import make_point, make_size
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
 from .range import Range, TableRow, TableColumn
@@ -216,21 +217,6 @@ class Shapes:
         fill_color: int | None = None,
         line_color: int | None = None,
     ) -> EllipseShape:
-        def _try_set_color(obj: Any, name: str, value: int | None) -> None:
-            if value is None:
-                return
-            setter = getattr(obj, "setPropertyValue", None)
-            if callable(setter):
-                try:
-                    setter(name, int(value))
-                    return
-                except Exception:
-                    pass
-            try:
-                setattr(obj, name, int(value))
-            except Exception:
-                # If even direct setattr fails, ignore so creation still succeeds
-                pass
 
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
@@ -238,8 +224,10 @@ class Shapes:
         ellipse = EllipseShape(ellipse_raw)
 
         # Position and size (1/100 mm)
-        point = make_point(x, y)
-        size = make_size(width, height)
+        point_struct = Point(x, y)
+        size_struct = Size(width, height)
+        point = point_struct.to_raw() if hasattr(point_struct, "to_raw") else point_struct
+        size = size_struct.to_raw() if hasattr(size_struct, "to_raw") else size_struct
         ellipse.Position = point
         ellipse.Size = size
         if fill_color is not None:

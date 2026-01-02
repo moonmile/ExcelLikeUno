@@ -8,11 +8,11 @@ from ..typing import (
     BorderLine2,
     CellHoriJustify,
     CellOrientation,
-    CellProtectionStruct,
+    CellProtection,
     CellVertJustify,
     Color,
     InterfaceNames,
-    ShadowFormatStruct,
+    ShadowFormat,
     TableBorder,
     TableBorder2,
     XCell,
@@ -240,19 +240,19 @@ class Range(UnoObject):
         self.properties.NumberFormat = value
 
     @property
-    def ShadowFormat(self) -> ShadowFormatStruct:
+    def ShadowFormat(self) -> ShadowFormat:
         return self.properties.ShadowFormat
 
     @ShadowFormat.setter
-    def ShadowFormat(self, value: ShadowFormatStruct) -> None:
+    def ShadowFormat(self, value: ShadowFormat) -> None:
         self.properties.ShadowFormat = value
 
     @property
-    def CellProtection(self) -> CellProtectionStruct:
+    def CellProtection(self) -> CellProtection:
         return self.properties.CellProtection
 
     @CellProtection.setter
-    def CellProtection(self, value: CellProtectionStruct) -> None:
+    def CellProtection(self, value: CellProtection) -> None:
         self.properties.CellProtection = value
 
     @property
