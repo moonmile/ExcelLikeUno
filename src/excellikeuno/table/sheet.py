@@ -3,6 +3,16 @@ from __future__ import annotations
 import re
 from typing import Any, List, cast, TYPE_CHECKING
 
+from excellikeuno.drawing.closed_bezier_shape import ClosedBezierShape
+from excellikeuno.drawing.connector_shape import ConnectorShape
+from excellikeuno.drawing.control_shape import ControlShape
+from excellikeuno.drawing.line_shape import LineShape
+from excellikeuno.drawing.polyline_shape import PolyLineShape
+from excellikeuno.drawing.polypolygon_bezier_shape import PolyPolygonBezierShape
+from excellikeuno.drawing.polypolygon_shape import PolyPolygonShape
+from excellikeuno.drawing.rectangle_shape import RectangleShape
+from excellikeuno.drawing.text_shape import TextShape
+from excellikeuno.typing.calc import ConnectionType, XConnectorShape
 from excellikeuno.typing.structs import Point, Size
 
 from ..core import UnoObject
@@ -224,12 +234,8 @@ class Shapes:
         ellipse = EllipseShape(ellipse_raw)
 
         # Position and size (1/100 mm)
-        point_struct = Point(x, y)
-        size_struct = Size(width, height)
-        point = point_struct.to_raw() if hasattr(point_struct, "to_raw") else point_struct
-        size = size_struct.to_raw() if hasattr(size_struct, "to_raw") else size_struct
-        ellipse.Position = point
-        ellipse.Size = size
+        ellipse.Position = Point(x, y)
+        ellipse.Size = Size(width, height)
         if fill_color is not None:
             ellipse.FillColor = int(fill_color)
         if line_color is not None:
@@ -237,6 +243,449 @@ class Shapes:
 
         # Must add to draw page before some properties become available
         draw_page.add(ellipse_raw)
-
         return ellipse
     
+    def add_circle_shape(
+        self,
+        x: int,
+        y: int,
+        diameter: int,
+        fill_color: int | None = None,
+        line_color: int | None = None,
+    ) -> EllipseShape:
+        """Add a circle shape to the sheet's draw page.
+
+        Args:
+            x: The X position (1/100 mm).
+            y: The Y position (1/100 mm).
+            diameter: The diameter (1/100 mm).
+            fill_color: Optional fill color as integer RGB.
+            line_color: Optional line color as integer RGB.
+
+        Returns:
+            The created EllipseShape representing the circle.
+        """
+        return self.add_ellipse_shape(
+            x=x,
+            y=y,
+            width=diameter,
+            height=diameter,
+            fill_color=fill_color,
+            line_color=line_color,
+        )
+    
+    def add_line_shape(
+        self,
+        x1: int,
+        y1: int,
+        x2: int,
+        y2: int,
+        line_color: int | None = None,
+        line_width: int | None = None,
+    ) -> LineShape:
+        """Add a line shape to the sheet's draw page.
+
+        Args:
+            x1: The starting X position (1/100 mm).
+            y1: The starting Y position (1/100 mm).
+            x2: The ending X position (1/100 mm).
+            y2: The ending Y position (1/100 mm).
+            line_color: Optional line color as integer RGB.
+            line_width: Optional line width (1/100 mm).
+
+        Returns:
+            The created Shape representing the line.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        line_raw = doc.createInstance("com.sun.star.drawing.LineShape")
+        line = LineShape(line_raw)
+
+        # Position and size (1/100 mm)
+        line.Position = Point(min(x1, x2), min(y1, y2))
+        line.Size = Size(abs(x2 - x1), abs(y2 - y1))
+        if line_color is not None:
+            line.LineColor = int(line_color)
+        if line_width is not None:
+            line.LineWidth = int(line_width)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(line_raw)
+        return line
+    
+    def add_rectangle_shape(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        fill_color: int | None = None,
+        line_color: int | None = None,
+    ) -> RectangleShape:
+        """Add a rectangle shape to the sheet's draw page.
+        
+        Args:
+            x: The X position (1/100 mm).
+            y: The Y position (1/100 mm).
+            width: The width (1/100 mm).
+            height: The height (1/100 mm).
+            fill_color: Optional fill color as integer RGB.
+            line_color: Optional line color as integer RGB.
+        Returns:
+            The created Shape representing the rectangle.
+        """
+
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        rect_raw = doc.createInstance("com.sun.star.drawing.RectangleShape")
+        rect = RectangleShape(rect_raw)
+
+        # Position and size (1/100 mm)
+        rect.Position = Point(x, y)
+        rect.Size = Size(width, height)
+        if fill_color is not None:
+            rect.FillColor = int(fill_color)
+        if line_color is not None:
+            rect.LineColor = int(line_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(rect_raw)
+        return rect
+    
+    def add_polyline_shape(
+        self,
+        points: List[Point],
+        line_color: int | None = None,
+        line_width: int | None = None,
+    ) -> PolyLineShape:
+        """Add a polyline shape to the sheet's draw page.
+
+        Args:
+            points: A list of Point objects defining the polyline vertices.
+            line_color: Optional line color as integer RGB.
+            line_width: Optional line width (1/100 mm).
+
+        Returns:
+            The created Shape representing the polyline.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        polyline_raw = doc.createInstance("com.sun.star.drawing.PolyLineShape")
+        polyline = PolyLineShape(polyline_raw)
+
+        # Set the points
+        raw_points = [p.to_raw() for p in points]
+        polyline_raw.setPoints(tuple(raw_points))
+
+        if line_color is not None:
+            polyline.LineColor = int(line_color)
+        if line_width is not None:
+            polyline.LineWidth = int(line_width)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(polyline_raw)
+        return polyline
+    
+    def add_polypolygon_shape(
+        self,
+        polygons: List[List[Point]],
+        line_color: int | None = None,
+        line_width: int | None = None,
+        fill_color: int | None = None,
+    ) -> PolyPolygonShape:
+        """Add a polypolygon shape to the sheet's draw page.
+
+        Args:
+            polygons: A list of polygons, each defined as a list of Point objects.
+            line_color: Optional line color as integer RGB.
+            line_width: Optional line width (1/100 mm).
+            fill_color: Optional fill color as integer RGB.
+
+        Returns:
+            The created Shape representing the polypolygon.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        polypolygon_raw = doc.createInstance("com.sun.star.drawing.PolyPolygonShape")
+        polypolygon = PolyPolygonShape(polypolygon_raw)
+
+        # Set the polygons
+        raw_polygons = [tuple(p.to_raw() for p in polygon) for polygon in polygons]
+        polypolygon_raw.setPolygons(tuple(raw_polygons))
+
+        if line_color is not None:
+            polypolygon.LineColor = int(line_color)
+        if line_width is not None:
+            polypolygon.LineWidth = int(line_width)
+        if fill_color is not None:
+            polypolygon.FillColor = int(fill_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(polypolygon_raw)
+        return polypolygon
+    
+    def add_ploypolygon_bezier_shape(
+        self,
+        polygons: List[List[Point]],
+        line_color: int | None = None,
+        line_width: int | None = None,
+        fill_color: int | None = None,
+    ) -> PolyPolygonBezierShape:
+        """Add a polypolygon bezier shape to the sheet's draw page.
+
+        Args:
+            polygons: A list of polygons, each defined as a list of Point objects.
+            line_color: Optional line color as integer RGB.
+            line_width: Optional line width (1/100 mm).
+            fill_color: Optional fill color as integer RGB.
+
+        Returns:
+            The created Shape representing the polypolygon bezier.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        polypolygon_bezier_raw = doc.createInstance("com.sun.star.drawing.PolyPolygonBezierShape")
+        polypolygon_bezier = PolyPolygonBezierShape(polypolygon_bezier_raw)
+
+        # Set the polygons
+        raw_polygons = [tuple(p.to_raw() for p in polygon) for polygon in polygons]
+        polypolygon_bezier_raw.setPolygons(tuple(raw_polygons))
+
+        if line_color is not None:
+            polypolygon_bezier.LineColor = int(line_color)
+        if line_width is not None:
+            polypolygon_bezier.LineWidth = int(line_width)
+        if fill_color is not None:
+            polypolygon_bezier.FillColor = int(fill_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(polypolygon_bezier_raw)
+        return polypolygon_bezier
+
+    def add_text_shape(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        text: str = "",
+        fill_color: int | None = None,
+        line_color: int | None = None,
+    ) -> TextShape:
+        """Add a text shape to the sheet's draw page.
+
+        Args:
+            x: The X position (1/100 mm).
+            y: The Y position (1/100 mm).
+            width: The width (1/100 mm).
+            height: The height (1/100 mm).
+            text: The text content of the shape.
+            fill_color: Optional fill color as integer RGB.
+            line_color: Optional line color as integer RGB.
+
+        Returns:
+            The created Shape representing the text shape.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        textshape_raw = doc.createInstance("com.sun.star.drawing.TextShape")
+        textshape = TextShape(textshape_raw)
+
+        # Position and size (1/100 mm)
+        textshape.Position = Point(x, y)
+        textshape.Size = Size(width, height)
+        textshape.String = text
+        if fill_color is not None:
+            textshape.FillColor = int(fill_color)
+        if line_color is not None:
+            textshape.LineColor = int(line_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(textshape_raw)
+        return textshape
+    
+    def add_closed_bezier_shape(
+        self,
+        points: List[Point],
+        line_color: int | None = None,
+        line_width: int | None = None,
+        fill_color: int | None = None,
+    ) -> ClosedBezierShape:
+        """Add a closed bezier shape to the sheet's draw page.
+
+        Args:
+            points: A list of Point objects defining the bezier vertices.
+            line_color: Optional line color as integer RGB.
+            line_width: Optional line width (1/100 mm).
+            fill_color: Optional fill color as integer RGB.
+
+        Returns:
+            The created Shape representing the closed bezier.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        closed_bezier_raw = doc.createInstance("com.sun.star.drawing.ClosedBezierShape")
+        closed_bezier = ClosedBezierShape(closed_bezier_raw)
+
+        # Set the points
+        raw_points = [p.to_raw() for p in points]
+        closed_bezier_raw.setControlPoints(tuple(raw_points))
+
+        if line_color is not None:
+            closed_bezier.LineColor = int(line_color)
+        if line_width is not None:
+            closed_bezier.LineWidth = int(line_width)
+        if fill_color is not None:
+            closed_bezier.FillColor = int(fill_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(closed_bezier_raw)
+        return closed_bezier
+    
+    def add_control_shape(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        control_type: str,
+        fill_color: int | None = None,
+        line_color: int | None = None,
+    ) -> ControlShape:
+        """Add a control shape to the sheet's draw page.
+
+        Args:
+            x: The X position (1/100 mm).
+            y: The Y position (1/100 mm).
+            width: The width (1/100 mm).
+            height: The height (1/100 mm).
+            control_type: The control type identifier.
+            fill_color: Optional fill color as integer RGB.
+            line_color: Optional line color as integer RGB.
+
+        Returns:
+            The created Shape representing the control shape.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        control_shape_raw = doc.createInstance("com.sun.star.drawing.ControlShape")
+        control_shape = ControlShape(control_shape_raw)
+
+        # Position and size (1/100 mm)
+        control_shape.Position = Point(x, y)
+        control_shape.Size = Size(width, height)
+        control_shape.ControlType = control_type
+        if fill_color is not None:
+            control_shape.FillColor = int(fill_color)
+        if line_color is not None:
+            control_shape.LineColor = int(line_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(control_shape_raw)
+        return control_shape    
+    
+    def add_custom_shape(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        shape_data: bytes,
+        fill_color: int | None = None,
+        line_color: int | None = None,
+    ) -> CustomShape:
+        """Add a custom shape to the sheet's draw page.
+
+        Args:
+            x: The X position (1/100 mm).
+            y: The Y position (1/100 mm).
+            width: The width (1/100 mm).
+            height: The height (1/100 mm).
+            shape_data: The custom shape data as bytes.
+            fill_color: Optional fill color as integer RGB.
+            line_color: Optional line color as integer RGB.
+
+        Returns:
+            The created Shape representing the custom shape.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        custom_shape_raw = doc.createInstance("com.sun.star.drawing.CustomShape")
+        custom_shape = CustomShape(custom_shape_raw)
+
+        # Position and size (1/100 mm)
+        custom_shape.Position = Point(x, y)
+        custom_shape.Size = Size(width, height)
+        custom_shape.ShapeData = shape_data
+        if fill_color is not None:
+            custom_shape.FillColor = int(fill_color)
+        if line_color is not None:
+            custom_shape.LineColor = int(line_color)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(custom_shape_raw)
+        return custom_shape
+    
+    def add_group_shape(
+        self,
+        shapes: List[Shape],
+    ) -> GroupShape:
+        """Add a group shape to the sheet's draw page.
+
+        Args:
+            shapes: A list of Shape objects to group.
+
+        Returns:
+            The created Shape representing the group shape.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        group_shape_raw = doc.createInstance("com.sun.star.drawing.GroupShape")
+        group_shape = GroupShape(group_shape_raw)
+
+        # Add shapes to group
+        group_iface = cast(XDrawPageSupplier, group_shape.iface(InterfaceNames.X_DRAW_PAGE_SUPPLIER))
+        group_draw_page = group_iface.getDrawPage()
+        for shape in shapes:
+            group_draw_page.add(shape.iface(InterfaceNames.X_SHAPE))
+
+        # Must add to draw page before some properties become available
+        draw_page.add(group_shape_raw)
+        return group_shape
+    
+    def add_connector_shape(
+        self,
+        start_shape: Shape,
+        end_shape: Shape,
+        line_color: int | None = None,
+        line_width: int | None = None,
+    ) -> ConnectorShape:
+        """Add a connector shape between two shapes on the sheet's draw page.
+
+        Args:
+            start_shape: The starting Shape object.
+            end_shape: The ending Shape object.
+            line_color: Optional line color as integer RGB.
+            line_width: Optional line width (1/100 mm).
+
+        Returns:
+            The created Shape representing the connector shape.
+        """
+        draw_page = self.sheet._draw_page()
+        doc = self.sheet.document
+        connector_shape_raw = doc.createInstance("com.sun.star.drawing.ConnectorShape")
+        connector_shape = ConnectorShape(connector_shape_raw)
+
+        # Set start and end shapes
+        connector_iface = cast("XConnectorShape", connector_shape.iface("com.sun.star.drawing.XConnectorShape"))
+        connector_iface.connectStart(start_shape.iface(InterfaceNames.X_SHAPE), ConnectionType.AUTO)
+        connector_iface.connectEnd(end_shape.iface(InterfaceNames.X_SHAPE), ConnectionType.AUTO)
+
+        if line_color is not None:
+            connector_shape.LineColor = int(line_color)
+        if line_width is not None:
+            connector_shape.LineWidth = int(line_width)
+
+        # Must add to draw page before some properties become available
+        draw_page.add(connector_shape_raw)
+        return connector_shape

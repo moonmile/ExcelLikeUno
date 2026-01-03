@@ -251,6 +251,16 @@ class LineDash(Protocol):
     DashLen: int
     Distance: int
 
+@runtime_checkable
+class XConnectorShape(Protocol):
+    def connectStart(self, xShape: Any, nPos: ConnectionType) -> Any:
+        ...
+    def connectEnd(self, xShape: Any, nPos: ConnectionType) -> Any:
+        ...
+    def disconnectBegin(self, xShape: ConnectionType) -> Any:
+        ...
+    def disconnectEnd(self, xShape: ConnectionType) -> Any:
+        ...
 
 class CellHoriJustify(IntEnum):
     STANDARD = 0
@@ -497,3 +507,10 @@ class Colors(IntEnum):
     YELLOW = 0xFFFF00
     YELLOWGREEN = 0x9ACD32
 
+class ConnectionType(IntEnum):
+    AUTO = 0
+    LEFT = 1
+    TOP = 2
+    RIGHT = 3
+    BOTTOM = 4
+    SPECIAL = 5
