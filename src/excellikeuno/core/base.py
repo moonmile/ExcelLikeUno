@@ -41,3 +41,10 @@ class UnoObject:
     def raw(self) -> Any:
         """Expose the wrapped UNO object when direct access is needed."""
         return self._obj
+
+    def queryInterface(self, iface: Any) -> Any:
+        """Delegate queryInterface to the wrapped UNO object when present."""
+        target = getattr(self._obj, "queryInterface", None)
+        if target is None:
+            raise AttributeError("UNO object missing queryInterface")
+        return target(iface)
