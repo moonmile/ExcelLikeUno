@@ -20,6 +20,39 @@ class InterfaceNames:
     LINE_PROPERTIES = "com.sun.star.drawing.LineProperties"
     SHADOW_PROPERTIES = "com.sun.star.drawing.ShadowProperties"
     TEXT_PROPERTIES = "com.sun.star.drawing.TextProperties"
+    X_CONNECTOR_SHAPE = "com.sun.star.drawing.XConnectorShape"
+
+    # Drawing shape services
+    TEXT_SHAPE = "com.sun.star.drawing.TextShape"
+    LINE_SHAPE = "com.sun.star.drawing.LineShape"
+    RECTANGLE_SHAPE = "com.sun.star.drawing.RectangleShape"
+    ELLIPSE_SHAPE = "com.sun.star.drawing.EllipseShape"
+    POLYLINE_SHAPE = "com.sun.star.drawing.PolyLineShape"
+    POLYPOLYGON_SHAPE = "com.sun.star.drawing.PolyPolygonShape"
+    POLYPOLYGON_BEZIER_SHAPE = "com.sun.star.drawing.PolyPolygonBezierShape"
+    CLOSED_BEZIER_SHAPE = "com.sun.star.drawing.ClosedBezierShape"
+    CONNECTOR_SHAPE = "com.sun.star.drawing.ConnectorShape"
+    CONTROL_SHAPE = "com.sun.star.drawing.ControlShape"
+    CUSTOM_SHAPE = "com.sun.star.drawing.CustomShape"
+    GROUP_SHAPE = "com.sun.star.drawing.GroupShape"
+
+
+class StructNames:
+    """String constants for UNO struct names used by Calc wrappers."""
+
+    BORDER_LINE = "com.sun.star.table.BorderLine"
+    BORDER_LINE2 = "com.sun.star.table.BorderLine2"
+    POINT = "com.sun.star.awt.Point"
+    SIZE = "com.sun.star.awt.Size"
+    CELL_ADDRESS = "com.sun.star.table.CellAddress"
+    CELL_RANGE_ADDRESS = "com.sun.star.table.CellRangeAddress"
+    TABLE_SORT_FIELD = "com.sun.star.table.TableSortField"
+    BAR_CODE = "com.sun.star.drawing.BarCode"
+    BEZIER_POINT = "com.sun.star.drawing.BezierPoint"
+    TABLE_BORDER = "com.sun.star.table.TableBorder"
+    TABLE_BORDER2 = "com.sun.star.table.TableBorder2"
+    SHADOW_FORMAT = "com.sun.star.drawing.ShadowFormat"
+    CELL_PROTECTION = "com.sun.star.table.CellProtection"
     
 
-__all__ = ["InterfaceNames"]
+__all__ = ["InterfaceNames", "StructNames"]

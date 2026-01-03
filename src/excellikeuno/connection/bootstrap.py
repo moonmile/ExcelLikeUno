@@ -56,7 +56,7 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
     first_sheet = sheets.getByIndex(0)
     return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
 
-def connect_calc() -> Tuple[Any, Any, Sheet]:
+def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
     try:
         import uno
         from com.sun.star.beans import PropertyValue

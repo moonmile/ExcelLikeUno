@@ -259,17 +259,37 @@ def test_polypolygon_shape_points_roundtrip():
 
 def test_textshape_string_roundtrip():
     _, doc, sheet, Point, Size = _connect_or_skip()
-    draw_page = sheet.raw.getDrawPage()
-    text_raw = _add_textshape(doc, draw_page)
-    text = TextShape(text_raw)
+    shapes = sheet.shapes
+
+    # Reuse an existing TextShape if present; otherwise create one like the sample
+    text_shape = None
+    for shape in shapes:
+        if isinstance(shape, TextShape):
+            text_shape = shape
+            break
+
+    if text_shape is None:
+        text_shape = shapes.add_text_shape(
+            x=1000,
+            y=1000,
+            width=4000,
+            height=1500,
+            text="",
+        )
+
+    test_string = "Hello Calc"
     try:
-        test_string = "Hello Calc"
         try:
-            text.string = test_string
+            text_shape.string = test_string
         except Exception as exc:  # pragma: no cover - runtime dependent
             pytest.skip(f"TextShape String not supported: {exc}")
-        if text.string == "":
+        if text_shape.string == "":
             pytest.skip("TextShape String returned empty; likely unsupported")
-        assert text.string == test_string
+        assert text_shape.string == test_string
     finally:
-        draw_page.remove(text.raw)
+        try:
+            # Clean up only if we created it in this test
+            if text_shape and text_shape.raw not in [s.raw for s in shapes]:
+                sheet.raw.getDrawPage().remove(text_shape.raw)
+        except Exception:
+            pass

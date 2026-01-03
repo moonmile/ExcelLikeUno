@@ -5,8 +5,6 @@ from typing import Any, cast
 from ..core import UnoObject
 from ..typing import (
     BorderLine,
-    BorderLine,
-    BorderLine2,
     BorderLine2,
     CellHoriJustify,
     CellOrientation,
@@ -18,11 +16,12 @@ from ..typing import (
     TableBorder2,
     XPropertySet,
 )
+from ..typing.interfaces import StructNames
 def _border_line_from_struct(value: BorderLine) -> Any:
     try:
         import uno  # type: ignore
 
-        struct = uno.createUnoStruct("com.sun.star.table.BorderLine")
+        struct = uno.createUnoStruct(StructNames.BORDER_LINE)
     except Exception:
         struct = BorderLine()
     struct.Color = value.Color
@@ -36,7 +35,7 @@ def _border_line2_from_struct(value: BorderLine2) -> Any:
     try:
         import uno  # type: ignore
 
-        struct = uno.createUnoStruct("com.sun.star.table.BorderLine2")
+        struct = uno.createUnoStruct(StructNames.BORDER_LINE2)
     except Exception:
         struct = BorderLine2()
     struct.Color = value.Color

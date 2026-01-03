@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 from .calc import Color, ShadowLocation
+from .interfaces import StructNames
 
 def _try_uno_struct(name: str) -> Any | None:
     try:
@@ -19,12 +20,32 @@ class BorderLine:
     InnerLineWidth: int = 0
     OuterLineWidth: int = 0
     LineDistance: int = 0
+    def to_raw(self) -> Any:
+        struct = _try_uno_struct(StructNames.BORDER_LINE)
+        if struct is None:
+            struct = type("BorderLine", (), {})()
+        struct.Color = self.Color
+        struct.InnerLineWidth = self.InnerLineWidth
+        struct.OuterLineWidth = self.OuterLineWidth
+        struct.LineDistance = self.LineDistance
+        return struct
 
 
 @dataclass
 class BorderLine2(BorderLine):
     LineStyle: int = 0
     LineWidth: int = 0
+    def to_raw(self) -> Any:
+        struct = _try_uno_struct(StructNames.BORDER_LINE2)
+        if struct is None:
+            struct = type("BorderLine2", (), {})()
+        struct.Color = self.Color
+        struct.InnerLineWidth = self.InnerLineWidth
+        struct.OuterLineWidth = self.OuterLineWidth
+        struct.LineDistance = self.LineDistance
+        struct.LineStyle = self.LineStyle
+        struct.LineWidth = self.LineWidth
+        return struct
 
 
 @dataclass
@@ -32,7 +53,7 @@ class Point:
     X: int = 0
     Y: int = 0
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.awt.Point")
+        struct = _try_uno_struct(StructNames.POINT)
         if struct is None:
             struct = type("Point", (), {})()
         struct.X = self.X
@@ -44,7 +65,7 @@ class Size:
     Width: int = 0
     Height: int = 0
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.awt.Size")
+        struct = _try_uno_struct(StructNames.SIZE)
         if struct is None:
             struct = type("Size", (), {})()
         struct.Width = self.Width
@@ -57,7 +78,7 @@ class CellAddress:
     Column: int = 0
     Row: int = 0
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.table.CellAddress")
+        struct = _try_uno_struct(StructNames.CELL_ADDRESS)
         if struct is None:
             struct = type("CellAddress", (), {})()
         struct.Sheet = self.Sheet
@@ -74,7 +95,7 @@ class CellRangeAddress:
     EndColumn: int = 0
     EndRow: int = 0
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.table.CellRangeAddress")
+        struct = _try_uno_struct(StructNames.CELL_RANGE_ADDRESS)
         if struct is None:
             struct = type("CellRangeAddress", (), {})()
         struct.Sheet = self.Sheet
@@ -92,7 +113,7 @@ class TableSortField:
     FieldType: int = 0
     CompareFlags: int = 0
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.table.TableSortField")
+        struct = _try_uno_struct(StructNames.TABLE_SORT_FIELD)
         if struct is None:
             struct = type("TableSortField", (), {})()
         struct.Field = self.Field
@@ -109,7 +130,7 @@ class BarCode:
     ErrorCorrection: int = 0
     Border: int = 0
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.drawing.BarCode")
+        struct = _try_uno_struct(StructNames.BAR_CODE)
         if struct is None:
             struct = type("BarCode", (), {})()
         struct.Type = self.Type
@@ -125,7 +146,7 @@ class BezierPoint:
     ControlPoint1: Any = field(default_factory=Point)
     ControlPoint2: Any = field(default_factory=Point)
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.drawing.BezierPoint")
+        struct = _try_uno_struct(StructNames.BEZIER_POINT)
         if struct is None:
             struct = type("BezierPoint", (), {})()
         struct.Position = self.Position.to_raw()
@@ -151,7 +172,7 @@ class TableBorder:
     Distance: int = 0
     IsDistanceValid: bool = False
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.table.TableBorder")
+        struct = _try_uno_struct(StructNames.TABLE_BORDER)
         if struct is None:
             struct = type("TableBorder", (), {})()
         struct.TopLine = self.TopLine.to_raw()
@@ -188,7 +209,7 @@ class TableBorder2:
     Distance: int = 0
     IsDistanceValid: bool = False
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.table.TableBorder2")
+        struct = _try_uno_struct(StructNames.TABLE_BORDER2)
         if struct is None:
             struct = type("TableBorder2", (), {})()
         struct.TopLine = self.TopLine.to_raw()
@@ -215,7 +236,7 @@ class ShadowFormat:
     ShadowColor: Color = 0
     IsTransparent: bool = False
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.drawing.ShadowFormat")
+        struct = _try_uno_struct(StructNames.SHADOW_FORMAT)
         if struct is None:
             struct = type("ShadowFormat", (), {})()
         struct.Location = self.Location.value
@@ -232,7 +253,7 @@ class CellProtection:
     IsHidden: bool = False
     IsPrintHidden: bool = False
     def to_raw(self) -> Any:
-        struct = _try_uno_struct("com.sun.star.table.CellProtection")
+        struct = _try_uno_struct(StructNames.CELL_PROTECTION)
         if struct is None:
             struct = type("CellProtection", (), {})()
         struct.IsLocked = self.IsLocked

@@ -6,6 +6,8 @@ from typing import Any, List, cast, TYPE_CHECKING
 from excellikeuno.drawing.closed_bezier_shape import ClosedBezierShape
 from excellikeuno.drawing.connector_shape import ConnectorShape
 from excellikeuno.drawing.control_shape import ControlShape
+from excellikeuno.drawing.custom_shape import CustomShape
+from excellikeuno.drawing.group_shape import GroupShape
 from excellikeuno.drawing.line_shape import LineShape
 from excellikeuno.drawing.polyline_shape import PolyLineShape
 from excellikeuno.drawing.polypolygon_bezier_shape import PolyPolygonBezierShape
@@ -105,10 +107,6 @@ class Sheet(UnoObject):
     def shape(self, index: int) -> Shape:
         draw_page = self._draw_page()
         return Shape(draw_page.getByIndex(index))
-
-    def shapes(self) -> List[Shape]:
-        draw_page = self._draw_page()
-        return [Shape(draw_page.getByIndex(i)) for i in range(draw_page.getCount())]
 
     @property
     def shapes(self) -> "Shapes":
@@ -213,10 +211,59 @@ class Shapes:
     def __init__(self, sheet: Sheet) -> None:
         self.sheet = sheet
 
+    def _wrap_shape(self, raw: Any) -> Shape:
+        supports = getattr(raw, "supportsService", None)
+        if callable(supports):
+            try:
+                if supports(InterfaceNames.TEXT_SHAPE):
+                    return TextShape(raw)
+                if supports(InterfaceNames.LINE_SHAPE):
+                    return LineShape(raw)
+                if supports(InterfaceNames.RECTANGLE_SHAPE):
+                    return RectangleShape(raw)
+                if supports(InterfaceNames.ELLIPSE_SHAPE):
+                    return EllipseShape(raw)
+                if supports(InterfaceNames.POLYLINE_SHAPE):
+                    return PolyLineShape(raw)
+                if supports(InterfaceNames.POLYPOLYGON_SHAPE):
+                    return PolyPolygonShape(raw)
+                if supports(InterfaceNames.POLYPOLYGON_BEZIER_SHAPE):
+                    return PolyPolygonBezierShape(raw)
+                if supports(InterfaceNames.CLOSED_BEZIER_SHAPE):
+                    return ClosedBezierShape(raw)
+                if supports(InterfaceNames.CONNECTOR_SHAPE):
+                    return ConnectorShape(raw)
+                if supports(InterfaceNames.CONTROL_SHAPE):
+                    return ControlShape(raw)
+                if supports(InterfaceNames.CUSTOM_SHAPE):
+                    return CustomShape(raw)  
+                if supports(InterfaceNames.GROUP_SHAPE):
+                    return GroupShape(raw)
+                
+            except Exception:
+                pass
+        return Shape(raw)
+
     def __call__(self) -> List[Shape]:
         """Return all shapes on the sheet as wrapped Shape objects."""
         draw_page = self.sheet._draw_page()
-        return [Shape(draw_page.getByIndex(i)) for i in range(draw_page.getCount())]
+        return [self._wrap_shape(draw_page.getByIndex(i)) for i in range(draw_page.getCount())]
+
+    def __len__(self) -> int:
+        draw_page = self.sheet._draw_page()
+        return draw_page.getCount()
+
+    def __iter__(self):
+        return iter(self())
+
+    def __getitem__(self, index: int) -> Shape:
+        draw_page = self.sheet._draw_page()
+        count = draw_page.getCount()
+        if index < 0:
+            index += count
+        if index < 0 or index >= count:
+            raise IndexError("shape index out of range")
+        return self._wrap_shape(draw_page.getByIndex(index))
 
     def add_ellipse_shape(
         self,
@@ -230,7 +277,7 @@ class Shapes:
 
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        ellipse_raw = doc.createInstance("com.sun.star.drawing.EllipseShape")
+        ellipse_raw = doc.createInstance(InterfaceNames.ELLIPSE_SHAPE)
         ellipse = EllipseShape(ellipse_raw)
 
         # Position and size (1/100 mm)
@@ -298,7 +345,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        line_raw = doc.createInstance("com.sun.star.drawing.LineShape")
+        line_raw = doc.createInstance(InterfaceNames.LINE_SHAPE)
         line = LineShape(line_raw)
 
         # Position and size (1/100 mm)
@@ -337,7 +384,7 @@ class Shapes:
 
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        rect_raw = doc.createInstance("com.sun.star.drawing.RectangleShape")
+        rect_raw = doc.createInstance(InterfaceNames.RECTANGLE_SHAPE)
         rect = RectangleShape(rect_raw)
 
         # Position and size (1/100 mm)
@@ -370,7 +417,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        polyline_raw = doc.createInstance("com.sun.star.drawing.PolyLineShape")
+        polyline_raw = doc.createInstance(InterfaceNames.POLYLINE_SHAPE)
         polyline = PolyLineShape(polyline_raw)
 
         # Set the points
@@ -406,7 +453,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        polypolygon_raw = doc.createInstance("com.sun.star.drawing.PolyPolygonShape")
+        polypolygon_raw = doc.createInstance(InterfaceNames.POLYPOLYGON_SHAPE)
         polypolygon = PolyPolygonShape(polypolygon_raw)
 
         # Set the polygons
@@ -444,7 +491,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        polypolygon_bezier_raw = doc.createInstance("com.sun.star.drawing.PolyPolygonBezierShape")
+        polypolygon_bezier_raw = doc.createInstance(InterfaceNames.POLYPOLYGON_BEZIER_SHAPE)
         polypolygon_bezier = PolyPolygonBezierShape(polypolygon_bezier_raw)
 
         # Set the polygons
@@ -488,7 +535,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        textshape_raw = doc.createInstance("com.sun.star.drawing.TextShape")
+        textshape_raw = doc.createInstance(InterfaceNames.TEXT_SHAPE)
         textshape = TextShape(textshape_raw)
 
         # Position and size (1/100 mm)
@@ -524,7 +571,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        closed_bezier_raw = doc.createInstance("com.sun.star.drawing.ClosedBezierShape")
+        closed_bezier_raw = doc.createInstance(InterfaceNames.CLOSED_BEZIER_SHAPE)
         closed_bezier = ClosedBezierShape(closed_bezier_raw)
 
         # Set the points
@@ -568,7 +615,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        control_shape_raw = doc.createInstance("com.sun.star.drawing.ControlShape")
+        control_shape_raw = doc.createInstance(InterfaceNames.CONTROL_SHAPE)
         control_shape = ControlShape(control_shape_raw)
 
         # Position and size (1/100 mm)
@@ -610,7 +657,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        custom_shape_raw = doc.createInstance("com.sun.star.drawing.CustomShape")
+        custom_shape_raw = doc.createInstance(InterfaceNames.CUSTOM_SHAPE)
         custom_shape = CustomShape(custom_shape_raw)
 
         # Position and size (1/100 mm)
@@ -640,7 +687,7 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        group_shape_raw = doc.createInstance("com.sun.star.drawing.GroupShape")
+        group_shape_raw = doc.createInstance(InterfaceNames.GROUP_SHAPE)
         group_shape = GroupShape(group_shape_raw)
 
         # Add shapes to group
@@ -673,11 +720,11 @@ class Shapes:
         """
         draw_page = self.sheet._draw_page()
         doc = self.sheet.document
-        connector_shape_raw = doc.createInstance("com.sun.star.drawing.ConnectorShape")
+        connector_shape_raw = doc.createInstance(InterfaceNames.CONNECTOR_SHAPE)
         connector_shape = ConnectorShape(connector_shape_raw)
 
         # Set start and end shapes
-        connector_iface = cast("XConnectorShape", connector_shape.iface("com.sun.star.drawing.XConnectorShape"))
+        connector_iface = cast("XConnectorShape", connector_shape.iface(InterfaceNames.X_CONNECTOR_SHAPE))
         connector_iface.connectStart(start_shape.iface(InterfaceNames.X_SHAPE), ConnectionType.AUTO)
         connector_iface.connectEnd(end_shape.iface(InterfaceNames.X_SHAPE), ConnectionType.AUTO)
 
