@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from excellikeuno.typing.calc import Color
+
 from ..core import UnoObject
 from ..typing import XPropertySet
 
@@ -20,12 +22,12 @@ class FillProperties(UnoObject):
 
     # Common FillProperties for convenience
     @property
-    def FillColor(self) -> int:
-        return int(self.get_property("FillColor"))
+    def FillColor(self) -> Color:
+        return Color(self.get_property("FillColor"))
 
     @FillColor.setter
-    def FillColor(self, value: int) -> None:
-        self.set_property("FillColor", int(value))
+    def FillColor(self, value: Color) -> None:
+        self.set_property("FillColor", Color(value))
 
     @property
     def FillStyle(self) -> Any:

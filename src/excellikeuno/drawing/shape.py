@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from excellikeuno.typing.calc import Color
 from excellikeuno.typing.structs import Point, Size
 
 from ..core import UnoObject
@@ -91,6 +92,7 @@ class Shape(UnoObject):
             object.__setattr__(self, "_shadow_properties", existing)
         return cast(ShadowProperties, existing)
 
+	# TextProperties implementation
     @property
     def text_properties(self) -> TextProperties:
         existing = self.__dict__.get("_text_properties")
@@ -155,34 +157,14 @@ class Shape(UnoObject):
     def TextLowerDistance(self, value: int) -> None:
         self.text_properties.TextLowerDistance = int(value)
 
+	# LineProperties implementation
     @property
-    def LineColor(self) -> int:
-        try:
-            return int(self.line_properties.LineColor)
-        except Exception:
-            try:
-                return int(self._get_prop("LineColor"))
-            except Exception:
-                return int(getattr(self.raw, "LineColor", 0))
+    def LineColor(self) -> Color:
+        return self.line_properties.LineColor
 
     @LineColor.setter
-    def LineColor(self, value: int) -> None:
-        val = int(value)
-        try:
-            self.line_properties.LineColor = val
-            return
-        except Exception:
-            pass
-        try:
-            self._set_prop("LineColor", val)
-            return
-        except Exception:
-            pass
-        try:
-            setattr(self.raw, "LineColor", val)
-        except Exception:
-            # Best-effort; suppress if even direct setattr is unsupported
-            pass
+    def LineColor(self, value: Color) -> None:
+        self.line_properties.LineColor = value
 
     @property
     def LineStyle(self) -> LineStyle:
@@ -224,6 +206,7 @@ class Shape(UnoObject):
     def LineDash(self, value: LineDash) -> None:
         self.line_properties.LineDash = value
 
+	# ShadowProperties implementation
     @property
     def Shadow(self) -> bool:
         return bool(self.shadow_properties.Shadow)
@@ -264,34 +247,14 @@ class Shape(UnoObject):
     def ShadowYDistance(self, value: int) -> None:
         self.shadow_properties.ShadowYDistance = int(value)
 
+	# FillProperties implementation
     @property
-    def FillColor(self) -> int:
-        try:
-            return int(self.fill_properties.FillColor)
-        except Exception:
-            try:
-                return int(self._get_prop("FillColor"))
-            except Exception:
-                return int(getattr(self.raw, "FillColor", 0))
+    def FillColor(self) -> Color:
+            return self.fill_properties.FillColor
 
     @FillColor.setter
-    def FillColor(self, value: int) -> None:
-        val = int(value)
-        try:
-            self.fill_properties.FillColor = val
-            return
-        except Exception:
-            pass
-        try:
-            self._set_prop("FillColor", val)
-            return
-        except Exception:
-            pass
-        try:
-            setattr(self.raw, "FillColor", val)
-        except Exception:
-            # Best-effort; suppress if even direct setattr is unsupported
-            pass
+    def FillColor(self, value: Color) -> None:
+        self.fill_properties.FillColor = value
 
     @property
     def FillStyle(self) -> Any:

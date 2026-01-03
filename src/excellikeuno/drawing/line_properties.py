@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from excellikeuno.typing.calc import Color
+
 from ..core import UnoObject
 from ..typing import LineDash, LineStyle, XPropertySet
 
@@ -20,11 +22,11 @@ class LineProperties(UnoObject):
 
     # Common LineProperties for convenience
     @property
-    def LineColor(self) -> int:
-        return int(self.get_property("LineColor"))
+    def LineColor(self) -> Color:
+        return Color(self.get_property("LineColor"))
 
     @LineColor.setter
-    def LineColor(self, value: int) -> None:
+    def LineColor(self, value: Color) -> None:
         self.set_property("LineColor", int(value))
 
     @property
