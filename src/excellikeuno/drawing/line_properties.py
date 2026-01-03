@@ -15,15 +15,34 @@ class LineProperties(UnoObject):
         return cast(XPropertySet, self.raw)
 
     def get_property(self, name: str) -> Any:
-        return self._props().getPropertyValue(name)
+        try:
+            return self._props().getPropertyValue(name)
+        except BaseException:
+            pass
+        try:
+            return getattr(self.raw, name)
+        except BaseException:
+            return None
 
     def set_property(self, name: str, value: Any) -> None:
-        self._props().setPropertyValue(name, value)
+        try:
+            self._props().setPropertyValue(name, value)
+            return
+        except BaseException:
+            pass
+        try:
+            setattr(self.raw, name, value)
+        except BaseException:
+            # Best-effort; swallow when the line interface is missing
+            pass
 
     # Common LineProperties for convenience
     @property
     def LineColor(self) -> Color:
-        return Color(self.get_property("LineColor"))
+        try:
+            return Color(self.get_property("LineColor"))
+        except BaseException:
+            return Color(0)
 
     @LineColor.setter
     def LineColor(self, value: Color) -> None:
@@ -31,7 +50,10 @@ class LineProperties(UnoObject):
 
     @property
     def LineStyle(self) -> LineStyle:
-        return LineStyle(int(self.get_property("LineStyle")))
+        try:
+            return LineStyle(int(self.get_property("LineStyle")))
+        except BaseException:
+            return LineStyle(0)
 
     @LineStyle.setter
     def LineStyle(self, value: LineStyle | int) -> None:
@@ -39,7 +61,10 @@ class LineProperties(UnoObject):
 
     @property
     def LineWidth(self) -> int:
-        return int(self.get_property("LineWidth"))
+        try:
+            return int(self.get_property("LineWidth"))
+        except BaseException:
+            return 0
 
     @LineWidth.setter
     def LineWidth(self, value: int) -> None:
@@ -47,7 +72,10 @@ class LineProperties(UnoObject):
 
     @property
     def LineTransparence(self) -> int:
-        return int(self.get_property("LineTransparence"))
+        try:
+            return int(self.get_property("LineTransparence"))
+        except BaseException:
+            return 0
 
     @LineTransparence.setter
     def LineTransparence(self, value: int) -> None:
@@ -55,7 +83,10 @@ class LineProperties(UnoObject):
 
     @property
     def LineDashName(self) -> str:
-        return cast(str, self.get_property("LineDashName"))
+        try:
+            return cast(str, self.get_property("LineDashName"))
+        except BaseException:
+            return ""
 
     @LineDashName.setter
     def LineDashName(self, value: str) -> None:
@@ -63,7 +94,10 @@ class LineProperties(UnoObject):
 
     @property
     def LineDash(self) -> LineDash:
-        return cast(LineDash, self.get_property("LineDash"))
+        try:
+            return cast(LineDash, self.get_property("LineDash"))
+        except BaseException:
+            return cast(LineDash, None)
 
     @LineDash.setter
     def LineDash(self, value: LineDash) -> None:

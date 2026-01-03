@@ -295,14 +295,9 @@ class ShadowLocation(IntEnum):
 
 
 class LineStyle(IntEnum):
-    SOLID = 0
-    DASH = 1
-    DOT = 2
-    DASHDOT = 3
-    DASHDOTDOT = 4
-    LONGDASH = 5
-    LONGDASHDOT = 6
-    LONGDASHDOTDOT = 7
+    NONE = 0
+    SOLID = 1
+    DASH = 2
     # Some runtimes expose 8/9 for ROUND/LONGROUND variants; keep strict per IDL here.
 
 

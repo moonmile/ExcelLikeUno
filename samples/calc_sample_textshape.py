@@ -12,3 +12,8 @@ text_shape : TextShape = sheet.shapes[0]
 text_value = text_shape.string
 
 print(text_value)
+
+text_shape.LineStyle = 1  # SOLID
+text_shape.LineColor = 0xFF0000  # 赤色に変更
+text_shape.LineWidth = 200  # 線の太さを200 (1/100 mm)
+text_shape.FillColor = 0xFFFF00  # 黄色に変更

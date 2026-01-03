@@ -15,15 +15,34 @@ class FillProperties(UnoObject):
         return cast(XPropertySet, self.raw)
 
     def get_property(self, name: str) -> Any:
-        return self._props().getPropertyValue(name)
+        try:
+            return self._props().getPropertyValue(name)
+        except BaseException:
+            pass
+        try:
+            return getattr(self.raw, name)
+        except BaseException:
+            return None
 
     def set_property(self, name: str, value: Any) -> None:
-        self._props().setPropertyValue(name, value)
+        try:
+            self._props().setPropertyValue(name, value)
+            return
+        except BaseException:
+            pass
+        try:
+            setattr(self.raw, name, value)
+        except BaseException:
+            # Best-effort; swallow when the fill interface is missing
+            pass
 
     # Common FillProperties for convenience
     @property
     def FillColor(self) -> Color:
-        return Color(self.get_property("FillColor"))
+        try:
+            return Color(self.get_property("FillColor"))
+        except BaseException:
+            return Color(0)
 
     @FillColor.setter
     def FillColor(self, value: Color) -> None:
@@ -31,7 +50,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillStyle(self) -> Any:
-        return self.get_property("FillStyle")
+        try:
+            return self.get_property("FillStyle")
+        except BaseException:
+            return None
 
     @FillStyle.setter
     def FillStyle(self, value: Any) -> None:
@@ -39,7 +61,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillTransparence(self) -> int:
-        return int(self.get_property("FillTransparence"))
+        try:
+            return int(self.get_property("FillTransparence"))
+        except BaseException:
+            return 0
 
     @FillTransparence.setter
     def FillTransparence(self, value: int) -> None:
@@ -47,7 +72,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillGradientName(self) -> str:
-        return cast(str, self.get_property("FillGradientName"))
+        try:
+            return cast(str, self.get_property("FillGradientName"))
+        except BaseException:
+            return ""
 
     @FillGradientName.setter
     def FillGradientName(self, value: str) -> None:
@@ -55,7 +83,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillHatchName(self) -> str:
-        return cast(str, self.get_property("FillHatchName"))
+        try:
+            return cast(str, self.get_property("FillHatchName"))
+        except BaseException:
+            return ""
 
     @FillHatchName.setter
     def FillHatchName(self, value: str) -> None:
@@ -63,7 +94,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapName(self) -> str:
-        return cast(str, self.get_property("FillBitmapName"))
+        try:
+            return cast(str, self.get_property("FillBitmapName"))
+        except BaseException:
+            return ""
 
     @FillBitmapName.setter
     def FillBitmapName(self, value: str) -> None:
@@ -71,7 +105,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapMode(self) -> int:
-        return int(self.get_property("FillBitmapMode"))
+        try:
+            return int(self.get_property("FillBitmapMode"))
+        except BaseException:
+            return 0
 
     @FillBitmapMode.setter
     def FillBitmapMode(self, value: int) -> None:
@@ -79,7 +116,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapOffsetX(self) -> int:
-        return int(self.get_property("FillBitmapOffsetX"))
+        try:
+            return int(self.get_property("FillBitmapOffsetX"))
+        except BaseException:
+            return 0
 
     @FillBitmapOffsetX.setter
     def FillBitmapOffsetX(self, value: int) -> None:
@@ -87,7 +127,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapOffsetY(self) -> int:
-        return int(self.get_property("FillBitmapOffsetY"))
+        try:
+            return int(self.get_property("FillBitmapOffsetY"))
+        except BaseException:
+            return 0
 
     @FillBitmapOffsetY.setter
     def FillBitmapOffsetY(self, value: int) -> None:
@@ -95,7 +138,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapPositionX(self) -> int:
-        return int(self.get_property("FillBitmapPositionX"))
+        try:
+            return int(self.get_property("FillBitmapPositionX"))
+        except BaseException:
+            return 0
 
     @FillBitmapPositionX.setter
     def FillBitmapPositionX(self, value: int) -> None:
@@ -103,7 +149,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapPositionY(self) -> int:
-        return int(self.get_property("FillBitmapPositionY"))
+        try:
+            return int(self.get_property("FillBitmapPositionY"))
+        except BaseException:
+            return 0
 
     @FillBitmapPositionY.setter
     def FillBitmapPositionY(self, value: int) -> None:
@@ -111,7 +160,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapSizeX(self) -> int:
-        return int(self.get_property("FillBitmapSizeX"))
+        try:
+            return int(self.get_property("FillBitmapSizeX"))
+        except BaseException:
+            return 0
 
     @FillBitmapSizeX.setter
     def FillBitmapSizeX(self, value: int) -> None:
@@ -119,7 +171,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBitmapSizeY(self) -> int:
-        return int(self.get_property("FillBitmapSizeY"))
+        try:
+            return int(self.get_property("FillBitmapSizeY"))
+        except BaseException:
+            return 0
 
     @FillBitmapSizeY.setter
     def FillBitmapSizeY(self, value: int) -> None:
@@ -127,7 +182,10 @@ class FillProperties(UnoObject):
 
     @property
     def FillBackground(self) -> bool:
-        return bool(self.get_property("FillBackground"))
+        try:
+            return bool(self.get_property("FillBackground"))
+        except BaseException:
+            return False
 
     @FillBackground.setter
     def FillBackground(self, value: bool) -> None:

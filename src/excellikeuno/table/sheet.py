@@ -14,7 +14,7 @@ from excellikeuno.drawing.polypolygon_bezier_shape import PolyPolygonBezierShape
 from excellikeuno.drawing.polypolygon_shape import PolyPolygonShape
 from excellikeuno.drawing.rectangle_shape import RectangleShape
 from excellikeuno.drawing.text_shape import TextShape
-from excellikeuno.typing.calc import ConnectionType, XConnectorShape
+from excellikeuno.typing.calc import Color, ConnectionType, XConnectorShape
 from excellikeuno.typing.structs import Point, Size
 
 from ..core import UnoObject
@@ -541,14 +541,13 @@ class Shapes:
         # Position and size (1/100 mm)
         textshape.Position = Point(x, y)
         textshape.Size = Size(width, height)
-        textshape.String = text
-        if fill_color is not None:
-            textshape.FillColor = int(fill_color)
-        if line_color is not None:
-            textshape.LineColor = int(line_color)
-
         # Must add to draw page before some properties become available
         draw_page.add(textshape_raw)
+        textshape.String = text
+        if fill_color is not None:
+            textshape.FillColor = Color(fill_color)
+        if line_color is not None:
+            textshape.LineColor = Color(line_color)
         return textshape
     
     def add_closed_bezier_shape(

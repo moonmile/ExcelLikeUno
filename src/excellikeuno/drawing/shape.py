@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from excellikeuno.typing.calc import Color
 from excellikeuno.typing.structs import Point, Size
 
 from ..core import UnoObject
-from ..typing import InterfaceNames, LineDash, LineStyle, XPropertySet, XShape
+from ..typing import Color, InterfaceNames, LineDash, LineStyle, XPropertySet, XShape
 from .fill_properties import FillProperties
 from .line_properties import LineProperties
 from .shadow_properties import ShadowProperties
@@ -72,7 +71,11 @@ class Shape(UnoObject):
     def fill_properties(self) -> FillProperties:
         existing = self.__dict__.get("_fill_properties")
         if existing is None:
-            existing = FillProperties(self.iface(InterfaceNames.FILL_PROPERTIES))
+            try:
+                fp_raw = self.iface(InterfaceNames.FILL_PROPERTIES)
+            except BaseException:
+                fp_raw = self.raw
+            existing = FillProperties(fp_raw)
             object.__setattr__(self, "_fill_properties", existing)
         return cast(FillProperties, existing)
 
@@ -80,7 +83,11 @@ class Shape(UnoObject):
     def line_properties(self) -> LineProperties:
         existing = self.__dict__.get("_line_properties")
         if existing is None:
-            existing = LineProperties(self.iface(InterfaceNames.LINE_PROPERTIES))
+            try:
+                lp_raw = self.iface(InterfaceNames.LINE_PROPERTIES)
+            except BaseException:
+                lp_raw = self.raw
+            existing = LineProperties(lp_raw)
             object.__setattr__(self, "_line_properties", existing)
         return cast(LineProperties, existing)
 
@@ -92,12 +99,16 @@ class Shape(UnoObject):
             object.__setattr__(self, "_shadow_properties", existing)
         return cast(ShadowProperties, existing)
 
-	# TextProperties implementation
+    # TextProperties implementation
     @property
     def text_properties(self) -> TextProperties:
         existing = self.__dict__.get("_text_properties")
         if existing is None:
-            existing = TextProperties(self.iface(InterfaceNames.TEXT_PROPERTIES))
+            try:
+                tp_raw = self.iface(InterfaceNames.TEXT_PROPERTIES)
+            except BaseException:
+                tp_raw = self.raw
+            existing = TextProperties(tp_raw)
             object.__setattr__(self, "_text_properties", existing)
         return cast(TextProperties, existing)
 
@@ -157,38 +168,82 @@ class Shape(UnoObject):
     def TextLowerDistance(self, value: int) -> None:
         self.text_properties.TextLowerDistance = int(value)
 
-	# LineProperties implementation
     @property
-    def LineColor(self) -> Color:
-        return self.line_properties.LineColor
+    def CharHeight(self) -> float:
+        return float(self.text_properties.CharHeight)
+
+    @CharHeight.setter
+    def CharHeight(self, value: float) -> None:
+        self.text_properties.CharHeight = float(value)
+
+    # Alias for VBA-like naming
+    font_size = CharHeight
+
+    @property
+    def CharFontName(self) -> str:
+        return cast(str, self.text_properties.CharFontName)
+
+    @CharFontName.setter
+    def CharFontName(self, value: str) -> None:
+        self.text_properties.CharFontName = value
+
+    # Alias for VBA-like naming
+    font_name = CharFontName
+
+    @property
+    def HoriJustify(self) -> int:
+        for name in ("TextHorizontalAdjust", "HoriJustify", "ParaAdjust"):
+            try:
+                return int(self.text_properties.get_property(name))
+            except BaseException:
+                continue
+        return 0
+
+    @HoriJustify.setter
+    def HoriJustify(self, value: int) -> None:
+        val = int(value)
+        for name in ("TextHorizontalAdjust", "HoriJustify", "ParaAdjust"):
+            try:
+                self.text_properties.set_property(name, val)
+                return
+            except BaseException:
+                continue
+
+    @property
+    def VertJustify(self) -> int:
+        for name in ("TextVerticalAdjust", "VertJustify"):
+            try:
+                return int(self.text_properties.get_property(name))
+            except BaseException:
+                continue
+        return 0
+
+    @VertJustify.setter
+    def VertJustify(self, value: int) -> None:
+        val = int(value)
+        for name in ("TextVerticalAdjust", "VertJustify"):
+            try:
+                self.text_properties.set_property(name, val)
+                return
+            except BaseException:
+                continue
+
+    # LineProperties implementation
+    @property
+    def LineColor(self) -> int:
+        return int(self.line_properties.LineColor)
 
     @LineColor.setter
-    def LineColor(self, value: Color) -> None:
-        self.line_properties.LineColor = value
+    def LineColor(self, value: int) -> None:
+        self.line_properties.LineColor = int(value)
 
     @property
     def LineStyle(self) -> LineStyle:
         return LineStyle(int(self.line_properties.LineStyle))
 
     @LineStyle.setter
-    def LineStyle(self, value: LineStyle | int) -> None:
+    def LineStyle(self, value: LineStyle) -> None:
         self.line_properties.LineStyle = int(value)
-
-    @property
-    def LineWidth(self) -> int:
-        return int(self.line_properties.LineWidth)
-
-    @LineWidth.setter
-    def LineWidth(self, value: int) -> None:
-        self.line_properties.LineWidth = int(value)
-
-    @property
-    def LineTransparence(self) -> int:
-        return int(self.line_properties.LineTransparence)
-
-    @LineTransparence.setter
-    def LineTransparence(self, value: int) -> None:
-        self.line_properties.LineTransparence = int(value)
 
     @property
     def LineDashName(self) -> str:
@@ -206,7 +261,15 @@ class Shape(UnoObject):
     def LineDash(self, value: LineDash) -> None:
         self.line_properties.LineDash = value
 
-	# ShadowProperties implementation
+    @property
+    def LineWidth(self) -> int:
+        return int(self.line_properties.LineWidth)
+
+    @LineWidth.setter
+    def LineWidth(self, value: int) -> None:
+        self.line_properties.LineWidth = int(value)
+
+    # ShadowProperties implementation
     @property
     def Shadow(self) -> bool:
         return bool(self.shadow_properties.Shadow)
@@ -247,14 +310,20 @@ class Shape(UnoObject):
     def ShadowYDistance(self, value: int) -> None:
         self.shadow_properties.ShadowYDistance = int(value)
 
-	# FillProperties implementation
+    # FillProperties implementation
     @property
     def FillColor(self) -> Color:
-            return self.fill_properties.FillColor
+        return cast(Color, self.fill_properties.FillColor)
 
     @FillColor.setter
     def FillColor(self, value: Color) -> None:
-        self.fill_properties.FillColor = value
+        val = Color(value)
+        solid = 1  # com.sun.star.drawing.FillStyle.SOLID
+        try:
+            self.fill_properties.FillStyle = solid
+        except BaseException:
+            pass
+        self.fill_properties.FillColor = val
 
     @property
     def FillStyle(self) -> Any:

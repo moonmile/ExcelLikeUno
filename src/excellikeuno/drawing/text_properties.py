@@ -13,15 +13,34 @@ class TextProperties(UnoObject):
         return cast(XPropertySet, self.raw)
 
     def get_property(self, name: str) -> Any:
-        return self._props().getPropertyValue(name)
+        try:
+            return self._props().getPropertyValue(name)
+        except BaseException:
+            pass
+        try:
+            return getattr(self.raw, name)
+        except BaseException:
+            return None
 
     def set_property(self, name: str, value: Any) -> None:
-        self._props().setPropertyValue(name, value)
+        try:
+            self._props().setPropertyValue(name, value)
+            return
+        except BaseException:
+            pass
+        try:
+            setattr(self.raw, name, value)
+        except BaseException:
+            # Best-effort; swallow when the text interface is missing
+            pass
 
     # Common TextProperties for convenience
     @property
     def CharColor(self) -> int:
-        return int(self.get_property("CharColor"))
+        try:
+            return int(self.get_property("CharColor"))
+        except BaseException:
+            return 0
 
     @CharColor.setter
     def CharColor(self, value: int) -> None:
@@ -29,7 +48,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharHeight(self) -> float:
-        return float(self.get_property("CharHeight"))
+        try:
+            return float(self.get_property("CharHeight"))
+        except BaseException:
+            return 0.0
 
     @CharHeight.setter
     def CharHeight(self, value: float) -> None:
@@ -37,7 +59,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharFontName(self) -> str:
-        return cast(str, self.get_property("CharFontName"))
+        try:
+            return cast(str, self.get_property("CharFontName"))
+        except BaseException:
+            return ""
 
     @CharFontName.setter
     def CharFontName(self, value: str) -> None:
@@ -45,7 +70,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharFontStyleName(self) -> str:
-        return cast(str, self.get_property("CharFontStyleName"))
+        try:
+            return cast(str, self.get_property("CharFontStyleName"))
+        except BaseException:
+            return ""
 
     @CharFontStyleName.setter
     def CharFontStyleName(self, value: str) -> None:
@@ -53,7 +81,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharFontPitch(self) -> int:
-        return int(self.get_property("CharFontPitch"))
+        try:
+            return int(self.get_property("CharFontPitch"))
+        except BaseException:
+            return 0
 
     @CharFontPitch.setter
     def CharFontPitch(self, value: int) -> None:
@@ -61,7 +92,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharWeight(self) -> float:
-        return float(self.get_property("CharWeight"))
+        try:
+            return float(self.get_property("CharWeight"))
+        except BaseException:
+            return 0.0
 
     @CharWeight.setter
     def CharWeight(self, value: float) -> None:
@@ -69,7 +103,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharPosture(self) -> FontSlant:
-        return FontSlant(int(self.get_property("CharPosture")))
+        try:
+            return FontSlant(int(self.get_property("CharPosture")))
+        except BaseException:
+            return FontSlant(0)
 
     @CharPosture.setter
     def CharPosture(self, value: FontSlant | int) -> None:
@@ -77,7 +114,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharUnderline(self) -> FontUnderline:
-        return FontUnderline(int(self.get_property("CharUnderline")))
+        try:
+            return FontUnderline(int(self.get_property("CharUnderline")))
+        except BaseException:
+            return FontUnderline(0)
 
     @CharUnderline.setter
     def CharUnderline(self, value: FontUnderline | int) -> None:
@@ -85,7 +125,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharStrikeout(self) -> FontStrikeout:
-        return FontStrikeout(int(self.get_property("CharStrikeout")))
+        try:
+            return FontStrikeout(int(self.get_property("CharStrikeout")))
+        except BaseException:
+            return FontStrikeout(0)
 
     @CharStrikeout.setter
     def CharStrikeout(self, value: FontStrikeout | int) -> None:
@@ -93,7 +136,10 @@ class TextProperties(UnoObject):
 
     @property
     def CharLocale(self) -> Any:
-        return self.get_property("CharLocale")
+        try:
+            return self.get_property("CharLocale")
+        except BaseException:
+            return None
 
     @CharLocale.setter
     def CharLocale(self, value: Any) -> None:

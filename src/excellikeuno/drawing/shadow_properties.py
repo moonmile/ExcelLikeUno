@@ -13,15 +13,34 @@ class ShadowProperties(UnoObject):
         return cast(XPropertySet, self.raw)
 
     def get_property(self, name: str) -> Any:
-        return self._props().getPropertyValue(name)
+        try:
+            return self._props().getPropertyValue(name)
+        except BaseException:
+            pass
+        try:
+            return getattr(self.raw, name)
+        except BaseException:
+            return None
 
     def set_property(self, name: str, value: Any) -> None:
-        self._props().setPropertyValue(name, value)
+        try:
+            self._props().setPropertyValue(name, value)
+            return
+        except BaseException:
+            pass
+        try:
+            setattr(self.raw, name, value)
+        except BaseException:
+            # Best-effort; swallow when the shadow interface is missing
+            pass
 
     # Common ShadowProperties for convenience
     @property
     def Shadow(self) -> bool:
-        return bool(self.get_property("Shadow"))
+        try:
+            return bool(self.get_property("Shadow"))
+        except BaseException:
+            return False
 
     @Shadow.setter
     def Shadow(self, value: bool) -> None:
@@ -29,7 +48,10 @@ class ShadowProperties(UnoObject):
 
     @property
     def ShadowColor(self) -> int:
-        return int(self.get_property("ShadowColor"))
+        try:
+            return int(self.get_property("ShadowColor"))
+        except BaseException:
+            return 0
 
     @ShadowColor.setter
     def ShadowColor(self, value: int) -> None:
@@ -37,7 +59,10 @@ class ShadowProperties(UnoObject):
 
     @property
     def ShadowTransparence(self) -> int:
-        return int(self.get_property("ShadowTransparence"))
+        try:
+            return int(self.get_property("ShadowTransparence"))
+        except BaseException:
+            return 0
 
     @ShadowTransparence.setter
     def ShadowTransparence(self, value: int) -> None:
@@ -45,7 +70,10 @@ class ShadowProperties(UnoObject):
 
     @property
     def ShadowXDistance(self) -> int:
-        return int(self.get_property("ShadowXDistance"))
+        try:
+            return int(self.get_property("ShadowXDistance"))
+        except BaseException:
+            return 0
 
     @ShadowXDistance.setter
     def ShadowXDistance(self, value: int) -> None:
@@ -53,7 +81,10 @@ class ShadowProperties(UnoObject):
 
     @property
     def ShadowYDistance(self) -> int:
-        return int(self.get_property("ShadowYDistance"))
+        try:
+            return int(self.get_property("ShadowYDistance"))
+        except BaseException:
+            return 0
 
     @ShadowYDistance.setter
     def ShadowYDistance(self, value: int) -> None:
@@ -61,7 +92,10 @@ class ShadowProperties(UnoObject):
 
     @property
     def ShadowLocation(self) -> ShadowLocation:
-        return ShadowLocation(int(self.get_property("ShadowLocation")))
+        try:
+            return ShadowLocation(int(self.get_property("ShadowLocation")))
+        except BaseException:
+            return ShadowLocation(0)
 
     @ShadowLocation.setter
     def ShadowLocation(self, value: ShadowLocation | int) -> None:
