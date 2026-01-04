@@ -24,7 +24,7 @@ class Shape(UnoObject):
         props.setPropertyValue(name, value)
 
     @property
-    def Position(self) -> Any:
+    def Position(self) -> Point:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         pos = shape.getPosition()
         try:
@@ -33,7 +33,7 @@ class Shape(UnoObject):
             return pos
 
     @Position.setter
-    def Position(self, value: Any) -> None:
+    def Position(self, value: Point) -> None:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         target = value
         if hasattr(value, "to_raw"):
@@ -44,7 +44,7 @@ class Shape(UnoObject):
         shape.setPosition(target)
 
     @property
-    def Size(self) -> Any:
+    def Size(self) -> Size:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         size = shape.getSize()
         try:
@@ -53,7 +53,7 @@ class Shape(UnoObject):
             return size
 
     @Size.setter
-    def Size(self, value: Any) -> None:
+    def Size(self, value: Size) -> None:
         shape = cast(XShape, self.iface(InterfaceNames.X_SHAPE))
         target = value
         if hasattr(value, "to_raw"):
@@ -789,3 +789,41 @@ class Shape(UnoObject):
     @AllowOverlap.setter
     def AllowOverlap(self, value: bool) -> None:
         self._set_prop("AllowOverlap", bool(value))
+
+    @property
+    def string(self) -> str:
+        try:
+            value = self._get_prop("String")
+            return str(value) if value is not None else ""
+        except Exception:
+            try:
+                return str(self.raw.getText().getString())  # type: ignore[attr-defined]
+            except Exception:
+                return ""
+
+    @string.setter
+    def string(self, value: str) -> None:
+        try:
+            self._set_prop("String", value)
+            return
+        except Exception:
+            pass
+        try:
+            self.raw.setString(value)  # type: ignore[attr-defined]
+            return
+        except Exception:
+            pass
+        try:
+            self.raw.getText().setString(value)  # type: ignore[attr-defined]
+        except Exception:
+            # Best effort; swallow if unsupported
+            pass
+
+    @property
+    def String(self) -> str:
+        return self.string
+
+    @String.setter
+    def String(self, value: str) -> None:
+        self.string = value
+
