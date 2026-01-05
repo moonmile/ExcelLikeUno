@@ -21,6 +21,7 @@ class InterfaceNames:
     SHADOW_PROPERTIES = "com.sun.star.drawing.ShadowProperties"
     TEXT_PROPERTIES = "com.sun.star.drawing.TextProperties"
     X_CONNECTOR_SHAPE = "com.sun.star.drawing.XConnectorShape"
+    X_TEXT_DOCUMENT = "com.sun.star.text.XTextDocument"
 
     # Drawing shape services
     TEXT_SHAPE = "com.sun.star.drawing.TextShape"

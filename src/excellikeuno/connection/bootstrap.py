@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Tuple
 from ..core import UnoObject
 from ..core.calc_document import CalcDocument
+from ..core.writer_document import WriterDocument
 from ..typing import InterfaceNames
 from ..table import Sheet
 
@@ -90,6 +91,41 @@ def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
     except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
         raise RuntimeError("Failed to connect to Calc") from exc
 
+
+def connect_writer() -> Tuple[Any, WriterDocument]:
+    """Connect to an active Writer document.
+
+    Returns:
+        (desktop, document_wrapper)
+
+    Raises:
+        RuntimeError: when UNO runtime is unavailable or no Writer document is active.
+    """
+
+    try:
+        import uno
+    except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
+        raise RuntimeError("UNO runtime is not available") from exc
+
+    try:
+        local_ctx = uno.getComponentContext()
+        resolver = local_ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.bridge.UnoUrlResolver", local_ctx)
+
+        ctx = resolver.resolve(
+            "uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+
+        smgr = ctx.ServiceManager
+        desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+
+        doc = desktop.getCurrentComponent()
+        if doc is None or not doc.supportsService("com.sun.star.text.TextDocument"):
+            raise RuntimeError("No active Writer document found")
+
+        # Wrap the Writer document for convenience while still allowing raw access via .raw
+        return desktop, WriterDocument(doc)
+    except Exception as exc:  # pragma: no cover - depends on runtime
+        raise RuntimeError("Failed to connect to Writer") from exc
 
 
 def wrap_sheet(sheet_obj: Any) -> Sheet:

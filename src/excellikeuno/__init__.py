@@ -1,6 +1,7 @@
-from .connection import connect_calc, open_calc_document, wrap_sheet
+from .connection import connect_calc, connect_writer, open_calc_document, wrap_sheet
 from .core import UnoObject
 from .core.calc_document import CalcDocument
+from .core.writer_document import WriterDocument
 from .typing import InterfaceNames
 from .drawing import (
     ClosedBezierShape,
@@ -43,7 +44,9 @@ __all__ = [
     "OpenBezierShape",
     "PageShape",
     "CalcDocument",
+    "WriterDocument",
     "connect_calc",
+    "connect_writer",
     "open_calc_document",
     "wrap_sheet",
     "InterfaceNames",
@@ -56,6 +59,10 @@ try:
 
     if not hasattr(uno, "connect_calc"):
         uno.connect_calc = connect_calc  # type: ignore[attr-defined]
+    if not hasattr(uno, "connect_writer"):
+        uno.connect_writer = connect_writer  # type: ignore[attr-defined]
+    if not hasattr(uno, "WriterDocument"):
+        uno.WriterDocument = WriterDocument  # type: ignore[attr-defined]
 except Exception:
     # Ignore when UNO runtime is absent; normal imports still work.
     pass
