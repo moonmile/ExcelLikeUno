@@ -28,3 +28,6 @@ dist/
 
 .fake
 *.code-workspace
+
+.github/
+.vscode/
