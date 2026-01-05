@@ -1,5 +1,5 @@
 # 鶴亀オセロのサンプル
-from excellikeuno.connection.bootstrap import connect_calc
+from excellikeuno import connect_calc
 from excellikeuno.drawing import TextShape
 
 

@@ -1,4 +1,4 @@
-from excellikeuno.connection.bootstrap import connect_calc
+from excellikeuno import connect_calc
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 
 (desktop, doc, sheet) = connect_calc() 

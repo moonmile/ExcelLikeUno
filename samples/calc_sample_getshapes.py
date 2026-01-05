@@ -1,5 +1,5 @@
 # アクティブシートの図形を取得するサンプル
-from excellikeuno.connection.bootstrap import connect_calc
+from excellikeuno import connect_calc
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "図形取得サンプル"
 # シート上の全図形を列挙

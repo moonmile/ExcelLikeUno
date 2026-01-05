@@ -1,5 +1,5 @@
 # 将棋盤を作る
-from excellikeuno.connection.bootstrap import connect_calc
+from excellikeuno import connect_calc
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 from excellikeuno.typing.structs import BorderLine
 

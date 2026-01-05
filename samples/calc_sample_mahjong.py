@@ -1,5 +1,5 @@
 # 麻雀牌を並べる
-from excellikeuno.connection.bootstrap import connect_calc
+from excellikeuno import connect_calc
 from excellikeuno.typing.calc import LineStyle
 
 (desktop, doc, sheet) = connect_calc()
