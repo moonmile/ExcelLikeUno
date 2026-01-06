@@ -37,6 +37,78 @@
     - CellHoriJustify
 
 
+## クラス構成の比較
+
+### uno での Calc のクラス構造
+
+```
+SpreadsheetDocument
+ ├─ Sheets
+ │    ├─ Sheet
+ │    │    ├─ Cells
+ │    │    │    ├─ Cell
+ │    │    │    ├─ CellRange
+ │    │    │    └─ Cursor
+ │    │    ├─ Charts
+ │    │    ├─ DrawPage
+ │    │    ├─ Annotations
+ │    │    └─ DataPilotTables
+ ├─ NamedRanges
+ ├─ DatabaseRanges
+ ├─ StyleFamilies
+ └─ Controllers
+```
+
+### Excel のオブジェクトモデル
+
+```
+Application
+ ├─ Workbooks
+ │    ├─ Workbook
+ │    │    ├─ Worksheets
+ │    │    │    ├─ Worksheet
+ │    │    │    │    ├─ Range
+ │    │    │    │    ├─ Cells
+ │    │    │    │    ├─ Rows
+ │    │    │    │    ├─ Columns
+ │    │    │    │    ├─ Shapes
+ │    │    │    │    └─ ChartObjects
+ │    │    ├─ Names
+ │    │    ├─ Charts
+ │    │    └─ Windows
+ │    └─ ...
+ ├─ ActiveWorkbook
+ ├─ ActiveSheet
+ ├─ Selection（Range / Shape など）
+ ├─ Charts
+ ├─ AddIns
+ └─ Dialogs
+```
+
+### Excel Like UNO のクラス構造案
+
+```
+CalcDocument
+ ├─ Sheets
+ │    ├─ Sheet
+ │    │    ├─ cell(col, row) : Cell
+ │    │    ├─ range(col1, row1, col2, row2) : Range
+ │    │    ├─ Rows : TableRows
+ │    │    ├─ Columns : TableColumns
+ │    │    ├─ Charts : List[Chart]
+ │    │    ├─ Shapes : List[Shape]
+ │    │    ├─ PivodTables : List[PivodTable]
+ │    │    ├─ DrawPage 
+ │    │    └─ Annotations
+ ├─ NamedRanges
+ ├─ StyleFamilies
+ ├─ Selection（Range / Shape など）
+ ├─ ActiveSheet, ThisSheet
+ ActiveDocument, ThisDocument : global
+
+```
+
+
 
 ## クラス図
 
@@ -50,7 +122,11 @@ classDiagram
 
     class Sheet {
         +cell(col: int, row: int) Cell
-        +getCellByPosition(col: int, row: int) Cell
+        +range(col1: int, row1: int, col2: int, row2: int) Range
+        +Rows: TableRows
+        +Columns: TableColumns
+        +Charts: List[Chart]
+        +Shapes: List[Shape]
     }
     class Cell {
         +value: Any
