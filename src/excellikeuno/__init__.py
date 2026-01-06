@@ -1,4 +1,4 @@
-from .connection import connect_calc, connect_writer, open_calc_document, wrap_sheet
+from .connection import connect_calc, connect_writer, open_calc_document, wrap_sheet, connect_calc_script
 from .core import UnoObject
 from .core.calc_document import CalcDocument
 from .core.writer_document import WriterDocument
@@ -59,6 +59,8 @@ try:
 
     if not hasattr(uno, "connect_calc"):
         uno.connect_calc = connect_calc  # type: ignore[attr-defined]
+    if not hasattr(uno, "connect_calc_script"):
+        uno.connect_calc_script = connect_calc_script  # type: ignore[attr-defined]
     if not hasattr(uno, "connect_writer"):
         uno.connect_writer = connect_writer  # type: ignore[attr-defined]
     if not hasattr(uno, "WriterDocument"):

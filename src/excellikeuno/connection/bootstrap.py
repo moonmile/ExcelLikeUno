@@ -91,6 +91,14 @@ def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
     except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
         raise RuntimeError("Failed to connect to Calc") from exc
 
+# XSCRIPTCONTEXT に接続する
+def connect_calc_script(xscriptcontext) -> Tuple[Any, CalcDocument, Sheet]:
+    desktop = xscriptcontext.getDesktop()
+    doc = CalcDocument(desktop.getCurrentComponent())
+    controller = doc.raw.getCurrentController()
+    sheet = Sheet(controller.getActiveSheet())
+    return desktop, doc, sheet
+
 
 def connect_writer() -> Tuple[Any, WriterDocument]:
     """Connect to an active Writer document.

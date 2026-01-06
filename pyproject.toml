@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "excellikeuno"
+version = "0.1.0"
+description = "Excel/VBA-like UNO wrapper for LibreOffice Calc and Writer"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+  { name = "Tomoaki Masuda", email = "masuda@moonmile.net" },
+]
+keywords = ["libreoffice", "uno", "calc", "writer", "excel", "vba"]
+classifiers = [
+  "Programming Language :: Python",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/moonmile/ExcelLikeUno"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
