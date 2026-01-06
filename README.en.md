@@ -3,6 +3,8 @@
 Provides an Excel/VBA-like programming experience to LibreOffice Calc through a Python wrapper over the UNO API.
 The goal is to make migration from Excel macros easier.
 
+[Goto 日本語 README](README.md)
+
 # Key Features
 
 - Hides the complexity of the UNO API and exposes methods/properties close to Excel/VBA
@@ -34,7 +36,19 @@ With this server running, you can connect from `connect_calc()` or `connect_writ
 
 # Installation
 
-For local development, clone this repository and add `src` to `PYTHONPATH`.
+A pip package is available (under development):
+
+```powershell
+& 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
+```
+
+LibreOffice currently bundles Python 3.11, so the package is installed under a user site-packages directory similar to:
+
+```powershell
+C:\Users\<UserName>\AppData\Roaming\Python\Python311\site-packages\
+```
+
+For local development, clone this repository and add `src` to `PYTHONPATH` instead of using the installed package:
 
 ```powershell
 git clone <this-repo-url>
@@ -64,59 +78,58 @@ $env:PYTHONPATH='..\src\'
 
 ## Using from LibreOffice internal macros
 
-Place your Python script (and optionally this library) under:
+First, install the package with the LibreOffice-bundled Python:
+
+```powershell
+& 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
+```
+
+Alternatively, you can place this library directly under:
 
 ```powershell
 C:\Users\<UserName>\AppData\Roaming\LibreOffice\4\user\Scripts\python\
 ```
 
-Then add the script directory to `sys.path`, prepare `connect_calc_script()` that uses `XSCRIPTCONTEXT`,
-and add your macro function to `g_exportedScripts` so that it appears in
-"Tools" → "Macros" → "Run Macro".
+The library provides a helper `connect_calc_script()` that uses `XSCRIPTCONTEXT` to connect to the active Calc document.  
+Register your macro function in `g_exportedScripts` so that it appears under "Tools" → "Macros" → "Run Macro":
 
 ```python
-import inspect
-import os
-import sys
 from typing import Any, Tuple
-
-# Ensure this script's directory is importable so the local excellike package resolves
-BASE_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-if BASE_DIR not in sys.path:
-    sys.path.append(BASE_DIR)
-
 from excellikeuno.table.sheet import Sheet
-
-# Connect via XSCRIPTCONTEXT
-
-def connect_calc_script() -> Tuple[Any, Any, Sheet]:
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
-    controller = doc.getCurrentController()
-    sheet = Sheet(controller.getActiveSheet())
-    return desktop, doc, sheet
-
+from excellikeuno import connect_calc_script
 
 def hello_to_cell():
-    (_, _, sheet) = connect_calc_script()
-    sheet.cell(0, 0).text = "Hello Excel Like for Python!"
-    sheet.cell(0, 1).text = "こんにちは、Excel Like for Python!"
-    sheet.cell(0, 0).column_width = 10000  # set width
+  (_, _, sheet) = connect_calc_script(XSCRIPTCONTEXT)
+  sheet.cell(0, 0).text = "Hello Excel Like for Python!"
+  sheet.cell(0, 1).text = "こんにちは、Excel Like for Python!"
+  sheet.cell(0, 0).column_width = 10000  # set width
 
-    cell = sheet.cell(0, 1)
-    cell.CellBackColor = 0x006400  # dark green
-    cell.CharColor = 0xFFFFFF  # white text
-
+  cell = sheet.cell(0, 1)
+  cell.CellBackColor = 0x006400  # dark green
+  cell.CharColor = 0xFFFFFF  # white text
 
 g_exportedScripts = (
-    hello_to_cell,
+  hello_to_cell,
 )
 ```
 
-These steps are a bit cumbersome, so future improvements are planned:
+![Macro selection](./doc/images/connect_calc_script_macro.jpg)
 
-- Automate the `BASE_DIR` handling (it seems it only needs to be configured once)
-- Provide `connect_calc_script()` in `excellikeuno.connection.bootstrap`
+![Using connect_calc_script](./doc/images/connect_calc_script.jpg)
+
+To enable code completion in VS Code, add the following to `.vscode/settings.json`
+(adjust the path to your user name and Python version):
+
+```json
+{
+  // existing settings...
+
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.extraPaths": [
+    "C:/Users/masuda/AppData/Roaming/Python/Python311/site-packages"
+  ]
+}
+```
 
 ## Using on Linux
 
@@ -174,7 +187,8 @@ Sample code is under `samples/` and can be run via `xluno.ps1`:
 
 ```powershell
 cd samples
-./xluno.ps1 ./calc_sample_mahjong.py
+./xluno.ps1 ./calc_sample_cell.py
+./xluno.ps1 ./calc_sample_shogiban.py
 ./xluno.ps1 ./writer_sample_text.py
 ```
 
@@ -211,7 +225,8 @@ $env:PYTHONPATH='H:\LibreOffice-ExcelLike\src\'
 
 # Version
 
-0.1.0 (2025-01-05): Pre-release
+- 0.1.1 (2025-01-06): Built pip package
+- 0.1.0 (2025-01-05): Pre-release
 
 # License
 

@@ -3,6 +3,8 @@
 Python ラッパーを通じて LibreOffice Calc の UNO API を操作し、Excel/VBA ライクな操作感を提供します。
 Excel マクロからの移行を容易にすることを目的としています。
 
+[Goto English README](README.en.md)
+
 # 主な特徴
 
 - UNO API の複雑さを隠蔽し、Excel/VBA に近いメソッド・プロパティ名で操作可能
@@ -34,7 +36,19 @@ Calc/Writer へ外部から接続する場合は、先に LibreOffice を「UNO 
 
 # インストール
 
-ローカル開発用には本リポジトリをクローンし、`src` を `PYTHONPATH` に通します。
+開発中ですが、pip パッケージ化してあります。
+
+```powershell
+& 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
+```
+
+現在の LibreOffice の Python は 3.11 なので、以下のパスに配置されます。
+
+```powershell
+C:\Users\<ユーザー名>\AppData\Roaming\Python\Python311\site-packages\
+```
+
+あるいは、ローカル開発用には本リポジトリをクローンし、`src` を `PYTHONPATH` に通します。
 
 ```powershell
 git clone <this-repo-url>
@@ -66,38 +80,29 @@ $env:PYTHONPATH='..\src\'
 
 ## LibreOffice 内のマクロで使う場合
 
-ライブラリを以下に配置します。
+
+pip パッケージでインストールする
+
+```powershell
+& 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
+```
+
+あるいはライブラリを以下に配置します。
 
 ```powershell
 C:\Users\＜ユーザー名＞\AppData\Roaming\LibreOffice\4\user\Scripts\python\
 ```
 
-以下のように Python スクリプトのパスを通すのと、XSCRIPTCONTEXT を使って接続する connect_calc_script() を用意します。
+以下のように Python スクリプトのパスを通すのと、XSCRIPTCONTEXT を使って接続する connect_calc_script() が用意してあります。
 あと、関数が「マクロ」→「マクロを実行」から見えるように g_exportedScripts に追加しておきます。
 
 ```python
-import inspect
-import os
-import sys
 from typing import Any, Tuple
-
-# Ensure this script's directory is importable so the local excellike package resolves
-BASE_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-if BASE_DIR not in sys.path:
-    sys.path.append(BASE_DIR)
-
 from excellikeuno.table.sheet import Sheet 
-
-# XSCRIPTCONTEXT に接続する
-def connect_calc_script() -> Tuple[Any, Any, Sheet]:
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
-    controller = doc.getCurrentController()
-    sheet = Sheet(controller.getActiveSheet())
-    return desktop, doc, sheet
+from excellikeuno import connect_calc_script
 
 def hello_to_cell():
-    ( _, _, sheet ) = connect_calc_script()
+    ( _, _, sheet ) = connect_calc_script(XSCRIPTCONTEXT)
     sheet.cell(0, 0).text = "Hello Excel Like for Python!"
     sheet.cell(0, 1).text = "こんにちは、Excel Like for Python!"
     sheet.cell(0,0).column_width = 10000  # 幅を設定
@@ -111,12 +116,24 @@ g_exportedScripts = (
 )
 ```
 
-この手順が実に面倒くさいので、
+![図: マクロの選択](./doc/images/connect_calc_script_macro.jpg)
 
-- BASE_DIR の部分を自動化する（初回だけ設定すればよいらしい）
-- connect_calc_script() を excellikeuno.connection.bootstrap モジュールに入れる
 
-この改善を今後検討します。
+![図: connect_calc_script の利用](./doc/images/connect_calc_script.jpg)
+
+
+vscode でコード補完を有効にするために .vscode/settings.json に以下を追加します。
+
+```json
+{
+    ... 既存の設定
+
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.extraPaths": [
+        "C:/Users/masuda/AppData/Roaming/Python/Python311/site-packages"
+    ]
+}
+```
 
 
 ## Linux で使う場合
@@ -155,30 +172,96 @@ Linux 版では、ヘッドレス（GUIを使わないモード）がサポー�
 
 ```python
 from excellikeuno import connect_calc
+from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 
-desktop, doc, sheet = connect_calc()
+(desktop, doc, sheet) = connect_calc() 
+cell = sheet.cell(0, 0)  # A1 セルを取得
+cell.text = "Hello, World!"  # 値を設定
+sheet.range("A1:C1").merge(True)  # A1:C1 を結合
 
-sheet.cell(0, 0).value = 100    # A1
-sheet.cell(1, 0).value = 200    # B1
-sheet.cell(2, 0).formula = "=A1+B1"  # C1
+cell.font_size = 16
+cell.font_name = "Arial"
+cell.font_color = 0xFF0000  # フォント色を赤に
+
+cell.row_height = 2000  # 行の高さを設定 20 mm
+cell.HoriJustify = CellHoriJustify.CENTER
+cell.VertJustify = CellVertJustify.CENTER
+
+
+sheet.cell(0,1).text = "id"
+sheet.cell(1,1).text = "name"
+sheet.cell(2,1).text = "address"
+sheet.range("A2:C2").CellBackColor = 0xFFBF00  # A2:C2 の背景色を設定
+
+data = [
+    [1, "masuda", "tokyo"],
+    [2, "suzuki", "osaka"],
+    [3, "takahashi", "nagoya"],
+]
+sheet.range("A3:C5").value = data  # 範囲にデータを一括設定
 ```
 
-## Writer に接続してテキストを書き込む
+![図1: セル操作](./doc/images/calc_sample_cell.jpg)
 
+## Calc で罫線を引く
 ```python
 from excellikeuno import connect_calc
+from excellikeuno.typing.structs import BorderLine
+(desktop, doc, sheet) = connect_calc()
 
-desktop, doc = connect_writer()
-text = doc.text
-text.setString("Hello, LibreOffice Writer!")
+ban = sheet.range("A1:I9");
+ban.CellBackColor = 0xFFFACD  # 背景色を薄い黄色に設定
+ban.row_height = 1000  # 行の高さを設定 20 mm
+ban.column_width = 1000  # 列の幅を設定 20 mm
+# 罫線を設定
+for cell in [c for row in ban.cells for c in row]:
+    borderline = BorderLine()
+    borderline.Color = 0x000000
+    borderline.OuterLineWidth = 50
+    borderline.InnerLineWidth = 0
+    borderline.LineDistance = 0
+
+    cell.TopBorder = borderline
+    cell.BottomBorder = borderline
+    cell.LeftBorder = borderline
+    cell.RightBorder = borderline
+    # センタリング
+    cell.HoriJustify = CellHoriJustify.CENTER
+    cell.VertJustify = CellVertJustify.CENTER
+    # フォントサイズを大きく
+    cell.font_size = 16.0
+    cell.CharColor = 0x000000  # 黒色に設定
+
+# 駒を配置
+pieces = [
+    ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
+    ["", "飛", "", "", "", "", "", "角", ""],
+    ["歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩"],
+    ["", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩"],
+    ["", "角", "", "", "", "", "", "飛", ""],
+    ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
+]
+ban.value = pieces  # 一括で駒を配置
+# 相手の駒を反転表示
+for r in range(9):
+    for c in range(9):
+        cell = ban.cell(c, r)
+        if pieces[r][c] != "" and r < 3:
+            cell.CharRotation = 180  # 180度回転    
 ```
+
+![図2: 将棋盤](./doc/images/calc_sample_shogiban.jpg)
+
 
 サンプルコードは `samples/` 配下にあり、`xluno.ps1` 経由で実行できます。
 
 ```powershell
 cd samples
-./xluno.ps1 ./calc_sample_mahjong.py
-./xluno.ps1 ./writer_sample_text.py
+./xluno.ps1 ./calc_sample_cell.py
+./xluno.ps1 ./calc_sample_shougiban.py
 ```
 
 # VS Code での開発
@@ -214,7 +297,8 @@ $env:PYTHONPATH='H:\LibreOffice-ExcelLike\src\'
 
 # バージョン
 
-0.1.0 (2025-01-05) : 仮リリース
+- 0.1.1 (2025-01-06) : pip パッケージを作成
+- 0.1.0 (2025-01-05) : 仮リリース
 
 # ライセンス
 
