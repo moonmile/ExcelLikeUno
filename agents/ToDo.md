@@ -1,7 +1,7 @@
 # ToDo
 
 - [v] 仮リリースのための README.md の整備
-- [ ] samples/ に動作方法と実行画面を追加
+- [v] samples/ に動作方法と実行画面を追加
 - [ ] ExcelLikeUno パッケージの利用方法の解説
     - [v] 外部から接続する方法
     - [v] LibreOffice 内部から利用する方法
@@ -11,7 +11,12 @@
 
 ## 実装予定
 
-- [ ] Font 構造体の実装
-- [ ] Border 構造体の実装
-- [ ] Margin 構造体の実装
+- [v] Cell/Range/Shape.font プロパティの実装
+- [ ] Cell/Range.borders プロパティの実装
+- [ ] Shape.fill プロパティの実装
+    - [ ] Shape.fill.color プロパティの実装
+    - [ ] Shape.fill.gradient 関係
+    - [ ] Shape.fill.bitmap 関係
+    - [ ] Shape.fill.hatch 関係
+- [ ] Shape.line プロパティの実装
 

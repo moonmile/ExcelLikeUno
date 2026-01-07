@@ -116,6 +116,21 @@ class Range(UnoObject):
         first_cell = self._first_cell()
         return Font(getter=first_cell._font_getter, setter=self._font_broadcast)
 
+    @font.setter
+    def font(self, value: Font) -> None:
+        # Accept a Font proxy or plain Font config dict-like and broadcast to the range
+        current = {}
+        try:
+            current = value._current()  # type: ignore[attr-defined]
+        except Exception:
+            try:
+                current = dict(value)  # type: ignore[arg-type]
+            except Exception:
+                current = {}
+        if not current:
+            return
+        self._font_broadcast(**current)
+
     def _font_broadcast(self, **updates: Any) -> None:
         for cell in self:
             cell._font_setter(**updates)
