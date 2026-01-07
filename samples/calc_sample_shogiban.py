@@ -2,6 +2,7 @@
 from excellikeuno import connect_calc
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 from excellikeuno.typing.structs import BorderLine
+from excellikeuno.typing import Font
 
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "将棋盤"
@@ -25,8 +26,10 @@ for cell in [c for row in ban.cells for c in row]:
     cell.HoriJustify = CellHoriJustify.CENTER
     cell.VertJustify = CellVertJustify.CENTER
     # フォントサイズを大きく
-    cell.font_size = 16.0
-    cell.CharColor = 0x000000  # 黒色に設定
+    # cell.font = Font(size=16.0, color=0x000000)
+    cell.font.size = 16.0
+    cell.font.color = 0x000000
+
     
 
 # 駒を配置

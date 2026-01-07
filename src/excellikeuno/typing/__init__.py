@@ -46,8 +46,8 @@ from .structs import (
     TableSortField,
     ShadowFormat,
     CellProtection,
-    Font,
 )
+from ..style.font import Font
 
 __all__ = [
     "BorderLine",

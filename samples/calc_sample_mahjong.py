@@ -1,6 +1,7 @@
 # 麻雀牌を並べる
 from excellikeuno import connect_calc
 from excellikeuno.typing.calc import LineStyle
+from excellikeuno.typing import Font
 
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "麻雀牌"
@@ -26,10 +27,8 @@ for i in range(hai.__len__()):
     # テキストを中央揃え
     shape.HoriJustify = 1  # CENTER
     shape.VertJustify = 1  # CENTER
-    # フォントサイズを大きく
-    shape.font_size = 48.0
-    # フォントの指定
-    shape.CharFontName = "GL-MahjongTile"
+    # フォント指定（サイズ・フォント名）
+    shape.font = Font(size=48.0, name="GL-MahjongTile")
 
 # 麻雀牌を並べる
 for i, shape in enumerate(sheet.shapes):

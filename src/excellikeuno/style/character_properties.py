@@ -19,6 +19,18 @@ class CharacterProperties(UnoObject):
     def set_property(self, name: str, value: Any) -> None:
         self._props().setPropertyValue(name, value)
 
+    def _as_int(self, value: Any, default: int = 0) -> int:
+        if value is None:
+            return default
+        candidate = getattr(value, "value", value)
+        try:
+            return int(candidate)
+        except Exception:
+            try:
+                return int(getattr(candidate, "value", default))
+            except Exception:
+                return default
+
     # Common character styling props
 
     @property
@@ -55,7 +67,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharPosture(self) -> FontSlant:
-        return FontSlant(int(self.get_property("CharPosture")))
+        return FontSlant(self._as_int(self.get_property("CharPosture")))
 
     @CharPosture.setter
     def CharPosture(self, value: FontSlant | int) -> None:
@@ -63,7 +75,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharUnderline(self) -> FontUnderline:
-        return FontUnderline(int(self.get_property("CharUnderline")))
+        return FontUnderline(self._as_int(self.get_property("CharUnderline")))
 
     @CharUnderline.setter
     def CharUnderline(self, value: FontUnderline | int) -> None:
@@ -71,7 +83,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharStrikeout(self) -> FontStrikeout:
-        return FontStrikeout(int(self.get_property("CharStrikeout")))
+        return FontStrikeout(self._as_int(self.get_property("CharStrikeout")))
 
     @CharStrikeout.setter
     def CharStrikeout(self, value: FontStrikeout | int) -> None:
@@ -84,6 +96,29 @@ class CharacterProperties(UnoObject):
     @CharColor.setter
     def CharColor(self, value: Color) -> None:
         self.set_property("CharColor", value)
+
+    @property
+    def CharBackColor(self) -> Color:
+        return cast(Color, self.get_property("CharBackColor"))
+
+    @CharBackColor.setter
+    def CharBackColor(self, value: Color) -> None:
+        self.set_property("CharBackColor", value)
+
+    @property
+    def CharBackTransparent(self) -> bool:
+        try:
+            return bool(self.get_property("CharBackTransparent"))
+        except Exception:
+            return False
+
+    @CharBackTransparent.setter
+    def CharBackTransparent(self, value: bool) -> None:
+        try:
+            self.set_property("CharBackTransparent", bool(value))
+        except Exception:
+            # ignore when unsupported
+            pass
 
     @property
     def CharUnderlineHasColor(self) -> bool:
@@ -119,7 +154,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharCaseMap(self) -> int:
-        return int(self.get_property("CharCaseMap"))
+        return self._as_int(self.get_property("CharCaseMap"))
 
     @CharCaseMap.setter
     def CharCaseMap(self, value: int) -> None:
@@ -127,7 +162,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharKerning(self) -> int:
-        return int(self.get_property("CharKerning"))
+        return self._as_int(self.get_property("CharKerning"))
 
     @CharKerning.setter
     def CharKerning(self, value: int) -> None:
@@ -151,7 +186,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharRotation(self) -> int:
-        return int(self.get_property("CharRotation"))
+        return self._as_int(self.get_property("CharRotation"))
 
     @CharRotation.setter
     def CharRotation(self, value: int) -> None:
@@ -159,7 +194,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharScaleWidth(self) -> int:
-        return int(self.get_property("CharScaleWidth"))
+        return self._as_int(self.get_property("CharScaleWidth"))
 
     @CharScaleWidth.setter
     def CharScaleWidth(self, value: int) -> None:
@@ -167,7 +202,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharRelief(self) -> int:
-        return int(self.get_property("CharRelief"))
+        return self._as_int(self.get_property("CharRelief"))
 
     @CharRelief.setter
     def CharRelief(self, value: int) -> None:
@@ -175,7 +210,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharEscapement(self) -> int:
-        return int(self.get_property("CharEscapement"))
+        return self._as_int(self.get_property("CharEscapement"))
 
     @CharEscapement.setter
     def CharEscapement(self, value: int) -> None:
@@ -183,7 +218,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharEscapementHeight(self) -> int:
-        return int(self.get_property("CharEscapementHeight"))
+        return self._as_int(self.get_property("CharEscapementHeight"))
 
     @CharEscapementHeight.setter
     def CharEscapementHeight(self, value: int) -> None:
@@ -215,7 +250,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharFontFamily(self) -> int:
-        return int(self.get_property("CharFontFamily"))
+        return self._as_int(self.get_property("CharFontFamily"))
 
     @CharFontFamily.setter
     def CharFontFamily(self, value: int) -> None:
@@ -223,7 +258,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharFontCharSet(self) -> int:
-        return int(self.get_property("CharFontCharSet"))
+        return self._as_int(self.get_property("CharFontCharSet"))
 
     @CharFontCharSet.setter
     def CharFontCharSet(self, value: int) -> None:
@@ -231,7 +266,7 @@ class CharacterProperties(UnoObject):
 
     @property
     def CharFontPitch(self) -> int:
-        return int(self.get_property("CharFontPitch"))
+        return self._as_int(self.get_property("CharFontPitch"))
 
     @CharFontPitch.setter
     def CharFontPitch(self, value: int) -> None:

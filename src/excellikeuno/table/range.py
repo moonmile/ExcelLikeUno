@@ -22,6 +22,7 @@ from ..typing import (
     XTableRows,
     XMergeable,
 )
+from ..style.font import Font
 from .cell import Cell
 from .cell_properties import CellProperties
 
@@ -101,6 +102,16 @@ class Range(UnoObject):
     @property
     def props(self) -> CellProperties:
         return self.properties
+
+    @property
+    def font(self) -> Font:
+        # Use the top-left cell as representative for getter; setter broadcasts to all cells in range.
+        first_cell = next(iter(self))
+        return Font(getter=first_cell._font_getter, setter=self._font_broadcast)
+
+    def _font_broadcast(self, **updates: Any) -> None:
+        for cell in self:
+            cell._font_setter(**updates)
 
     # CellProperties shortcuts for IDE completion
     @property
