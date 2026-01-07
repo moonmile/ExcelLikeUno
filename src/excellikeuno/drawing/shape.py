@@ -291,6 +291,22 @@ class Shape(UnoObject):
     def font(self) -> Font:
         return Font(getter=self._font_getter, setter=self._font_setter)
 
+    @font.setter
+    def font(self, value: Font) -> None:
+        # Accept a Font proxy or plain Font config dict-like
+        current = {}
+        try:
+            current = value._current()  # type: ignore[attr-defined]
+        except Exception:
+            # fallback: if value is mapping-like
+            try:
+                current = dict(value)  # type: ignore[arg-type]
+            except Exception:
+                current = {}
+        if not current:
+            return
+        self._font_setter(**current)
+
     # LineProperties implementation
     @property
     def LineColor(self) -> int:
