@@ -83,9 +83,16 @@ class Range(UnoObject):
     def __iter__(self) -> Iterable[Cell]:  # pragma: no cover - helper for convenience
         rng = cast(XSheetCellRange, self.iface(InterfaceNames.X_SHEET_CELL_RANGE))
         addr = cast(XCellRangeAddressable, self.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)).getRangeAddress()
-        for row in range(addr.StartRow, addr.EndRow + 1):
-            for col in range(addr.StartColumn, addr.EndColumn + 1):
+        row_count = addr.EndRow - addr.StartRow + 1
+        col_count = addr.EndColumn - addr.StartColumn + 1
+        for row in range(row_count):
+            for col in range(col_count):
                 yield Cell(rng.getCellByPosition(col, row))
+
+    def _first_cell(self) -> Cell:
+        """Return the top-left cell without iterating the whole range."""
+        rng = cast(XSheetCellRange, self.iface(InterfaceNames.X_SHEET_CELL_RANGE))
+        return Cell(rng.getCellByPosition(0, 0))
 
     def __repr__(self) -> str:  # pragma: no cover - debugging helper
         return f"Range({self.raw!r})"
@@ -106,7 +113,7 @@ class Range(UnoObject):
     @property
     def font(self) -> Font:
         # Use the top-left cell as representative for getter; setter broadcasts to all cells in range.
-        first_cell = next(iter(self))
+        first_cell = self._first_cell()
         return Font(getter=first_cell._font_getter, setter=self._font_broadcast)
 
     def _font_broadcast(self, **updates: Any) -> None:

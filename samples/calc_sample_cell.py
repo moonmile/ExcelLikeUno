@@ -28,6 +28,3 @@ sheet.range("A3:C5").value = data  # 範囲にデータを一括設定
 
 
 
-
-
-
