@@ -46,6 +46,7 @@ from .structs import (
     TableSortField,
     ShadowFormat,
     CellProtection,
+    Font,
 )
 
 __all__ = [
@@ -94,4 +95,5 @@ __all__ = [
     "TableSortField",
     "ShadowFormat",
     "CellProtection",
+    "Font",
 ]

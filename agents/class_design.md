@@ -127,6 +127,7 @@ classDiagram
         +Columns: TableColumns
         +Charts: List[Chart]
         +Shapes: List[Shape]
+        +font: Font
     }
     class Cell {
         +value: Any
@@ -136,7 +137,11 @@ classDiagram
         +cellBackColor: Color
         +cellForeColor: Color
         +HoriJustify: enum CellHoriJustify
-
+        +font: Font
+    }
+    class Range : Cell {
+        +rows: int
+        +columns: int
     }
     class PivodTables {
     }
@@ -179,6 +184,22 @@ classDiagram
     class PolyPolygonShape : Shape {
     }
     class TextShape : Shape {
+    }
+
+
+    struct Font {
+        + name : str
+        + size : float
+        + bold : bool
+        + italic : bool
+        + underline : bool
+        + strikeout : bool
+        + color : Color
+        + subscript : bool
+        + superscript : bool
+        + background : Color
+        + font_style : int
+        + strikthrough : bool
     }
 ```
 

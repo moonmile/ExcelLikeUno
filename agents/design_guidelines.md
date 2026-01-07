@@ -8,6 +8,19 @@ UNO API の複雑さを隠し、「Python の 1 クラス = Calc の 1 つの概
 - インターフェース名を定数化して IDE 補完を効かせる
 - 型ヒントを Protocol で定義して IDE 補完を強化
 
+
+## コード規約
+
+- UNO API をラップしたときにプロパティ名、メソッド名は UNO ドキュメントに準拠するため PascalCase を使う。
+- ただし、Python 側で新規に追加するメソッドやプロパティは snake_case を使う。
+- ただし、value, text, formula だけはタイピングしやすいので小文字にしておく。
+
+- UNO API 由来のプロパティは PascalCase を使う。
+  - 例: Cell.value, Cell.formula, CellHoriJustify
+- Excel VBA ライクなメソッド名を追加する場合は snake_case を使う。
+  - 例: sheet.cell(col, row), sheet.range(col1, row1, col2, row2)
+
+
 ## 開発コード例
 
 以下は、開発コード例です。

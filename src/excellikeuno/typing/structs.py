@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any
-from .calc import Color, ShadowLocation
+from .calc import Color, ShadowLocation, FontSlant, FontStrikeout, FontUnderline
 from .interfaces import StructNames
 
 def _try_uno_struct(name: str) -> Any | None:
@@ -261,6 +261,22 @@ class CellProtection:
         struct.IsHidden = self.IsHidden
         struct.IsPrintHidden = self.IsPrintHidden
         return struct
+
+
+@dataclass
+class Font:
+    name: str = ""
+    size: float = 0.0
+    bold: bool = False
+    italic: bool = False
+    underline: FontUnderline = FontUnderline.NONE
+    strikeout: FontStrikeout = FontStrikeout.NONE
+    color: Color = 0
+    subscript: bool = False
+    superscript: bool = False
+    background: Color = 0
+    font_style: FontSlant = FontSlant.NONE
+    strikthrough: bool = False
 
 
 __all__ = [
