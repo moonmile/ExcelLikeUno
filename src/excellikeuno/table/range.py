@@ -154,15 +154,6 @@ class Range(UnoObject):
             return
         self._border_broadcast(**current)
 
-    # Backward compatibility
-    @property
-    def border(self) -> Borders:
-        return self.borders
-
-    @border.setter
-    def border(self, value: Borders) -> None:
-        self.borders = value
-
     def _border_broadcast(self, **updates: Any) -> None:
         for cell in self:
             Borders(owner=cell).apply(**updates)

@@ -29,10 +29,10 @@ def test_cell_border_roundtrip_via_proxy():
     right_line = BorderLine(Color=0x99AABB, InnerLineWidth=15, OuterLineWidth=45, LineDistance=65)
 
     try:
-        cell.border.top = top_line
-        cell.border.bottom = bottom_line
-        cell.border.left = left_line
-        cell.border.right = right_line
+        cell.borders.top = top_line
+        cell.borders.bottom = bottom_line
+        cell.borders.left = left_line
+        cell.borders.right = right_line
 
         assert getattr(cell.TopBorder, "Color", None) == top_line.Color
         assert abs(getattr(cell.BottomBorder, "OuterLineWidth", 0) - bottom_line.OuterLineWidth) <= 2
@@ -63,9 +63,9 @@ def test_border_config_holder_reuse_on_cells():
     border_cfg = Borders(top=top_line, bottom=bottom_line, left=left_line, right=right_line)
 
     try:
-        first.border = border_cfg
-        second.border = border_cfg
-
+        first.borders = border_cfg
+        second.borders = border_cfg
+    
         for cell in (first, second):
             assert getattr(cell.TopBorder, "Color", None) == top_line.Color
             assert getattr(cell.BottomBorder, "Color", None) == bottom_line.Color
@@ -101,7 +101,7 @@ def test_border_all_sets_all_sides():
     line = BorderLine(Color=0xABCDEF, InnerLineWidth=12, OuterLineWidth=24, LineDistance=36)
 
     try:
-        cell.border.all = line
+        cell.borders.all = line
 
         assert getattr(cell.TopBorder, "Color", None) == line.Color
         assert getattr(cell.BottomBorder, "Color", None) == line.Color

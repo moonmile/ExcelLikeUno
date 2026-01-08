@@ -670,11 +670,11 @@ class Cell(UnoObject):
         self.character_properties.CharFontPitch = value
 
     @property
-    def border(self) -> Borders:
+    def borders(self) -> Borders:
         return Borders(owner=self)
 
-    @border.setter
-    def border(self, value: Borders) -> None:
+    @borders.setter
+    def borders(self, value: Borders) -> None:
         try:
             current = value._current()  # type: ignore[attr-defined]
         except Exception:

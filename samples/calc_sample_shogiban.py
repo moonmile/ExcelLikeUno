@@ -20,8 +20,8 @@ for cell in [c for row in ban.cells for c in row]:
     borderline.LineDistance = 0
     # borderline.LineStyle =  BorderLineStyle.SOLID  # solid
 
-    # 一括設定（新しい Border プロキシ経由）
-    cell.border.all = borderline
+    # 一括設定
+    cell.borders.all = borderline
 
     # センタリング
     cell.HoriJustify = CellHoriJustify.CENTER
