@@ -33,6 +33,28 @@ def test_range_font_broadcast_size_and_bold():
             cell.CharWeight = w
 
 
+def test_range_font_size_roundtrip_via_proxy():
+    _, _, sheet = _connect_or_skip()
+    rng = sheet.range(4, 5, 5, 6)  # 2x2 block separate from other test data
+
+    cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
+    originals = [float(c.CharHeight) for c in cells]
+
+    new_size = 18.5
+
+    try:
+        rng.font.size = new_size
+
+        for cell in cells:
+            assert abs(cell.CharHeight - new_size) <= 0.5
+
+        # Proxy getter should reflect the applied size (use tolerance for UNO rounding)
+        assert abs(float(rng.font.size) - new_size) <= 0.5
+    finally:
+        for cell, height in zip(cells, originals):
+            cell.CharHeight = height
+
+
 def test_range_font_broadcast_color_and_backcolor():
     _, _, sheet = _connect_or_skip()
     rng = sheet.range(2, 5, 3, 6)  # another 2x2 block
@@ -60,3 +82,27 @@ def test_range_font_broadcast_color_and_backcolor():
         for cell, back in zip(cells, original_backs):
             if back is not None:
                 cell.CellBackColor = back
+
+
+def test_range_font_broadcast_size_kanji():
+    _, _, sheet = _connect_or_skip()
+    rng = sheet.range(2, 5, 3, 6)  # another 2x2 block
+
+    cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
+    orizinal_sizes = [float(c.CharHeight) for c in cells]
+
+    new_size = 20.0
+
+    try:
+        rng.font.size = new_size
+        for cell in cells:
+            assert abs(cell.CharHeight - new_size) <= 0.5
+        rng.value = [["あ", "あ"], ["あ", "あ"]]
+        for cell in cells:
+            assert cell.text == "あ"
+            assert abs(cell.CharHeight - new_size) <= 0.5
+
+    finally:
+        # for cell, height in zip(cells, orizinal_sizes):
+        #    cell.CharHeight = height
+        pass

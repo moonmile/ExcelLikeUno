@@ -114,7 +114,7 @@ class Range(UnoObject):
     def font(self) -> Font:
         # Use the top-left cell as representative for getter; setter broadcasts to all cells in range.
         first_cell = self._first_cell()
-        return Font(getter=first_cell._font_getter, setter=self._font_broadcast)
+        return Font(owner=first_cell, setter=self._font_broadcast)
 
     @font.setter
     def font(self, value: Font) -> None:
@@ -133,7 +133,7 @@ class Range(UnoObject):
 
     def _font_broadcast(self, **updates: Any) -> None:
         for cell in self:
-            cell._font_setter(**updates)
+            Font(owner=cell).apply(**updates)
 
     # CellProperties shortcuts for IDE completion
     @property

@@ -14,8 +14,16 @@ class Font:
         self,
         getter: Callable[[], Dict[str, Any]] | None = None,
         setter: Callable[..., None] | None = None,
+        owner: Any | None = None,
         **kwargs: Any,
     ) -> None:
+        # Allow constructing with owner only; fallback to owner's font getter/setter if provided.
+        if owner is not None and getter is None:
+            getter = getattr(owner, "_font_getter", None)
+        if owner is not None and setter is None:
+            setter = getattr(owner, "_font_setter", None)
+
+        object.__setattr__(self, "_owner", owner)
         object.__setattr__(self, "_getter", getter)
         object.__setattr__(self, "_setter", setter)
         object.__setattr__(self, "_buffer", {})
@@ -27,6 +35,11 @@ class Font:
         if self._getter:
             try:
                 base = dict(self._getter())
+            except Exception:
+                base = {}
+        elif self._owner is not None:
+            try:
+                base = self._read_from_owner()
             except Exception:
                 base = {}
         # buffered values take precedence
@@ -45,10 +58,144 @@ class Font:
             except Exception:
                 # fall back to local buffer when setter fails
                 self._buffer.update(updates)
+        elif self._owner is not None:
+            try:
+                self._write_to_owner(**updates)
+            except Exception:
+                self._buffer.update(updates)
         else:
             self._buffer.update(updates)
         return self
 
+    # --- owner direct access helpers -------------------------------------
+    def _read_from_owner(self) -> Dict[str, Any]:
+        owner = getattr(self, "_owner", None)
+        if owner is None:
+            return {}
+        # Prefer owner's dedicated getter when available (Range keeps broadcast semantics).
+        og = getattr(owner, "_font_getter", None)
+        if callable(og):
+            try:
+                return dict(og())
+            except Exception:
+                pass
+
+        cp = getattr(owner, "character_properties", None)
+
+        def _get(name: str) -> Any:
+            if cp is not None:
+                try:
+                    return cp.get_property(name)
+                except Exception:
+                    # fall through to owner
+                    pass
+            try:
+                return getattr(owner, name)
+            except Exception:
+                return None
+
+        def _as_float(val: Any) -> float:
+            try:
+                return float(val)
+            except Exception:
+                return 0.0
+
+        def _as_int(val: Any) -> int:
+            try:
+                return int(val)
+            except Exception:
+                return 0
+
+        esc = _as_int(_get("CharEscapement"))
+        backcolor = _get("CharBackColor")
+        if backcolor is None:
+            backcolor = _get("CellBackColor")
+
+        return {
+            "name": _get("CharFontName"),
+            "size": _as_float(_get("CharHeight")),
+            "bold": _as_float(_get("CharWeight")) >= 150.0,
+            "italic": bool(_as_int(_get("CharPosture"))),
+            "underline": _as_int(_get("CharUnderline")),
+            "strikeout": _as_int(_get("CharStrikeout")),
+            "color": _get("CharColor"),
+            "backcolor": backcolor,
+            "subscript": esc < 0,
+            "superscript": esc > 0,
+            "font_style": _as_int(_get("CharPosture")),
+            "strikthrough": _as_int(_get("CharStrikeout")) != 0,
+        }
+
+    def _write_to_owner(self, **updates: Any) -> None:
+        owner = getattr(self, "_owner", None)
+        if owner is None:
+            raise AttributeError("owner not set")
+
+        os = getattr(owner, "_font_setter", None)
+        if callable(os):
+            os(**updates)
+            return
+
+        cp = getattr(owner, "character_properties", None)
+
+        def _set(name: str, value: Any) -> bool:
+            if cp is not None:
+                try:
+                    cp.set_property(name, value)
+                    return True
+                except Exception:
+                    pass
+            try:
+                setattr(owner, name, value)
+                return True
+            except Exception:
+                return False
+
+        if "name" in updates:
+            _set("CharFontName", updates["name"])
+        if "size" in updates:
+            size_val = float(updates["size"])
+            _set("CharHeight", size_val)
+            _set("CharHeightAsian", size_val)
+            _set("CharHeightComplex", size_val)
+        if "bold" in updates:
+            _set("CharWeight", 150.0 if updates["bold"] else 100.0)
+        if "italic" in updates:
+            _set("CharPosture", 2 if updates["italic"] else 0)
+        if "font_style" in updates:
+            try:
+                _set("CharPosture", int(updates["font_style"]))
+            except Exception:
+                pass
+        if "underline" in updates:
+            _set("CharUnderline", int(updates["underline"]))
+        if "strikeout" in updates:
+            _set("CharStrikeout", int(updates["strikeout"]))
+        if "color" in updates:
+            _set("CharColor", updates["color"])
+        if "backcolor" in updates:
+            value = updates["backcolor"]
+            # Try character background first, fallback to cell background
+            try:
+                _set("CharBackTransparent", False)
+            except Exception:
+                pass
+            _set("CharBackColor", value)
+            _set("CellBackColor", value)
+        if "subscript" in updates or "superscript" in updates:
+            if updates.get("superscript"):
+                _set("CharEscapement", 58)
+            elif updates.get("subscript"):
+                _set("CharEscapement", -25)
+            else:
+                _set("CharEscapement", 0)
+        if "strikthrough" in updates:
+            try:
+                _set("CharStrikeout", 1 if updates["strikthrough"] else 0)
+            except Exception:
+                pass
+
+    # 型無しプロパティ設定の互換のため
     def __getattr__(self, name: str) -> Any:  # noqa: D401
         if name.startswith("_"):
             raise AttributeError(name)
@@ -57,6 +204,7 @@ class Font:
             return cur[name]
         raise AttributeError(name)
 
+    # 型無しプロパティ設定の互換のため
     def __setattr__(self, name: str, value: Any) -> None:  # noqa: D401
         if name.startswith("_"):
             object.__setattr__(self, name, value)

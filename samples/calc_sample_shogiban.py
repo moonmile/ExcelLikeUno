@@ -25,12 +25,10 @@ for cell in [c for row in ban.cells for c in row]:
     # センタリング
     cell.HoriJustify = CellHoriJustify.CENTER
     cell.VertJustify = CellVertJustify.CENTER
-    # フォントサイズを大きく
-    # cell.font = Font(size=16.0, color=0x000000)
-    cell.font.size = 16.0
-    cell.font.color = 0x000000
 
-    
+# フォントの一括変更（内容設定後に適用）
+ban.font.size = 16.0
+ban.font.color = 0x000000 # 青色
 
 # 駒を配置
 pieces = [
@@ -45,13 +43,13 @@ pieces = [
     ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
 ]
 ban.value = pieces  # 一括で駒を配置
+
 # 相手の駒を反転表示
 for r in range(9):
     for c in range(9):
         cell = ban.cell(c, r)
         if pieces[r][c] != "" and r < 3:
             cell.CharRotation = 180  # 180度回転
-
 
 
 

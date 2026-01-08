@@ -223,73 +223,9 @@ class Shape(UnoObject):
             except BaseException:
                 continue
 
-    def _font_getter(self) -> dict[str, Any]:
-        esc = int(self.text_properties.CharEscapement)
-        try:
-            backcolor = self.text_properties.CharBackColor
-        except Exception:
-            backcolor = 0
-        return {
-            "name": self.text_properties.CharFontName,
-            "size": float(self.text_properties.CharHeight),
-            "bold": float(self.text_properties.CharWeight) >= 150.0,
-            "italic": bool(int(self.text_properties.CharPosture)),
-            "underline": int(self.text_properties.CharUnderline),
-            "strikeout": int(self.text_properties.CharStrikeout),
-            "color": self.text_properties.CharColor,
-            "subscript": esc < 0,
-            "superscript": esc > 0,
-            "backcolor": backcolor,
-            "font_style": int(self.text_properties.CharPosture),
-            "strikthrough": int(self.text_properties.CharStrikeout) != 0,
-        }
-
-    def _font_setter(self, **updates: Any) -> None:
-        tp = self.text_properties
-        if "name" in updates:
-            tp.CharFontName = updates["name"]
-        if "size" in updates:
-            tp.CharHeight = float(updates["size"])
-        if "bold" in updates:
-            tp.CharWeight = 150.0 if updates["bold"] else 100.0
-        if "italic" in updates:
-            tp.CharPosture = 2 if updates["italic"] else 0
-        if "font_style" in updates:
-            try:
-                tp.CharPosture = int(updates["font_style"])
-            except Exception:
-                pass
-        if "underline" in updates:
-            tp.CharUnderline = int(updates["underline"])
-        if "strikeout" in updates:
-            tp.CharStrikeout = int(updates["strikeout"])
-        if "color" in updates:
-            tp.CharColor = updates["color"]
-        if "backcolor" in updates:
-            try:
-                tp.set_property("CharBackTransparent", False)
-            except Exception:
-                pass
-            try:
-                tp.CharBackColor = updates["backcolor"]
-            except Exception:
-                pass
-        if "subscript" in updates or "superscript" in updates:
-            if updates.get("superscript"):
-                tp.CharEscapement = 58
-            elif updates.get("subscript"):
-                tp.CharEscapement = -25
-            else:
-                tp.CharEscapement = 0
-        if "strikthrough" in updates:
-            try:
-                tp.CharStrikeout = 1 if updates["strikthrough"] else 0
-            except Exception:
-                pass
-
     @property
     def font(self) -> Font:
-        return Font(getter=self._font_getter, setter=self._font_setter)
+        return Font(owner=self)
 
     @font.setter
     def font(self, value: Font) -> None:
@@ -305,7 +241,7 @@ class Shape(UnoObject):
                 current = {}
         if not current:
             return
-        self._font_setter(**current)
+        Font(owner=self).apply(**current)
 
     # LineProperties implementation
     @property

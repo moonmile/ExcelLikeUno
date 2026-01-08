@@ -83,3 +83,35 @@ def test_font_buffers_when_setter_raises():
     # buffered values should override getter results even when setter fails
     assert font.size == 12
     assert font.bold is True
+
+
+def test_font_without_owner_reusable_on_multiple_cells():
+    _, _, sheet = _connect_or_skip()
+    c1 = sheet.cell(2, 6)
+    c2 = sheet.cell(2, 7)
+
+    originals = [
+        (float(c1.CharHeight), float(c1.CharWeight)),
+        (float(c2.CharHeight), float(c2.CharWeight)),
+    ]
+
+    font = Font(size=13, bold=True)
+
+    try:
+        c1.font = font
+        c2.font = font
+
+        assert abs(c1.CharHeight - 13.0) <= 0.5
+        assert c1.CharWeight >= 150.0
+        assert abs(c2.CharHeight - 13.0) <= 0.5
+        assert c2.CharWeight >= 150.0
+
+        # font remains reusable/config-holder after applications
+        assert font.size == 13
+        assert font.bold is True
+    finally:
+        (c1_height, c1_weight), (c2_height, c2_weight) = originals
+        c1.CharHeight = c1_height
+        c1.CharWeight = c1_weight
+        c2.CharHeight = c2_height
+        c2.CharWeight = c2_weight

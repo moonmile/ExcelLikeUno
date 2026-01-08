@@ -524,118 +524,9 @@ class Cell(UnoObject):
     def CharFontPitch(self, value: int) -> None:
         self.character_properties.CharFontPitch = value
 
-    def _font_getter(self) -> dict[str, Any]:
-        try:
-            esc = int(self.CharEscapement)
-        except Exception:
-            esc = 0
-        def _safe_int(val: Any, default: int = 0) -> int:
-            try:
-                return int(val)
-            except Exception:
-                return default
-        def _safe_float(val: Any, default: float = 0.0) -> float:
-            try:
-                return float(val)
-            except Exception:
-                return default
-        backcolor: Any = None
-        try:
-            backcolor = self.CellBackColor
-        except Exception:
-            backcolor = None
-        try:
-            prop_back = self.character_properties.CharBackColor
-            if prop_back is not None:
-                backcolor = prop_back
-        except Exception:
-            pass
-        cache_backcolor = getattr(self, "_font_backcolor_cache", None)
-        if cache_backcolor is not None:
-            backcolor = cache_backcolor
-        font_state = {
-            "name": self.CharFontName,
-            "size": _safe_float(self.CharHeight),
-            "bold": _safe_float(self.CharWeight) >= 150.0,
-            "italic": bool(_safe_int(self.CharPosture)),
-            "underline": _safe_int(self.CharUnderline),
-            "strikeout": _safe_int(self.CharStrikeout),
-            "color": self.CharColor,
-            "subscript": esc < 0,
-            "superscript": esc > 0,
-            "backcolor": backcolor,
-            "font_style": _safe_int(self.CharPosture),
-            "strikthrough": _safe_int(self.CharStrikeout) != 0,
-        }
-        cache = getattr(self, "_font_cache", None)
-        if cache:
-            font_state.update(cache)
-        return font_state
-
-    def _font_setter(self, **updates: Any) -> None:
-        cache = self.__dict__.get("_font_cache")
-        if cache is None:
-            cache = {}
-            object.__setattr__(self, "_font_cache", cache)
-        if "name" in updates:
-            self.CharFontName = updates["name"]
-            cache["name"] = updates["name"]
-        if "size" in updates:
-            self.CharHeight = float(updates["size"])
-            cache["size"] = updates["size"]
-        if "bold" in updates:
-            self.CharWeight = 150.0 if updates["bold"] else 100.0
-            cache["bold"] = updates["bold"]
-        if "italic" in updates:
-            self.CharPosture = 2 if updates["italic"] else 0
-            cache["italic"] = updates["italic"]
-        if "font_style" in updates:
-            try:
-                self.CharPosture = int(updates["font_style"])
-            except Exception:
-                pass
-            cache["font_style"] = updates["font_style"]
-        if "underline" in updates:
-            self.CharUnderline = int(updates["underline"])
-            cache["underline"] = updates["underline"]
-        if "strikeout" in updates:
-            self.CharStrikeout = int(updates["strikeout"])
-            cache["strikeout"] = updates["strikeout"]
-        if "color" in updates:
-            self.CharColor = updates["color"]
-            cache["color"] = updates["color"]
-        if "backcolor" in updates:
-            value = updates["backcolor"]
-            cache["backcolor"] = value
-            object.__setattr__(self, "_font_backcolor_cache", value)
-            try:
-                self.character_properties.CharBackTransparent = False
-                self.character_properties.CharBackColor = value
-            except Exception:
-                pass
-            try:
-                self.CellBackColor = value
-            except Exception:
-                pass
-        if "subscript" in updates or "superscript" in updates:
-            if updates.get("superscript"):
-                self.CharEscapement = 58
-            elif updates.get("subscript"):
-                self.CharEscapement = -25
-            else:
-                self.CharEscapement = 0
-            cache["subscript"] = updates.get("subscript")
-            cache["superscript"] = updates.get("superscript")
-        if "strikthrough" in updates:
-            try:
-                self.CharStrikeout = 1 if updates["strikthrough"] else 0
-            except Exception:
-                pass
-            cache["strikthrough"] = updates["strikthrough"]
-
     @property
     def font(self) -> Font:
-        return Font(getter=self._font_getter, setter=self._font_setter)
+        return Font(owner=self)
 
     @font.setter
     def font(self, value: Font) -> None:
@@ -646,7 +537,7 @@ class Cell(UnoObject):
             current = {}
         if not current:
             return
-        self._font_setter(**current)
+        Font(owner=self).apply(**current)
 
     # 行の高さ
     @property
