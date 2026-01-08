@@ -19,4 +19,5 @@
     - [ ] Shape.fill.bitmap 関係
     - [ ] Shape.fill.hatch 関係
 - [ ] Shape.line プロパティの実装
+- [ ] Shape.margins プロパティの実装
 

@@ -59,6 +59,12 @@ class Sheet(UnoObject):
             ec, er = self._a1_to_pos(right)
             return sc, sr, ec, er
 
+        # Support sheet.range("A1", "B2")
+        if isinstance(start_column, str) and isinstance(start_row, str) and end_column is None and end_row is None:
+            sc, sr = self._a1_to_pos(start_column)
+            ec, er = self._a1_to_pos(start_row)
+            return sc, sr, ec, er
+
         if isinstance(start_column, str):
             if start_row is not None:
                 raise ValueError("When start is A1 notation, omit start_row")

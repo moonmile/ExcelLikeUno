@@ -2,6 +2,8 @@ import os
 import pathlib
 import pytest
 
+# Note: このテストは test_sheet_001.ods を開いてテストするので、skip しても問題なし。
+
 from excellikeuno.connection import open_calc_document
 
 

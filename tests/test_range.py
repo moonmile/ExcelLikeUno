@@ -34,16 +34,16 @@ def test_range_subrange_and_aliases():
     nested = rng.getCellRangeByPosition(2, 1, 2, 1)
     assert nested.cell(0, 0).text == "C2"
     
-    def test_range_a1_notation():
-        _, doc, sheet = _connect_or_skip()
-        sheet.cell("A1").text = "top-left"
-        sheet.cell("B2").text = "center"
-        sheet.cell("C3").text = "bottom-right"
+def test_range_a1_notation():
+    _, doc, sheet = _connect_or_skip()
+    sheet.cell("A1").text = "top-left"
+    sheet.cell("B2").text = "center"
+    sheet.cell("C3").text = "bottom-right"
 
-        rng = sheet.range("A1:C3")
-        assert rng.cell(0, 0).text == "top-left"
-        assert rng.cell(1, 1).text == "center"
-        assert rng.cell(2, 2).text == "bottom-right"
+    rng = sheet.range("A1:C3")
+    assert rng.cell(0, 0).text == "top-left"
+    assert rng.cell(1, 1).text == "center"
+    assert rng.cell(2, 2).text == "bottom-right"
 
-        sub = sheet.range("A1", "B2")
-        assert sub.cell(1, 1).text == "center"
+    sub = sheet.range("A1", "B2")
+    assert sub.cell(1, 1).text == "center"

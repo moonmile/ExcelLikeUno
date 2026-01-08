@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, cast
+from numbers import Number
 
 from ..core import UnoObject
 from ..typing import (
@@ -737,13 +738,13 @@ class Cell(UnoObject):
         return cell.getValue()
 
     @value.setter
-    def value(self, value: float) -> None:
-        cell = cast(XCell, self.iface(InterfaceNames.X_CELL))
-        cell.setValue(value)
-
-    @value.setter
-    def value(self, value: str) -> None:
-        self.text = value
+    def value(self, value: Any) -> None:
+        cell_iface = cast(XCell, self.iface(InterfaceNames.X_CELL))
+        if isinstance(value, Number):
+            cell_iface.setValue(float(value))
+        else:
+            # Fallback to string/formula set
+            cell_iface.setFormula(str(value))
 
     @property
     def formula(self) -> str:
