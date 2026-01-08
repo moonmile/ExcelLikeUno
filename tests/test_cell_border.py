@@ -1,7 +1,7 @@
 import pytest
 
 from excellikeuno.connection import connect_calc
-from excellikeuno.style.border import Borders
+from excellikeuno.style.border import Borders, BorderStyle
 from excellikeuno.typing import BorderLine
 
 
@@ -43,6 +43,16 @@ def test_cell_border_roundtrip_via_proxy():
         cell.BottomBorder = originals["bottom"]
         cell.LeftBorder = originals["left"]
         cell.RightBorder = originals["right"]
+
+
+def test_borderstyle_config_constructor_defaults():
+    style = BorderStyle(color=0x010203, weight=22, line_style=3, inner_width=4, distance=6)
+
+    assert style.color == 0x010203
+    assert style.weight == 22
+    assert style.inner_width == 4
+    assert style.distance == 6
+    assert style.line_style == 3
 
 
 def test_border_config_holder_reuse_on_cells():
@@ -114,6 +124,59 @@ def test_border_all_sets_all_sides():
         cell.RightBorder = originals["right"]
 
 
+def test_cell_borderstyle_attribute_updates():
+    _, _, sheet = _connect_or_skip()
+    cell = sheet.cell(3, 8)
+
+    originals = {
+        "top": cell.TopBorder,
+        "bottom": cell.BottomBorder,
+        "left": cell.LeftBorder,
+        "right": cell.RightBorder,
+    }
+
+    try:
+        cell.borders.top.color = 0x123456
+        cell.borders.top.weight = 40
+        cell.borders.top.line_style = 1
+
+        assert cell.borders.top.color == 0x123456
+        assert abs(cell.borders.top.weight - 40) <= 2
+        assert int(cell.borders.top.line_style) == 1
+    finally:
+        cell.TopBorder = originals["top"]
+        cell.BottomBorder = originals["bottom"]
+        cell.LeftBorder = originals["left"]
+        cell.RightBorder = originals["right"]
+
+
+
+def test_cell_borderstyle_constructor():
+    _, _, sheet = _connect_or_skip()
+    cell = sheet.cell(3, 8)
+
+    originals = {
+        "top": cell.TopBorder,
+        "bottom": cell.BottomBorder,
+        "left": cell.LeftBorder,
+        "right": cell.RightBorder,
+    }
+
+    try:
+
+        borderstyle = BorderStyle(color=0x123456, weight=40, line_style=0)
+        cell.borders.top = borderstyle
+
+        assert cell.borders.top.color == 0x123456
+        assert abs(cell.borders.top.weight - 40) <= 2
+        assert int(cell.borders.top.line_style) == 0
+    finally:
+        cell.TopBorder = originals["top"]
+        cell.BottomBorder = originals["bottom"]
+        cell.LeftBorder = originals["left"]
+        cell.RightBorder = originals["right"]
+
+
 def test_range_border_broadcast_via_proxy():
     _, _, sheet = _connect_or_skip()
     rng = sheet.range(3, 8, 4, 9)  # 2x2 block
@@ -133,6 +196,31 @@ def test_range_border_broadcast_via_proxy():
             assert abs(getattr(cell.BottomBorder, "OuterLineWidth", 0) - line.OuterLineWidth) <= 2
             assert getattr(cell.LeftBorder, "Color", None) == line.Color
             assert getattr(cell.RightBorder, "Color", None) == line.Color
+    finally:
+        for cell, (top, bottom, left, right) in zip(cells, originals):
+            cell.TopBorder = top
+            cell.BottomBorder = bottom
+            cell.LeftBorder = left
+            cell.RightBorder = right
+
+
+def test_range_borderstyle_broadcast_fields():
+    _, _, sheet = _connect_or_skip()
+    rng = sheet.range(5, 8, 6, 9)
+
+    cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
+    originals = [
+        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+    ]
+
+    try:
+        rng.borders.left.color = 0x0F0F0F
+        rng.borders.left.weight = 30
+        rng.borders.left.line_style = 1
+
+        for cell in cells:
+            assert cell.borders.left.color == 0x0F0F0F
+            assert abs(cell.borders.left.weight - 30) <= 2
     finally:
         for cell, (top, bottom, left, right) in zip(cells, originals):
             cell.TopBorder = top

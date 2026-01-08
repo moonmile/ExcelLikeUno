@@ -138,11 +138,17 @@ class Range(UnoObject):
 
     @property
     def borders(self) -> Borders:
-        first_cell = self._first_cell()
-        return Borders(owner=first_cell, setter=self._border_broadcast)
+        existing = self.__dict__.get("_borders")
+        if existing is None:
+            first_cell = self._first_cell()
+            existing = Borders(owner=first_cell, setter=self._border_broadcast)
+            object.__setattr__(self, "_borders", existing)
+        return existing
 
     @borders.setter
     def borders(self, value: Borders) -> None:
+        current_proxy = self.__dict__.get("_borders") or Borders(owner=self._first_cell(), setter=self._border_broadcast)
+        object.__setattr__(self, "_borders", current_proxy)
         try:
             current = value._current()  # type: ignore[attr-defined]
         except Exception:

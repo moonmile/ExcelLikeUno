@@ -1,5 +1,6 @@
 # 将棋盤を作る
 from excellikeuno import connect_calc
+from excellikeuno.style.border import BorderStyle
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLineStyle
 
 from excellikeuno.typing.structs import BorderLine2
@@ -13,15 +14,14 @@ ban.row_height = 1000  # 行の高さを設定 20 mm
 ban.column_width = 1000  # 列の幅を設定 20 mm
 # 罫線を設定
 for cell in [c for row in ban.cells for c in row]:
-    borderline = BorderLine2()
-    borderline.Color = 0x000000
-    borderline.OuterLineWidth = 50
-    borderline.InnerLineWidth = 0
-    borderline.LineDistance = 0
-    # borderline.LineStyle =  BorderLineStyle.SOLID  # solid
 
     # 一括設定
-    cell.borders.all = borderline
+    cell.borders.all.color = 0x000000 # 黒色
+    cell.borders.all.weight = 50  # 線の太さを設定
+    cell.borders.all.line_style = BorderLineStyle.SOLID  # 0: 実線 
+    # BorderStyle の利用
+    cell.borders.all = BorderStyle()
+
 
     # センタリング
     cell.HoriJustify = CellHoriJustify.CENTER

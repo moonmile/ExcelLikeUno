@@ -68,7 +68,7 @@ class Cell(UnoObject):
                     InnerLineWidth=int(getattr(value, "InnerLineWidth", getattr(fallback, "InnerLineWidth", 0))),
                     OuterLineWidth=int(getattr(value, "OuterLineWidth", getattr(fallback, "OuterLineWidth", 0))),
                     LineDistance=int(getattr(value, "LineDistance", getattr(fallback, "LineDistance", 0))),
-                    LineStyle=int(getattr(value, "LineStyle", 1)),
+                    LineStyle=int(getattr(value, "LineStyle", 0)),
                     LineWidth=int(getattr(value, "LineWidth", getattr(fallback, "OuterLineWidth", 0))),
                 )
             except Exception:
@@ -144,7 +144,7 @@ class Cell(UnoObject):
             line_attr = line_attrs.get(side)
             try:
                 if line_attr is not None:
-                    setattr(table_border, line_attr, _as_line(getattr(self, attr)))
+                    setattr(table_border, line_attr, _as_line(line))
             except Exception:
                 pass
             try:
@@ -155,7 +155,7 @@ class Cell(UnoObject):
 
             try:
                 if line_attr is not None:
-                    setattr(table_border2, line_attr, _as_line2(getattr(self, attr), _as_line(line)))
+                    setattr(table_border2, line_attr, _as_line2(line, _as_line(line)))
             except Exception:
                 pass
             try:
@@ -671,10 +671,16 @@ class Cell(UnoObject):
 
     @property
     def borders(self) -> Borders:
-        return Borders(owner=self)
+        existing = self.__dict__.get("_borders")
+        if existing is None:
+            existing = Borders(owner=self)
+            object.__setattr__(self, "_borders", existing)
+        return existing
 
     @borders.setter
     def borders(self, value: Borders) -> None:
+        current_proxy = self.__dict__.get("_borders") or Borders(owner=self)
+        object.__setattr__(self, "_borders", current_proxy)
         try:
             current = value._current()  # type: ignore[attr-defined]
         except Exception:
@@ -684,7 +690,7 @@ class Cell(UnoObject):
                 current = {}
         if not current:
             return
-        Borders(owner=self).apply(**current)
+        current_proxy.apply(**current)
 
     @property
     def font(self) -> Font:
