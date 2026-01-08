@@ -23,6 +23,7 @@ from ..typing import (
     XMergeable,
 )
 from ..style.font import Font
+from ..style.border import Border
 from .cell import Cell
 from .cell_properties import CellProperties
 
@@ -134,6 +135,28 @@ class Range(UnoObject):
     def _font_broadcast(self, **updates: Any) -> None:
         for cell in self:
             Font(owner=cell).apply(**updates)
+
+    @property
+    def border(self) -> Border:
+        first_cell = self._first_cell()
+        return Border(owner=first_cell, setter=self._border_broadcast)
+
+    @border.setter
+    def border(self, value: Border) -> None:
+        try:
+            current = value._current()  # type: ignore[attr-defined]
+        except Exception:
+            try:
+                current = dict(value)  # type: ignore[arg-type]
+            except Exception:
+                current = {}
+        if not current:
+            return
+        self._border_broadcast(**current)
+
+    def _border_broadcast(self, **updates: Any) -> None:
+        for cell in self:
+            Border(owner=cell).apply(**updates)
 
     # CellProperties shortcuts for IDE completion
     @property

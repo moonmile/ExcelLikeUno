@@ -21,6 +21,7 @@ from ..typing import (
 )
 from ..typing.structs import Point
 from ..style.font import Font
+from ..style.border import Border
 from .cell_properties import CellProperties
 from ..style.character_properties import CharacterProperties
 from .rows import TableRows
@@ -34,6 +35,150 @@ class Cell(UnoObject):
     def _set_prop(self, name: str, value: Any) -> None:
         props = cast(XPropertySet, self.iface(InterfaceNames.X_PROPERTY_SET))
         props.setPropertyValue(name, value)
+
+    def _border_getter(self) -> dict[str, BorderLine]:
+        return {
+            "top": self.TopBorder,
+            "bottom": self.BottomBorder,
+            "left": self.LeftBorder,
+            "right": self.RightBorder,
+        }
+
+    def _border_setter(self, **updates: BorderLine) -> None:
+        def _as_line(value: Any) -> BorderLine:
+            try:
+                return BorderLine(
+                    Color=int(getattr(value, "Color", 0)),
+                    InnerLineWidth=int(getattr(value, "InnerLineWidth", 0)),
+                    OuterLineWidth=int(getattr(value, "OuterLineWidth", 0)),
+                    LineDistance=int(getattr(value, "LineDistance", 0)),
+                )
+            except Exception:
+                return BorderLine()
+
+        try:
+            current_table = self.TableBorder
+        except Exception:
+            current_table = None
+
+        def _as_line2(value: Any, fallback: BorderLine | None = None) -> BorderLine2:
+            try:
+                return BorderLine2(
+                    Color=int(getattr(value, "Color", getattr(fallback, "Color", 0))),
+                    InnerLineWidth=int(getattr(value, "InnerLineWidth", getattr(fallback, "InnerLineWidth", 0))),
+                    OuterLineWidth=int(getattr(value, "OuterLineWidth", getattr(fallback, "OuterLineWidth", 0))),
+                    LineDistance=int(getattr(value, "LineDistance", getattr(fallback, "LineDistance", 0))),
+                    LineStyle=int(getattr(value, "LineStyle", 1)),
+                    LineWidth=int(getattr(value, "LineWidth", getattr(fallback, "OuterLineWidth", 0))),
+                )
+            except Exception:
+                return BorderLine2()
+
+        table_border = TableBorder(
+            TopLine=_as_line(getattr(current_table, "TopLine", None)),
+            IsTopLineValid=bool(getattr(current_table, "IsTopLineValid", False)),
+            BottomLine=_as_line(getattr(current_table, "BottomLine", None)),
+            IsBottomLineValid=bool(getattr(current_table, "IsBottomLineValid", False)),
+            LeftLine=_as_line(getattr(current_table, "LeftLine", None)),
+            IsLeftLineValid=bool(getattr(current_table, "IsLeftLineValid", False)),
+            RightLine=_as_line(getattr(current_table, "RightLine", None)),
+            IsRightLineValid=bool(getattr(current_table, "IsRightLineValid", False)),
+            HorizontalLine=_as_line(getattr(current_table, "HorizontalLine", None)),
+            IsHorizontalLineValid=bool(getattr(current_table, "IsHorizontalLineValid", False)),
+            VerticalLine=_as_line(getattr(current_table, "VerticalLine", None)),
+            IsVerticalLineValid=bool(getattr(current_table, "IsVerticalLineValid", False)),
+            Distance=int(getattr(current_table, "Distance", 0)) if current_table is not None else 0,
+            IsDistanceValid=bool(getattr(current_table, "IsDistanceValid", False)),
+        )
+
+        try:
+            current_table2 = self.TableBorder2
+        except Exception:
+            current_table2 = None
+
+        table_border2 = TableBorder2(
+            TopLine=_as_line2(getattr(current_table2, "TopLine", None)),
+            IsTopLineValid=bool(getattr(current_table2, "IsTopLineValid", False)),
+            BottomLine=_as_line2(getattr(current_table2, "BottomLine", None)),
+            IsBottomLineValid=bool(getattr(current_table2, "IsBottomLineValid", False)),
+            LeftLine=_as_line2(getattr(current_table2, "LeftLine", None)),
+            IsLeftLineValid=bool(getattr(current_table2, "IsLeftLineValid", False)),
+            RightLine=_as_line2(getattr(current_table2, "RightLine", None)),
+            IsRightLineValid=bool(getattr(current_table2, "IsRightLineValid", False)),
+            HorizontalLine=_as_line2(getattr(current_table2, "HorizontalLine", None)),
+            IsHorizontalLineValid=bool(getattr(current_table2, "IsHorizontalLineValid", False)),
+            VerticalLine=_as_line2(getattr(current_table2, "VerticalLine", None)),
+            IsVerticalLineValid=bool(getattr(current_table2, "IsVerticalLineValid", False)),
+            Distance=int(getattr(current_table2, "Distance", 0)) if current_table2 is not None else 0,
+            IsDistanceValid=bool(getattr(current_table2, "IsDistanceValid", False)),
+        )
+
+        mapping = {
+            "top": "TopBorder",
+            "bottom": "BottomBorder",
+            "left": "LeftBorder",
+            "right": "RightBorder",
+        }
+        valid_flags = {
+            "top": "IsTopLineValid",
+            "bottom": "IsBottomLineValid",
+            "left": "IsLeftLineValid",
+            "right": "IsRightLineValid",
+        }
+        line_attrs = {
+            "top": "TopLine",
+            "bottom": "BottomLine",
+            "left": "LeftLine",
+            "right": "RightLine",
+        }
+        for side, line in updates.items():
+            attr = mapping.get(side)
+            if attr is None:
+                continue
+            setattr(self, attr, line)
+            try:
+                setattr(self, f"{attr}2", _as_line2(line, _as_line(line)))
+            except Exception:
+                pass
+            valid_attr = valid_flags.get(side)
+            line_attr = line_attrs.get(side)
+            try:
+                if line_attr is not None:
+                    setattr(table_border, line_attr, _as_line(getattr(self, attr)))
+            except Exception:
+                pass
+            try:
+                if valid_attr is not None:
+                    setattr(table_border, valid_attr, True)
+            except Exception:
+                continue
+
+            try:
+                if line_attr is not None:
+                    setattr(table_border2, line_attr, _as_line2(getattr(self, attr), _as_line(line)))
+            except Exception:
+                pass
+            try:
+                if valid_attr is not None:
+                    setattr(table_border2, valid_attr, True)
+            except Exception:
+                continue
+
+        try:
+            self.TableBorder = table_border.to_raw()
+        except Exception:
+            try:
+                self.TableBorder = table_border
+            except Exception:
+                pass
+
+        try:
+            self.TableBorder2 = table_border2.to_raw()
+        except Exception:
+            try:
+                self.TableBorder2 = table_border2
+            except Exception:
+                pass
 
     @property
     def properties(self) -> CellProperties:
@@ -523,6 +668,23 @@ class Cell(UnoObject):
     @CharFontPitch.setter
     def CharFontPitch(self, value: int) -> None:
         self.character_properties.CharFontPitch = value
+
+    @property
+    def border(self) -> Border:
+        return Border(owner=self)
+
+    @border.setter
+    def border(self, value: Border) -> None:
+        try:
+            current = value._current()  # type: ignore[attr-defined]
+        except Exception:
+            try:
+                current = dict(value)  # type: ignore[arg-type]
+            except Exception:
+                current = {}
+        if not current:
+            return
+        Border(owner=self).apply(**current)
 
     @property
     def font(self) -> Font:

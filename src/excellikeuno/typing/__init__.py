@@ -31,6 +31,7 @@ from .calc import (
     XColumnRowRange,
     XCellRangeAddressable,
     XMergeable,
+    BorderLineStyle,
 )
 from .interfaces import InterfaceNames
 from .structs import (
@@ -96,4 +97,5 @@ __all__ = [
     "ShadowFormat",
     "CellProtection",
     "Font",
+    "BorderLineStyle",
 ]

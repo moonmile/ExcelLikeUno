@@ -512,3 +512,10 @@ class ConnectionType(IntEnum):
     RIGHT = 3
     BOTTOM = 4
     SPECIAL = 5
+
+class BorderLineStyle(IntEnum):
+    NONE = 0x7FFF
+    SOLID = 0
+    DOTTED = 1
+    DASHED = 2
+    DOUBLE = 3
