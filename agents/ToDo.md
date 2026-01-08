@@ -12,7 +12,7 @@
 ## 実装予定
 
 - [v] Cell/Range/Shape.font プロパティの実装
-- [ ] Cell/Range.borders プロパティの実装
+- [v] Cell/Range.borders プロパティの実装
 - [ ] Shape.fill プロパティの実装
     - [ ] Shape.fill.color プロパティの実装
     - [ ] Shape.fill.gradient 関係

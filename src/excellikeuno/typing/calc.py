@@ -519,3 +519,13 @@ class BorderLineStyle(IntEnum):
     DOTTED = 1
     DASHED = 2
     DOUBLE = 3
+class TextHorizontalAdjust(IntEnum):
+    LEFT = 0
+    CENTER = 1
+    RIGHT = 2
+    BLOCK = 3
+class TextVerticalAdjust(IntEnum):
+    TOP = 0
+    CENTER = 1
+    BOTTOM = 2
+    BLOCK = 3
