@@ -11,6 +11,7 @@ from .line_properties import LineProperties
 from .shadow_properties import ShadowProperties
 from .text_properties import TextProperties
 from ..style.font import Font
+from ..style.line import Line
 
 
 class Shape(UnoObject):
@@ -243,6 +244,29 @@ class Shape(UnoObject):
             return
         Font(owner=self).apply(**current)
 
+    # Line proxy (Font/Borders style)
+    @property
+    def line(self) -> Line:
+        existing = self.__dict__.get("_line")
+        if existing is None:
+            existing = Line(owner=self)
+            object.__setattr__(self, "_line", existing)
+        return existing
+
+    @line.setter
+    def line(self, value: Line) -> None:
+        current = {}
+        try:
+            current = value._current()  # type: ignore[attr-defined]
+        except Exception:
+            try:
+                current = dict(value)  # type: ignore[arg-type]
+            except Exception:
+                current = {}
+        if not current:
+            return
+        Line(owner=self).apply(**current)
+
     # LineProperties implementation
     @property
     def LineColor(self) -> int:
@@ -283,6 +307,35 @@ class Shape(UnoObject):
     @LineWidth.setter
     def LineWidth(self, value: int) -> None:
         self.line_properties.LineWidth = int(value)
+
+    # internal line getters/setters for Line proxy
+    def _line_getter(self) -> dict[str, Any]:
+        lp = self.line_properties
+        return {
+            "color": lp.LineColor,
+            "line_style": lp.LineStyle,
+            "dash": lp.LineDash,
+            "dash_name": lp.LineDashName,
+            "transparence": lp.LineTransparence,
+            "width": lp.LineWidth,
+        }
+
+    def _line_setter(self, **updates: Any) -> None:
+        lp = self.line_properties
+        if "color" in updates:
+            lp.LineColor = int(updates["color"])
+        if "line_style" in updates:
+            lp.LineStyle = int(updates["line_style"])
+        if "dash" in updates:
+            lp.LineDash = updates["dash"]
+        if "dash_name" in updates:
+            lp.LineDashName = updates["dash_name"]
+        if "transparence" in updates:
+            lp.LineTransparence = int(updates["transparence"])
+        if "width" in updates:
+            lp.LineWidth = int(updates["width"])
+        if "weight" in updates:
+            lp.LineWidth = int(updates["weight"])
 
     # ShadowProperties implementation
     @property

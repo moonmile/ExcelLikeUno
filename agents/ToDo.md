@@ -13,11 +13,14 @@
 
 - [v] Cell/Range/Shape.font プロパティの実装
 - [v] Cell/Range.borders プロパティの実装
+- [v] Shape.line プロパティの実装
+- [ ] Shape.margins プロパティの実装
 - [ ] Shape.fill プロパティの実装
     - [ ] Shape.fill.color プロパティの実装
     - [ ] Shape.fill.gradient 関係
     - [ ] Shape.fill.bitmap 関係
     - [ ] Shape.fill.hatch 関係
-- [ ] Shape.line プロパティの実装
-- [ ] Shape.margins プロパティの実装
+- [ ] TextProperties, CharacterProperties の混在を解消
+- [ ] Chart の実装
+- [ ] PivodTable の実装
 
