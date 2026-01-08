@@ -140,7 +140,13 @@ class BorderStyle:
 
     @property
     def line_style(self) -> BorderLineStyle:
-        return int(getattr(self._line(), "LineStyle", 0))
+        val = int(getattr(self._line(), "LineStyle", 0))
+        try:
+            if val == 0 and self.outer_width == 0:
+                return BorderLineStyle.NONE
+        except Exception:
+            pass
+        return val
 
     @line_style.setter
     def line_style(self, value: BorderLineStyle) -> None:
@@ -250,6 +256,22 @@ class Borders:
             all_line = self._clone_line(normalized.pop("all"))
             for key in ("top", "bottom", "left", "right"):
                 normalized.setdefault(key, self._clone_line(all_line))
+        if "around" in normalized:
+            value = normalized.pop("around")
+            if isinstance(value, dict):
+                normalized["around"] = self._line_from_dict(value)
+            elif isinstance(value, BorderStyle):
+                normalized["around"] = self._clone_line(value.line)
+            else:
+                normalized["around"] = self._clone_line(value)
+        if "inner" in normalized:
+            value = normalized.pop("inner")
+            if isinstance(value, dict):
+                normalized["inner"] = self._line_from_dict(value)
+            elif isinstance(value, BorderStyle):
+                normalized["inner"] = self._clone_line(value.line)
+            else:
+                normalized["inner"] = self._clone_line(value)
         for key, value in list(normalized.items()):
             if isinstance(value, dict):
                 normalized[key] = self._line_from_dict(value)
@@ -322,7 +344,15 @@ class Borders:
         result: Dict[str, BorderLine | BorderLine2] = {}
         for key, attr in attr_map.items():
             try:
-                result[key] = self._clone_line(getattr(owner, attr))
+                base_val = getattr(owner, attr)
+                alt_attr = f"{attr}2"
+                try:
+                    alt_val = getattr(owner, alt_attr)
+                    if hasattr(alt_val, "LineStyle"):
+                        base_val = alt_val
+                except Exception:
+                    pass
+                result[key] = self._clone_line(base_val)
             except Exception:
                 continue
         return result
@@ -350,7 +380,15 @@ class Borders:
         attr = attr_map.get(field)
         if attr is None:
             raise AttributeError(field)
-        return self._clone_line(getattr(owner, attr))
+        base_val = getattr(owner, attr)
+        alt_attr = f"{attr}2"
+        try:
+            alt_val = getattr(owner, alt_attr)
+            if hasattr(alt_val, "LineStyle"):
+                base_val = alt_val
+        except Exception:
+            pass
+        return self._clone_line(base_val)
 
     def _write_to_owner(self, **updates: BorderLine | BorderLine2) -> None:
         owner = getattr(self, "_owner", None)
@@ -420,6 +458,22 @@ class Borders:
     @all.setter
     def all(self, value: Any) -> None:
         self.apply(all=value)
+
+    @property
+    def around(self) -> BorderStyle:
+        return self._style("around")
+
+    @around.setter
+    def around(self, value: Any) -> None:
+        self.apply(around=value)
+
+    @property
+    def inner(self) -> BorderStyle:
+        return self._style("inner")
+
+    @inner.setter
+    def inner(self, value: Any) -> None:
+        self.apply(inner=value)
 
     @property
     def top_line(self) -> BorderLine | BorderLine2:

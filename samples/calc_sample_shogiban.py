@@ -29,7 +29,7 @@ for cell in [c for row in ban.cells for c in row]:
 
 # フォントの一括変更（内容設定後に適用）
 ban.font.size = 16.0
-ban.font.color = 0x000000 # 青色
+ban.font.color = 0x000000 # 黒色
 
 # Range で一括設定
 # ban.borders.all = BorderStyle(color=0x000000, weight=50, line_style=BorderLineStyle.SOLID)

@@ -6,6 +6,7 @@ from ..core import UnoObject
 from ..typing import (
     BorderLine,
     BorderLine2,
+    BorderLineStyle,
     CellHoriJustify,
     CellOrientation,
     CellProtection,
@@ -161,8 +162,124 @@ class Range(UnoObject):
         self._border_broadcast(**current)
 
     def _border_broadcast(self, **updates: Any) -> None:
-        for cell in self:
-            Borders(owner=cell).apply(**updates)
+        around = updates.pop("around", None)
+        inner = updates.pop("inner", None)
+        if around is not None:
+            self._apply_around(around)
+        if inner is not None:
+            self._apply_inner(inner)
+        if updates:
+            for cell in self:
+                cell.borders.apply(**updates)
+
+    def _apply_around(self, line: BorderLine | BorderLine2) -> None:
+        rng = cast(XSheetCellRange, self.iface(InterfaceNames.X_SHEET_CELL_RANGE))
+        addr = cast(XCellRangeAddressable, self.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)).getRangeAddress()
+        row_count = addr.EndRow - addr.StartRow + 1
+        col_count = addr.EndColumn - addr.StartColumn + 1
+
+        def _to_line2(val: Any) -> BorderLine2:
+            try:
+                line2 = BorderLine2(
+                    Color=int(getattr(val, "Color", 0)),
+                    InnerLineWidth=int(getattr(val, "InnerLineWidth", 0)),
+                    OuterLineWidth=int(getattr(val, "OuterLineWidth", 0)),
+                    LineDistance=int(getattr(val, "LineDistance", 0)),
+                    LineStyle=int(getattr(val, "LineStyle", 0)),
+                    LineWidth=int(getattr(val, "LineWidth", getattr(val, "OuterLineWidth", 0))),
+                )
+                if line2.LineStyle == 0 and line2.OuterLineWidth == 0:
+                    width_hint = int(getattr(val, "LineWidth", getattr(val, "OuterLineWidth", 0)) or 0)
+                    if width_hint == 0:
+                        width_hint = 1
+                    line2.OuterLineWidth = width_hint
+                    line2.LineWidth = width_hint
+                return line2
+            except Exception:
+                return BorderLine2()
+
+        clear_line = _to_line2(
+            BorderLine2(
+                Color=0,
+                InnerLineWidth=0,
+                OuterLineWidth=0,
+                LineDistance=0,
+                LineStyle=int(BorderLineStyle.NONE),
+                LineWidth=0,
+            )
+        )
+        solid_line = _to_line2(line)
+
+        for r in range(row_count):
+            for c in range(col_count):
+                updates: dict[str, BorderLine | BorderLine2] = {}
+                if r == 0:
+                    updates["top"] = _to_line2(solid_line)
+                if r == row_count - 1:
+                    updates["bottom"] = _to_line2(solid_line)
+                if c == 0:
+                    updates["left"] = _to_line2(solid_line)
+                if c == col_count - 1:
+                    updates["right"] = _to_line2(solid_line)
+
+                if not updates:
+                    continue
+
+                cell = Cell(rng.getCellByPosition(c, r))
+                bproxy = cell.borders
+                bproxy.apply(**updates)
+                try:
+                    bproxy._buffer.update({k: Borders()._clone_line(v) for k, v in updates.items()})
+                except Exception:
+                    pass
+
+    def _apply_inner(self, line: BorderLine | BorderLine2) -> None:
+        rng = cast(XSheetCellRange, self.iface(InterfaceNames.X_SHEET_CELL_RANGE))
+        addr = cast(XCellRangeAddressable, self.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)).getRangeAddress()
+        row_count = addr.EndRow - addr.StartRow + 1
+        col_count = addr.EndColumn - addr.StartColumn + 1
+
+        def _to_line2(val: Any) -> BorderLine2:
+            try:
+                line2 = BorderLine2(
+                    Color=int(getattr(val, "Color", 0)),
+                    InnerLineWidth=int(getattr(val, "InnerLineWidth", 0)),
+                    OuterLineWidth=int(getattr(val, "OuterLineWidth", 0)),
+                    LineDistance=int(getattr(val, "LineDistance", 0)),
+                    LineStyle=int(getattr(val, "LineStyle", 0)),
+                    LineWidth=int(getattr(val, "LineWidth", getattr(val, "OuterLineWidth", 0))),
+                )
+                if line2.LineStyle == 0 and line2.OuterLineWidth == 0:
+                    width_hint = int(getattr(val, "LineWidth", getattr(val, "OuterLineWidth", 0)) or 0)
+                    if width_hint == 0:
+                        width_hint = 1
+                    line2.OuterLineWidth = width_hint
+                    line2.LineWidth = width_hint
+                return line2
+            except Exception:
+                return BorderLine2()
+
+        solid_line = _to_line2(line)
+
+        for r in range(row_count):
+            for c in range(col_count):
+                updates: dict[str, BorderLine | BorderLine2] = {}
+                if r == 0:
+                    updates["top"] = _to_line2(solid_line)
+                if r == row_count - 1:
+                    updates["bottom"] = _to_line2(solid_line)
+                if c == 0:
+                    updates["left"] = _to_line2(solid_line)
+                if c == col_count - 1:
+                    updates["right"] = _to_line2(solid_line)
+
+                cell = Cell(rng.getCellByPosition(c, r))
+                bproxy = cell.borders
+                bproxy.apply(**updates)
+                try:
+                    bproxy._buffer.update({k: Borders()._clone_line(v) for k, v in updates.items()})
+                except Exception:
+                    pass
 
     # CellProperties shortcuts for IDE completion
     @property
