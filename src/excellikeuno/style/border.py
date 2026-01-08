@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict
 from excellikeuno.typing import BorderLine, BorderLine2
 
 
-class Border:
+class Borders:
     """Proxy-style border wrapper for cell/range borders."""
 
     def __init__(
@@ -87,7 +87,7 @@ class Border:
             normalized.update({k: self._clone_line(v) for k, v in self._buffer.items()})
         return normalized
 
-    def apply(self, **kwargs: Any) -> "Border":
+    def apply(self, **kwargs: Any) -> "Borders":
         updates = self._normalize_updates(kwargs)
         if not updates:
             return self

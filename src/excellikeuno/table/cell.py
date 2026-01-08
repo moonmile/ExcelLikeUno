@@ -21,7 +21,7 @@ from ..typing import (
 )
 from ..typing.structs import Point
 from ..style.font import Font
-from ..style.border import Border
+from ..style.border import Borders
 from .cell_properties import CellProperties
 from ..style.character_properties import CharacterProperties
 from .rows import TableRows
@@ -670,11 +670,11 @@ class Cell(UnoObject):
         self.character_properties.CharFontPitch = value
 
     @property
-    def border(self) -> Border:
-        return Border(owner=self)
+    def border(self) -> Borders:
+        return Borders(owner=self)
 
     @border.setter
-    def border(self, value: Border) -> None:
+    def border(self, value: Borders) -> None:
         try:
             current = value._current()  # type: ignore[attr-defined]
         except Exception:
@@ -684,7 +684,7 @@ class Cell(UnoObject):
                 current = {}
         if not current:
             return
-        Border(owner=self).apply(**current)
+        Borders(owner=self).apply(**current)
 
     @property
     def font(self) -> Font:

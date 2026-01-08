@@ -1,7 +1,7 @@
 import pytest
 
 from excellikeuno.connection import connect_calc
-from excellikeuno.style.border import Border
+from excellikeuno.style.border import Borders
 from excellikeuno.typing import BorderLine
 
 
@@ -60,7 +60,7 @@ def test_border_config_holder_reuse_on_cells():
     left_line = BorderLine(Color=0x778899, InnerLineWidth=5, OuterLineWidth=25, LineDistance=45)
     right_line = BorderLine(Color=0x99AABB, InnerLineWidth=8, OuterLineWidth=28, LineDistance=48)
 
-    border_cfg = Border(top=top_line, bottom=bottom_line, left=left_line, right=right_line)
+    border_cfg = Borders(top=top_line, bottom=bottom_line, left=left_line, right=right_line)
 
     try:
         first.border = border_cfg
@@ -126,7 +126,7 @@ def test_range_border_broadcast_via_proxy():
     line = BorderLine(Color=0xC0FFEE, InnerLineWidth=18, OuterLineWidth=36, LineDistance=54)
 
     try:
-        rng.border = Border(all=line)
+        rng.borders = Borders(all=line)
 
         for cell in cells:
             assert getattr(cell.TopBorder, "Color", None) == line.Color
