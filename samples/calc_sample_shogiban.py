@@ -15,12 +15,12 @@ ban.column_width = 1000  # 列の幅を設定 20 mm
 # 罫線を設定
 for cell in [c for row in ban.cells for c in row]:
 
-    # 一括設定
+    # 罫線の設定 top/left/bottom/right を一括設定
     cell.borders.all.color = 0x000000 # 黒色
     cell.borders.all.weight = 50  # 線の太さを設定
     cell.borders.all.line_style = BorderLineStyle.SOLID  # 0: 実線 
     # BorderStyle の利用
-    cell.borders.all = BorderStyle()
+    # cell.borders.all = BorderStyle(color=0x000000, weight=50, line_style=BorderLineStyle.SOLID)
 
 
     # センタリング
@@ -30,6 +30,9 @@ for cell in [c for row in ban.cells for c in row]:
 # フォントの一括変更（内容設定後に適用）
 ban.font.size = 16.0
 ban.font.color = 0x000000 # 青色
+
+# Range で一括設定
+# ban.borders.all = BorderStyle(color=0x000000, weight=50, line_style=BorderLineStyle.SOLID)
 
 # 駒を配置
 pieces = [
