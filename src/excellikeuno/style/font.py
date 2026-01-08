@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict
 
+from excellikeuno.typing.calc import Color, FontSlant
+
 
 class Font:
     """Proxy-style font wrapper.
@@ -68,6 +70,86 @@ class Font:
         return self
 
     # --- owner direct access helpers -------------------------------------
+    def _value_from_owner(self, field: str) -> Any:
+        owner = getattr(self, "_owner", None)
+        if owner is None:
+            raise AttributeError("owner not set")
+
+        cp = getattr(owner, "character_properties", None)
+
+        def _get_prop(name: str) -> Any:
+            if cp is not None:
+                try:
+                    return cp.get_property(name)
+                except Exception:
+                    pass
+            return getattr(owner, name)
+
+        if field == "name":
+            return _get_prop("CharFontName")
+        if field == "size":
+            try:
+                return float(_get_prop("CharHeight"))
+            except Exception:
+                return 0.0
+        if field == "bold":
+            try:
+                return float(_get_prop("CharWeight")) >= 150.0
+            except Exception:
+                return False
+        if field in {"italic", "font_style"}:
+            try:
+                posture = int(_get_prop("CharPosture"))
+                return posture if field == "font_style" else bool(posture)
+            except Exception:
+                return 0 if field == "font_style" else False
+        if field == "underline":
+            try:
+                return int(_get_prop("CharUnderline"))
+            except Exception:
+                return 0
+        if field == "strikeout":
+            try:
+                return int(_get_prop("CharStrikeout"))
+            except Exception:
+                return 0
+        if field == "color":
+            try:
+                return _get_prop("CharColor")
+            except Exception:
+                return None
+        if field == "backcolor":
+            val = None
+            try:
+                val = _get_prop("CharBackColor")
+            except Exception:
+                val = None
+            if val is None:
+                try:
+                    val = _get_prop("CellBackColor")
+                except Exception:
+                    val = None
+            return val
+        if field in {"subscript", "superscript", "strikthrough"}:
+            try:
+                esc = int(_get_prop("CharEscapement"))
+            except Exception:
+                esc = 0
+            if field == "subscript":
+                return esc < 0
+            if field == "superscript":
+                return esc > 0
+            if field == "strikthrough":
+                try:
+                    return int(_get_prop("CharStrikeout")) != 0
+                except Exception:
+                    return False
+        # Fallback to cached mapping
+        cur = self._current()
+        if field in cur:
+            return cur[field]
+        raise AttributeError(field)
+
     def _read_from_owner(self) -> Dict[str, Any]:
         owner = getattr(self, "_owner", None)
         if owner is None:
@@ -199,9 +281,14 @@ class Font:
     def __getattr__(self, name: str) -> Any:  # noqa: D401
         if name.startswith("_"):
             raise AttributeError(name)
-        cur = self._current()
-        if name in cur:
-            return cur[name]
+        if name in self._buffer:
+            return self._buffer[name]
+        try:
+            return self._value_from_owner(name)
+        except Exception:
+            cur = self._current()
+            if name in cur:
+                return cur[name]
         raise AttributeError(name)
 
     # 型無しプロパティ設定の互換のため
@@ -217,99 +304,159 @@ class Font:
 
     # --- typed convenience properties for IDE completion -----------------
     @property
-    def name(self) -> Any:
-        return self._current().get("name")
+    def name(self) -> str:
+        if "name" in self._buffer:
+            return self._buffer.get("name")
+        try:
+            return self._value_from_owner("name")
+        except Exception:
+            return self._current().get("name")
 
     @name.setter
-    def name(self, value: Any) -> None:
+    def name(self, value: str) -> None:
         self.apply(name=value)
 
     @property
-    def size(self) -> Any:
-        return self._current().get("size")
+    def size(self) -> float:
+        if "size" in self._buffer:
+            return self._buffer.get("size")
+        try:
+            return self._value_from_owner("size")
+        except Exception:
+            return self._current().get("size")
 
     @size.setter
-    def size(self, value: Any) -> None:
+    def size(self, value: float) -> None:
         self.apply(size=value)
 
     @property
-    def bold(self) -> Any:
-        return self._current().get("bold")
+    def bold(self) -> bool:
+        if "bold" in self._buffer:
+            return self._buffer.get("bold")
+        try:
+            return self._value_from_owner("bold")
+        except Exception:
+            return self._current().get("bold")
 
     @bold.setter
-    def bold(self, value: Any) -> None:
+    def bold(self, value: bool) -> None:
         self.apply(bold=value)
 
     @property
-    def italic(self) -> Any:
-        return self._current().get("italic")
+    def italic(self) -> bool:
+        if "italic" in self._buffer:
+            return self._buffer.get("italic")
+        try:
+            return self._value_from_owner("italic")
+        except Exception:
+            return self._current().get("italic")
 
     @italic.setter
-    def italic(self, value: Any) -> None:
+    def italic(self, value: bool) -> None:
         self.apply(italic=value)
 
     @property
-    def underline(self) -> Any:
-        return self._current().get("underline")
+    def underline(self) -> bool:
+        if "underline" in self._buffer:
+            return self._buffer.get("underline")
+        try:
+            return self._value_from_owner("underline")
+        except Exception:
+            return self._current().get("underline")
 
     @underline.setter
-    def underline(self, value: Any) -> None:
+    def underline(self, value: bool) -> None:
         self.apply(underline=value)
 
     @property
-    def strikeout(self) -> Any:
-        return self._current().get("strikeout")
+    def strikeout(self) -> bool:
+        if "strikeout" in self._buffer:
+            return self._buffer.get("strikeout")
+        try:
+            return self._value_from_owner("strikeout")
+        except Exception:
+            return self._current().get("strikeout")
 
     @strikeout.setter
-    def strikeout(self, value: Any) -> None:
+    def strikeout(self, value: bool) -> None:
         self.apply(strikeout=value)
 
     @property
-    def color(self) -> Any:
-        return self._current().get("color")
+    def color(self) -> Color:
+        if "color" in self._buffer:
+            return self._buffer.get("color")
+        try:
+            return self._value_from_owner("color")
+        except Exception:
+            return self._current().get("color")
 
     @color.setter
-    def color(self, value: Any) -> None:
+    def color(self, value: Color) -> None:
         self.apply(color=value)
 
     @property
-    def backcolor(self) -> Any:
-        return self._current().get("backcolor")
+    def backcolor(self) -> Color:
+        if "backcolor" in self._buffer:
+            return self._buffer.get("backcolor")
+        try:
+            return self._value_from_owner("backcolor")
+        except Exception:
+            return self._current().get("backcolor")
 
     @backcolor.setter
-    def backcolor(self, value: Any) -> None:
+    def backcolor(self, value: Color) -> None:
         self.apply(backcolor=value)
 
     @property
-    def subscript(self) -> Any:
-        return self._current().get("subscript")
+    def subscript(self) -> bool:
+        if "subscript" in self._buffer:
+            return self._buffer.get("subscript")
+        try:
+            return self._value_from_owner("subscript")
+        except Exception:
+            return self._current().get("subscript")
 
     @subscript.setter
-    def subscript(self, value: Any) -> None:
+    def subscript(self, value: bool) -> None:
         self.apply(subscript=value)
 
     @property
-    def superscript(self) -> Any:
-        return self._current().get("superscript")
+    def superscript(self) -> bool:
+        if "superscript" in self._buffer:
+            return self._buffer.get("superscript")
+        try:
+            return self._value_from_owner("superscript")
+        except Exception:
+            return self._current().get("superscript")
 
     @superscript.setter
-    def superscript(self, value: Any) -> None:
+    def superscript(self, value: bool) -> None:
         self.apply(superscript=value)
 
     @property
-    def font_style(self) -> Any:
-        return self._current().get("font_style")
+    def font_style(self) -> FontSlant:
+        if "font_style" in self._buffer:
+            return self._buffer.get("font_style")
+        try:
+            return self._value_from_owner("font_style")
+        except Exception:
+            return self._current().get("font_style")
 
     @font_style.setter
-    def font_style(self, value: Any) -> None:
+    def font_style(self, value: FontSlant) -> None:
         self.apply(font_style=value)
 
     @property
-    def strikthrough(self) -> Any:
-        return self._current().get("strikthrough")
+    def strikthrough(self) -> int:
+        if "strikthrough" in self._buffer:
+            return self._buffer.get("strikthrough")
+        try:
+            return self._value_from_owner("strikthrough")
+        except Exception:
+            return self._current().get("strikthrough")
 
     @strikthrough.setter
-    def strikthrough(self, value: Any) -> None:
+    def strikthrough(self, value: int) -> None:
         self.apply(strikthrough=value)
 
 

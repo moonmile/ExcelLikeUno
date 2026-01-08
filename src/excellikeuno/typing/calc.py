@@ -305,6 +305,9 @@ class FontSlant(IntEnum):
     NONE = 0
     OBLIQUE = 1
     ITALIC = 2
+    DONTKNOW = 3
+    REVERSE_OBLIQUE = 4
+    REVERSE_ITALIC = 5
 
 
 class FontUnderline(IntEnum):
