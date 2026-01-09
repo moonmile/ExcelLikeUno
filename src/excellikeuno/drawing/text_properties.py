@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import Any, cast
 
 from ..core import UnoObject
-from ..typing import FontSlant, FontStrikeout, FontUnderline, XPropertySet
+from ..typing import XPropertySet
 
 
 class TextProperties(UnoObject):
-    """Attribute-style wrapper over drawing TextProperties."""
+    """Attribute-style wrapper over drawing TextProperties (Text* only)."""
 
     def _props(self) -> XPropertySet:
         return cast(XPropertySet, self.raw)
@@ -34,116 +34,72 @@ class TextProperties(UnoObject):
             # Best-effort; swallow when the text interface is missing
             pass
 
-    # Common TextProperties for convenience
+    # Text* convenience (Char* は CharacterProperties 側に委譲する)
     @property
-    def CharColor(self) -> int:
+    def TextAutoGrowHeight(self) -> bool:
         try:
-            return int(self.get_property("CharColor"))
+            return bool(self.get_property("TextAutoGrowHeight"))
+        except BaseException:
+            return False
+
+    @TextAutoGrowHeight.setter
+    def TextAutoGrowHeight(self, value: bool) -> None:
+        self.set_property("TextAutoGrowHeight", bool(value))
+
+    @property
+    def TextAutoGrowWidth(self) -> bool:
+        try:
+            return bool(self.get_property("TextAutoGrowWidth"))
+        except BaseException:
+            return False
+
+    @TextAutoGrowWidth.setter
+    def TextAutoGrowWidth(self, value: bool) -> None:
+        self.set_property("TextAutoGrowWidth", bool(value))
+
+    @property
+    def TextLeftDistance(self) -> int:
+        try:
+            return int(self.get_property("TextLeftDistance"))
         except BaseException:
             return 0
 
-    @CharColor.setter
-    def CharColor(self, value: int) -> None:
-        self.set_property("CharColor", int(value))
+    @TextLeftDistance.setter
+    def TextLeftDistance(self, value: int) -> None:
+        self.set_property("TextLeftDistance", int(value))
 
     @property
-    def CharHeight(self) -> float:
+    def TextRightDistance(self) -> int:
         try:
-            return float(self.get_property("CharHeight"))
-        except BaseException:
-            return 0.0
-
-    @CharHeight.setter
-    def CharHeight(self, value: float) -> None:
-        self.set_property("CharHeight", float(value))
-
-    @property
-    def CharFontName(self) -> str:
-        try:
-            return cast(str, self.get_property("CharFontName"))
-        except BaseException:
-            return ""
-
-    @CharFontName.setter
-    def CharFontName(self, value: str) -> None:
-        self.set_property("CharFontName", value)
-
-    @property
-    def CharFontStyleName(self) -> str:
-        try:
-            return cast(str, self.get_property("CharFontStyleName"))
-        except BaseException:
-            return ""
-
-    @CharFontStyleName.setter
-    def CharFontStyleName(self, value: str) -> None:
-        self.set_property("CharFontStyleName", value)
-
-    @property
-    def CharFontPitch(self) -> int:
-        try:
-            return int(self.get_property("CharFontPitch"))
+            return int(self.get_property("TextRightDistance"))
         except BaseException:
             return 0
 
-    @CharFontPitch.setter
-    def CharFontPitch(self, value: int) -> None:
-        self.set_property("CharFontPitch", int(value))
+    @TextRightDistance.setter
+    def TextRightDistance(self, value: int) -> None:
+        self.set_property("TextRightDistance", int(value))
 
     @property
-    def CharWeight(self) -> float:
+    def TextUpperDistance(self) -> int:
         try:
-            return float(self.get_property("CharWeight"))
+            return int(self.get_property("TextUpperDistance"))
         except BaseException:
-            return 0.0
+            return 0
 
-    @CharWeight.setter
-    def CharWeight(self, value: float) -> None:
-        self.set_property("CharWeight", float(value))
+    @TextUpperDistance.setter
+    def TextUpperDistance(self, value: int) -> None:
+        self.set_property("TextUpperDistance", int(value))
 
     @property
-    def CharPosture(self) -> FontSlant:
+    def TextLowerDistance(self) -> int:
         try:
-            return FontSlant(int(self.get_property("CharPosture")))
+            return int(self.get_property("TextLowerDistance"))
         except BaseException:
-            return FontSlant(0)
+            return 0
 
-    @CharPosture.setter
-    def CharPosture(self, value: FontSlant | int) -> None:
-        self.set_property("CharPosture", int(value))
-
-    @property
-    def CharUnderline(self) -> FontUnderline:
-        try:
-            return FontUnderline(int(self.get_property("CharUnderline")))
-        except BaseException:
-            return FontUnderline(0)
-
-    @CharUnderline.setter
-    def CharUnderline(self, value: FontUnderline | int) -> None:
-        self.set_property("CharUnderline", int(value))
-
-    @property
-    def CharStrikeout(self) -> FontStrikeout:
-        try:
-            return FontStrikeout(int(self.get_property("CharStrikeout")))
-        except BaseException:
-            return FontStrikeout(0)
-
-    @CharStrikeout.setter
-    def CharStrikeout(self, value: FontStrikeout | int) -> None:
-        self.set_property("CharStrikeout", int(value))
-
-    @property
-    def CharLocale(self) -> Any:
-        try:
-            return self.get_property("CharLocale")
-        except BaseException:
-            return None
-
-    @CharLocale.setter
-    def CharLocale(self, value: Any) -> None:
-        self.set_property("CharLocale", value)
+    @TextLowerDistance.setter
+    def TextLowerDistance(self, value: int) -> None:
+        self.set_property("TextLowerDistance", int(value))
 
     def getPropertyValue(self, name: str) -> Any:  # noqa: N802 - UNO naming
         return self.get_property(name)

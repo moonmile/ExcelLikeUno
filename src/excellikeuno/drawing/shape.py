@@ -10,6 +10,7 @@ from .fill_properties import FillProperties
 from .line_properties import LineProperties
 from .shadow_properties import ShadowProperties
 from .text_properties import TextProperties
+from ..style.character_properties import CharacterProperties
 from ..style.font import Font
 from ..style.line import Line
 
@@ -101,6 +102,18 @@ class Shape(UnoObject):
             object.__setattr__(self, "_shadow_properties", existing)
         return cast(ShadowProperties, existing)
 
+    @property
+    def character_properties(self) -> CharacterProperties:
+        existing = self.__dict__.get("_character_properties")
+        if existing is None:
+            try:
+                cp_raw = self.iface(InterfaceNames.X_PROPERTY_SET)
+            except BaseException:
+                cp_raw = self.raw
+            existing = CharacterProperties(cp_raw)
+            object.__setattr__(self, "_character_properties", existing)
+        return cast(CharacterProperties, existing)
+
     # TextProperties implementation
     @property
     def text_properties(self) -> TextProperties:
@@ -172,23 +185,35 @@ class Shape(UnoObject):
 
     @property
     def CharHeight(self) -> float:
-        return float(self.text_properties.CharHeight)
+        try:
+            return float(self.character_properties.CharHeight)
+        except BaseException:
+            return 0.0
 
     @CharHeight.setter
     def CharHeight(self, value: float) -> None:
-        self.text_properties.CharHeight = float(value)
+        try:
+            self.character_properties.CharHeight = float(value)
+        except BaseException:
+            pass
 
     @property
     def CharFontName(self) -> str:
-        return cast(str, self.text_properties.CharFontName)
+        try:
+            return cast(str, self.character_properties.CharFontName)
+        except BaseException:
+            return ""
 
     @CharFontName.setter
     def CharFontName(self, value: str) -> None:
-        self.text_properties.CharFontName = value
+        try:
+            self.character_properties.CharFontName = value
+        except BaseException:
+            pass
 
     @property
     def HoriJustify(self) -> int:
-        for name in ("TextHorizontalAdjust", "HoriJustify", "ParaAdjust"):
+        for name in ("TextHorizontalAdjust", "HoriJustify"):
             try:
                 return int(self.text_properties.get_property(name))
             except BaseException:
@@ -198,7 +223,7 @@ class Shape(UnoObject):
     @HoriJustify.setter
     def HoriJustify(self, value: int) -> None:
         val = int(value)
-        for name in ("TextHorizontalAdjust", "HoriJustify", "ParaAdjust"):
+        for name in ("TextHorizontalAdjust", "HoriJustify"):
             try:
                 self.text_properties.set_property(name, val)
                 return
@@ -243,6 +268,94 @@ class Shape(UnoObject):
         if not current:
             return
         Font(owner=self).apply(**current)
+
+    # Font helper for CharacterProperties access
+    def _font_getter(self) -> dict[str, Any]:
+        cp = self.character_properties
+        def _get(name: str, default: Any = None) -> Any:
+            try:
+                return cp.get_property(name)
+            except Exception:
+                return default
+
+        def _as_float(val: Any) -> float:
+            try:
+                return float(val)
+            except Exception:
+                return 0.0
+
+        def _as_int(val: Any) -> int:
+            try:
+                return int(val)
+            except Exception:
+                return 0
+
+        esc = _as_int(_get("CharEscapement", 0))
+        backcolor = _get("CharBackColor", None)
+        return {
+            "name": _get("CharFontName"),
+            "size": _as_float(_get("CharHeight")),
+            "bold": _as_float(_get("CharWeight")) >= 150.0,
+            "italic": bool(_as_int(_get("CharPosture"))),
+            "underline": _as_int(_get("CharUnderline")),
+            "strikeout": _as_int(_get("CharStrikeout")),
+            "color": _get("CharColor"),
+            "backcolor": backcolor,
+            "subscript": esc < 0,
+            "superscript": esc > 0,
+            "font_style": _as_int(_get("CharPosture")),
+            "strikthrough": _as_int(_get("CharStrikeout")) != 0,
+        }
+
+    def _font_setter(self, **updates: Any) -> None:
+        cp = self.character_properties
+
+        def _set(name: str, value: Any) -> None:
+            try:
+                cp.set_property(name, value)
+            except Exception:
+                pass
+
+        if "name" in updates:
+            _set("CharFontName", updates["name"])
+        if "size" in updates:
+            val = float(updates["size"])
+            for key in ("CharHeight", "CharHeightAsian", "CharHeightComplex"):
+                _set(key, val)
+        if "bold" in updates:
+            _set("CharWeight", 150.0 if updates["bold"] else 100.0)
+        if "italic" in updates:
+            target = 2 if updates["italic"] else 0
+            for key in ("CharPosture", "CharPostureAsian", "CharPostureComplex"):
+                _set(key, target)
+        if "font_style" in updates:
+            try:
+                target = int(updates["font_style"])
+                for key in ("CharPosture", "CharPostureAsian", "CharPostureComplex"):
+                    _set(key, target)
+            except Exception:
+                pass
+        if "underline" in updates:
+            _set("CharUnderline", int(updates["underline"]))
+        if "strikeout" in updates:
+            _set("CharStrikeout", int(updates["strikeout"]))
+        if "color" in updates:
+            _set("CharColor", updates["color"])
+        if "backcolor" in updates:
+            _set("CharBackTransparent", False)
+            _set("CharBackColor", updates["backcolor"])
+        if "subscript" in updates or "superscript" in updates:
+            if updates.get("superscript"):
+                _set("CharEscapement", 58)
+            elif updates.get("subscript"):
+                _set("CharEscapement", -25)
+            else:
+                _set("CharEscapement", 0)
+        if "strikthrough" in updates:
+            try:
+                _set("CharStrikeout", 1 if updates["strikthrough"] else 0)
+            except Exception:
+                pass
 
     # Line proxy (Font/Borders style)
     @property
