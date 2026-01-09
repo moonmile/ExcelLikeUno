@@ -17,6 +17,8 @@ token は ~/.pypirc に保存してある。
 ## インストール
 ```
 & 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
+
+& 'C:\Program Files\LibreOffice\program\python' -m pip install --upgrade excellikeuno
 ```
 
 ## アンインストール
@@ -38,7 +40,11 @@ twine upload --repository testpypi dist/*
 
 ## テストサーバーからインストール
 ```
-& 'C:\Program Files\LibreOffice\program\python' -m pip pip install -i https://test.pypi.org/simple excellikeuno
+& 'C:\Program Files\LibreOffice\program\python' -m pip install -i https://test.pypi.org/simple excellikeuno
+
+& 'C:\Program Files\LibreOffice\program\python' -m pip install requests -i https://test.pypi.org/simple excellikeuno
+
+
 ```
 
 ## 本番サーバーへアップロード

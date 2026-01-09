@@ -1,16 +1,29 @@
 # Excel Like UNO
 
-Provides an Excel/VBA-like programming experience to LibreOffice Calc through a Python wrapper over the UNO API.
-The goal is to make migration from Excel macros easier.
+Provides an Excel/VBA-like programming experience to LibreOffice Calc through a Python wrapper over the UNO API. The goal is to make migration from Excel macros easier.
 
 [Goto 日本語 README](README.md)
 
 # Key Features
 
-- Hides the complexity of the UNO API and exposes methods/properties close to Excel/VBA
-- Wraps Calc concepts (sheets, cells, ranges, shapes, etc.) as Python classes
-- Ships rich type hints to support IDE completion and static analysis
-- Supports VBA-like code such as `sheet.cell(col, row).value` to help migrate macros
+- Hide the complexity of the UNO API and expose methods/properties close to Excel/VBA
+- Wrap Calc concepts (sheets, cells, ranges, shapes, etc.) as Python classes
+- Ship rich type hints to support IDE completion and static analysis
+- Support VBA-like code such as `sheet.cell(col, row).value` to help migrate macros
+
+# Design Principles
+
+- One wrapper class per Calc concept, all built on a shared `UnoObject` cache of queried interfaces
+- UNO-derived names stay PascalCase; newly added Python helpers use snake_case (shortcuts like `value`, `formula`, `text` kept lowercase)
+- Prefer interface-name constants and Protocol-based type hints to improve IDE completion and avoid typos
+- Provide Excel/VBA-like convenience such as `sheet.cell(col, row)` and `range.borders` to simplify migration
+
+# Project Layout
+
+- `src/excellikeuno/`: library code (connection/bootstrap, core base, Calc/table wrappers, drawing/shapes, utils, typing)
+- `samples/`: runnable examples; use `samples/xluno.ps1` with the LibreOffice-bundled Python
+- `tests/`: pytest cases targeting the LibreOffice runtime (UNO server required)
+- `agents/`: design docs and prompts (single source of truth for architecture and naming)
 
 # Prerequisites (Windows)
 
@@ -63,8 +76,7 @@ $env:PYTHONPATH=<path-to-excellikeuno>
 & 'C:\Program Files\LibreOffice\program\python' <script-file>
 ```
 
-Make sure that the Python executable is the one bundled with LibreOffice.
-Other Python environments usually do not have the UNO modules installed and will fail.
+Make sure that the Python executable is the one bundled with LibreOffice. Other Python environments usually do not have the UNO modules installed and will fail.
 
 It is convenient to have a helper script like `samples/xluno.ps1` adjusted to your environment:
 
@@ -84,32 +96,31 @@ First, install the package with the LibreOffice-bundled Python:
 & 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
 ```
 
-Alternatively, you can place this library directly under:
+Alternatively, place this library directly under:
 
 ```powershell
 C:\Users\<UserName>\AppData\Roaming\LibreOffice\4\user\Scripts\python\
 ```
 
-The library provides a helper `connect_calc_script()` that uses `XSCRIPTCONTEXT` to connect to the active Calc document.  
-Register your macro function in `g_exportedScripts` so that it appears under "Tools" → "Macros" → "Run Macro":
+The library provides `connect_calc_script()`, which uses `XSCRIPTCONTEXT` to connect to the active Calc document. Add your macro function to `g_exportedScripts` so it is visible under "Tools" → "Macros" → "Run Macro":
 
 ```python
 from typing import Any, Tuple
-from excellikeuno.table.sheet import Sheet
+from excellikeuno.table.sheet import Sheet 
 from excellikeuno import connect_calc_script
 
 def hello_to_cell():
-  (_, _, sheet) = connect_calc_script(XSCRIPTCONTEXT)
-  sheet.cell(0, 0).text = "Hello Excel Like for Python!"
-  sheet.cell(0, 1).text = "こんにちは、Excel Like for Python!"
-  sheet.cell(0, 0).column_width = 10000  # set width
+    (_, _, sheet) = connect_calc_script(XSCRIPTCONTEXT)
+    sheet.cell(0, 0).text = "Hello Excel Like for Python!"
+    sheet.cell(0, 1).text = "こんにちは、Excel Like for Python!"
+    sheet.cell(0,0).column_width = 10000  # set width
 
-  cell = sheet.cell(0, 1)
-  cell.CellBackColor = 0x006400  # dark green
-  cell.CharColor = 0xFFFFFF  # white text
+    cell = sheet.cell(0,1)
+    cell.CellBackColor = 0x006400  # dark green
+    cell.CharColor = 0xFFFFFF  # white text
 
 g_exportedScripts = (
-  hello_to_cell,
+    hello_to_cell,
 )
 ```
 
@@ -117,25 +128,22 @@ g_exportedScripts = (
 
 ![Using connect_calc_script](./doc/images/connect_calc_script.jpg)
 
-To enable code completion in VS Code, add the following to `.vscode/settings.json`
-(adjust the path to your user name and Python version):
+To enable code completion in VS Code, add the following to `.vscode/settings.json` (adjust the path to your user name and Python version):
 
 ```json
 {
-  // existing settings...
+    // existing settings...
 
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.extraPaths": [
-    "C:/Users/masuda/AppData/Roaming/Python/Python311/site-packages"
-  ]
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.extraPaths": [
+        "C:/Users/masuda/AppData/Roaming/Python/Python311/site-packages"
+    ]
 }
 ```
 
 ## Using on Linux
 
-(Work in progress)
-
-Installation on Linux is relatively straightforward using distribution packages.
+Work in progress, but installation on Linux is relatively straightforward using distribution packages.
 
 ```bash
 sudo apt install libreoffice
@@ -148,16 +156,26 @@ Start the UNO server:
 soffice --accept="socket,host=localhost,port=2002;urp;" --norestore --nologo
 ```
 
-On Linux, headless (no GUI) mode is available and convenient when controlling LibreOffice via the UNO API.
-This can be extended to run a LibreOffice server inside WSL or Docker containers.
+On Linux, headless (no GUI) mode is available and convenient when controlling LibreOffice via the UNO API. You can also run the LibreOffice server inside WSL or Docker.
+
+For Python macros, install the package into the OS Python environment. Example on Ubuntu 20.04 + Python 3.12 (create any working folder such as `~/libre`):
+
+```bash
+mkdir libre
+cd libre
+python -m venv .venv
+.venv/bin/pip install excellikeuno
+ls .venv/lib/python3.12/site-packages
+sudo cp -r ~/libre/.venv/lib/python3.12/site-packages/excellikeuno /usr/lib/python3/dist-packages/
+```
 
 ## Using with WSL
 
-(Work in progress)
+Work in progress
 
 ## Using with Docker containers
 
-(Work in progress)
+Work in progress
 
 # Usage Overview
 
@@ -165,23 +183,80 @@ This can be extended to run a LibreOffice server inside WSL or Docker containers
 
 ```python
 from excellikeuno import connect_calc
+from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 
-desktop, doc, sheet = connect_calc()
+(desktop, doc, sheet) = connect_calc() 
+cell = sheet.cell(0, 0)  # A1
+cell.text = "Hello, World!"
+sheet.range("A1:C1").merge(True)
 
-sheet.cell(0, 0).value = 100    # A1
-sheet.cell(1, 0).value = 200    # B1
-sheet.cell(2, 0).formula = "=A1+B1"  # C1
+cell.font.size = 16
+cell.font.name = "Arial"
+cell.font.color = 0xFF0000  # red text
+
+cell.row_height = 2000  # 20 mm
+cell.HoriJustify = CellHoriJustify.CENTER
+cell.VertJustify = CellVertJustify.CENTER
+
+sheet.cell(0,1).text = "id"
+sheet.cell(1,1).text = "name"
+sheet.cell(2,1).text = "address"
+sheet.range("A2:C2").CellBackColor = 0xFFBF00  # header background
+
+data = [
+    [1, "masuda", "tokyo"],
+    [2, "suzuki", "osaka"],
+    [3, "takahashi", "nagoya"],
+]
+sheet.range("A3:C5").value = data  # bulk assign
 ```
 
-## Connect to Writer and write text
+![Cell operations](./doc/images/calc_sample_cell.jpg)
+
+## Draw borders in Calc
 
 ```python
-from excellikeuno import connect_writer
+from excellikeuno import connect_calc
+from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLineStyle
 
-desktop, doc = connect_writer()
-text = doc.text
-text.setString("Hello, LibreOffice Writer!")
+(desktop, doc, sheet) = connect_calc()
+
+ban = sheet.range("A1:I9")
+ban.CellBackColor = 0xFFFACD  # light yellow
+ban.row_height = 1000
+ban.column_width = 1000
+
+for cell in [c for row in ban.cells for c in row]:
+    cell.borders.all.color = 0x000000
+    cell.borders.all.weight = 50
+    cell.borders.all.line_style = BorderLineStyle.SOLID
+    cell.HoriJustify = CellHoriJustify.CENTER
+    cell.VertJustify = CellVertJustify.CENTER
+
+ban.font.size = 16.0
+ban.font.color = 0x000000
+
+pieces = [
+    ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
+    ["", "飛", "", "", "", "", "", "角", ""],
+    ["歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩"],
+    ["", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", ""],
+    ["歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩"],
+    ["", "角", "", "", "", "", "", "飛", ""],
+    ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
+]
+ban.value = pieces
+
+for r in range(9):
+    for c in range(9):
+        cell = ban.cell(c, r)
+        if pieces[r][c] != "" and r < 3:
+            cell.CharRotation = 180
 ```
+
+![Shogi board](./doc/images/calc_sample_shogiban.jpg)
 
 Sample code is under `samples/` and can be run via `xluno.ps1`:
 
@@ -195,10 +270,14 @@ cd samples
 # Development with VS Code
 
 - Enable the Python extension and PowerShell extension
-- To run tests, use the Command Palette or "Run Task" and choose:
-  - `Test (LibreOffice Python)`
+- To run tests, use the Command Palette or "Run Task" and choose `Test (LibreOffice Python)`
 
 The task uses the LibreOffice-bundled Python to run `pytest tests`.
+
+Recommended flow:
+- Start the UNO server (see below)
+- Ensure `PYTHONPATH` includes `src`
+- Run the `Test (LibreOffice Python)` task or the equivalent command below
 
 # Running Tests
 
@@ -215,16 +294,24 @@ $env:PYTHONPATH='H:\LibreOffice-ExcelLike\src\'
 
 # Documentation / UNO API Reference
 
-- Project design and specs live under `agents/`:
-  - Class design: `agents/class_design.md`
-  - Coding rules: `agents/coding_rule.md`
-  - Design guidelines: `agents/design_guidelines.md`
-  - Test execution: `agents/test_execution.md`
+- Project design and specs live under `agents/` (update these first when changing behavior):
+  - `agents/class_design.md` (class responsibilities)
+  - `agents/design_guidelines.md` (wrapping patterns and naming rules)
+  - `agents/folder_structure.md` (module layout)
+  - `agents/naming_rules.md` (Calc naming conventions; stub)
+  - `agents/operation_spec.md` (Calc operation spec; stub)
+  - `agents/tasks.md` (work items for agents)
+  - `agents/test_execution.md` (how to run tests/headless modes)
 - UNO API reference (local installation):
   - `C:\Program Files\LibreOffice\sdk\docs\`
 
+## Blog
+
+- [Using ExcelLikeUno with LibreOffice Calc on Linux | Moonmile Solutions Blog](https://www.moonmile.net/blog/archives/11933)
+
 # Version
 
+- 0.2.0 (2025-01-09): Added `font` on Cell/Range/Shape and `borders` on Cell/Range
 - 0.1.1 (2025-01-06): Built pip package
 - 0.1.0 (2025-01-05): Pre-release
 
