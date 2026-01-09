@@ -142,10 +142,21 @@ class BorderStyle:
     def line_style(self) -> BorderLineStyle:
         val = int(getattr(self._line(), "LineStyle", 0))
         try:
-            if val == 0 and self.outer_width == 0:
-                return BorderLineStyle.NONE
+            width = int(getattr(self._line(), "OuterLineWidth", getattr(self._line(), "LineWidth", 0)) or 0)
         except Exception:
-            pass
+            width = 0
+        try:
+            color = int(getattr(self._line(), "Color", 0))
+        except Exception:
+            color = 0
+
+        if val == int(BorderLineStyle.NONE):
+            return BorderLineStyle.NONE
+        if val == 0 and width == 0:
+            return BorderLineStyle.NONE
+        if val == 0 and color == 0xFFFFFF and width <= 1:
+            # Treat zero-width, white line with no style as cleared.
+            return BorderLineStyle.NONE
         return val
 
     @line_style.setter

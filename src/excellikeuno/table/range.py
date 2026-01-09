@@ -213,6 +213,7 @@ class Range(UnoObject):
         for r in range(row_count):
             for c in range(col_count):
                 updates: dict[str, BorderLine | BorderLine2] = {}
+                # apply only to the perimeter, keep inner grid untouched
                 if r == 0:
                     updates["top"] = _to_line2(solid_line)
                 if r == row_count - 1:
@@ -264,13 +265,14 @@ class Range(UnoObject):
         for r in range(row_count):
             for c in range(col_count):
                 updates: dict[str, BorderLine | BorderLine2] = {}
-                if r == 0:
+                # apply only to internal grid lines, not the perimeter
+                if r > 0:
                     updates["top"] = _to_line2(solid_line)
-                if r == row_count - 1:
+                if r < row_count - 1:
                     updates["bottom"] = _to_line2(solid_line)
-                if c == 0:
+                if c > 0:
                     updates["left"] = _to_line2(solid_line)
-                if c == col_count - 1:
+                if c < col_count - 1:
                     updates["right"] = _to_line2(solid_line)
 
                 cell = Cell(rng.getCellByPosition(c, r))

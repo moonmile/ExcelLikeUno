@@ -1,10 +1,6 @@
 # 将棋盤を作る
 from excellikeuno import connect_calc
-from excellikeuno.style.border import BorderStyle
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLineStyle
-
-from excellikeuno.typing.structs import BorderLine2
-from excellikeuno.typing import Font
 
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "将棋盤"

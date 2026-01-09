@@ -20,7 +20,7 @@
     - [ ] Shape.fill.gradient 関係
     - [ ] Shape.fill.bitmap 関係
     - [ ] Shape.fill.hatch 関係
-- [ ] TextProperties, CharacterProperties の混在を解消
+- [v] TextProperties, CharacterProperties の混在を解消
 - [ ] Chart の実装
 - [ ] PivodTable の実装
 

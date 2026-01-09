@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Any, cast
 from numbers import Number
 
+from excellikeuno.typing.calc import BorderLineStyle
+
 from ..core import UnoObject
 from ..typing import (
     Color,
@@ -37,11 +39,40 @@ class Cell(UnoObject):
         props.setPropertyValue(name, value)
 
     def _border_getter(self) -> dict[str, BorderLine]:
+        def _normalize_line(val: Any) -> BorderLine:
+            if hasattr(val, "LineStyle"):
+                return val
+            try:
+                color = int(getattr(val, "Color", 0))
+                inner = int(getattr(val, "InnerLineWidth", 0))
+                outer = int(getattr(val, "OuterLineWidth", 0))
+                distance = int(getattr(val, "LineDistance", 0))
+                style = int(BorderLineStyle.NONE) if outer == 0 else 0
+                return BorderLine2(
+                    Color=color,
+                    InnerLineWidth=inner,
+                    OuterLineWidth=outer,
+                    LineDistance=distance,
+                    LineStyle=style,
+                    LineWidth=outer,
+                )
+            except Exception:
+                return val
+
+        def _prefer_line2(name: str) -> BorderLine:
+            try:
+                val2 = getattr(self, f"{name}2")
+                if hasattr(val2, "LineStyle"):
+                    return val2
+            except Exception:
+                pass
+            return _normalize_line(getattr(self, name))
+
         return {
-            "top": self.TopBorder,
-            "bottom": self.BottomBorder,
-            "left": self.LeftBorder,
-            "right": self.RightBorder,
+            "top": _prefer_line2("TopBorder"),
+            "bottom": _prefer_line2("BottomBorder"),
+            "left": _prefer_line2("LeftBorder"),
+            "right": _prefer_line2("RightBorder"),
         }
 
     def _border_setter(self, **updates: BorderLine) -> None:

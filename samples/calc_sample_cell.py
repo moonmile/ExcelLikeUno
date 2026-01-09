@@ -18,7 +18,6 @@ sheet.cell(0,1).text = "id"
 sheet.cell(1,1).text = "name"
 sheet.cell(2,1).text = "address"
 sheet.range("A2:C2").CellBackColor = 0xFFBF00  # A2:C2 の背景色を設定
-
 data = [
     [1, "masuda", "tokyo"],
     [2, "suzuki", "osaka"],

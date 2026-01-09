@@ -156,6 +156,17 @@ soffice --accept="socket,host=localhost,port=2002;urp;" --norestore --nologo
 Linux 版では、ヘッドレス（GUIを使わないモード）がサポートされているので、UNO API 経由での操作に便利です。
 これを応用した方法として、WSL や Docker 内で LibreOffice サーバーを動かす方法があります。
 
+Python マクロで使う場合は、OS の Python 環境に pip インストールします。
+以下に Ubuntu 20.04 + Python 3.12 の例を示します。libre フォルダーは適当に作成してください。
+
+```bash
+mkdir libre
+cd libre
+python -m venv .venv
+.venv/bin/pip install exellikeuno
+ls .venv/lib/python3.12/site-packages
+sudo ~/libre/.venv/lib/python3.12/site-packages/excellikeuno /usr/lib/python3/dist-packages/
+```
 
 ## WSL で使う場合
 
@@ -179,9 +190,9 @@ cell = sheet.cell(0, 0)  # A1 セルを取得
 cell.text = "Hello, World!"  # 値を設定
 sheet.range("A1:C1").merge(True)  # A1:C1 を結合
 
-cell.font_size = 16
-cell.font_name = "Arial"
-cell.font_color = 0xFF0000  # フォント色を赤に
+cell.font.size = 16
+cell.font.name = "Arial"
+cell.font.color = 0xFF0000  # フォント色を赤に
 
 cell.row_height = 2000  # 行の高さを設定 20 mm
 cell.HoriJustify = CellHoriJustify.CENTER
@@ -206,7 +217,8 @@ sheet.range("A3:C5").value = data  # 範囲にデータを一括設定
 ## Calc で罫線を引く
 ```python
 from excellikeuno import connect_calc
-from excellikeuno.typing.structs import BorderLine
+from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLineStyle
+
 (desktop, doc, sheet) = connect_calc()
 
 ban = sheet.range("A1:I9");
@@ -215,22 +227,21 @@ ban.row_height = 1000  # 行の高さを設定 20 mm
 ban.column_width = 1000  # 列の幅を設定 20 mm
 # 罫線を設定
 for cell in [c for row in ban.cells for c in row]:
-    borderline = BorderLine()
-    borderline.Color = 0x000000
-    borderline.OuterLineWidth = 50
-    borderline.InnerLineWidth = 0
-    borderline.LineDistance = 0
-
-    cell.TopBorder = borderline
-    cell.BottomBorder = borderline
-    cell.LeftBorder = borderline
-    cell.RightBorder = borderline
+    # 罫線の設定 top/left/bottom/right を一括設定
+    cell.borders.all.color = 0x000000 # 黒色
+    cell.borders.all.weight = 50  # 線の太さを設定
+    cell.borders.all.line_style = BorderLineStyle.SOLID  # 0: 実線 
+    # BorderStyle の利用
+    # cell.borders.all = BorderStyle(color=0x000000, weight=50, line_style=BorderLineStyle.SOLID)
     # センタリング
     cell.HoriJustify = CellHoriJustify.CENTER
     cell.VertJustify = CellVertJustify.CENTER
-    # フォントサイズを大きく
-    cell.font_size = 16.0
-    cell.CharColor = 0x000000  # 黒色に設定
+
+# フォントの一括変更（内容設定後に適用）
+ban.font.size = 16.0
+ban.font.color = 0x000000 # 黒色
+# Range で一括設定
+# ban.borders.all = BorderStyle(color=0x000000, weight=50, line_style=BorderLineStyle.SOLID)
 
 # 駒を配置
 pieces = [
@@ -295,8 +306,14 @@ $env:PYTHONPATH='H:\LibreOffice-ExcelLike\src\'
 - UNO API リファレンス（ローカルインストール）
 	- `C:\Program Files\LibreOffice\sdk\docs\`
 
+## ブログ
+
+- [Linux 版の LibreOffice Calc で ExcelLikeUno を使う \| Moonmile Solutions Blog](https://www.moonmile.net/blog/archives/11933)
+
+
 # バージョン
 
+- 0.2.0 (2025-01-09) : Cell/Range/Shape.font プロパティ、Cell/Range.borders プロパティの作成
 - 0.1.1 (2025-01-06) : pip パッケージを作成
 - 0.1.0 (2025-01-05) : 仮リリース
 
