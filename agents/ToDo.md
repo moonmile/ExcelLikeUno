@@ -15,12 +15,16 @@
 - [v] Cell/Range.borders プロパティの実装
 - [v] Shape.line プロパティの実装
 - [ ] Shape.margins プロパティの実装
-- [ ] Shape.fill プロパティの実装
-    - [ ] Shape.fill.color プロパティの実装
-    - [ ] Shape.fill.gradient 関係
-    - [ ] Shape.fill.bitmap 関係
-    - [ ] Shape.fill.hatch 関係
+- [v] Shape.fill プロパティの実装
 - [v] TextProperties, CharacterProperties の混在を解消
 - [ ] Chart の実装
 - [ ] PivodTable の実装
+- [ ] DarwPage の実装
 
+
+- [ ] DispatchHelper まわりの実装
+    - [ ] Calc の保存/読み込みのサポート
+    - [ ] Sheet.copy/paste の実装
+    - [ ] Cell/Range.copy/paste の実装
+    - [ ] Shape.copy/paste の実装
+    - [ ] Selection/Select の実装
