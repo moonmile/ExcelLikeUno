@@ -6,6 +6,7 @@ from excellikeuno.typing.structs import Point, Size
 
 from ..core import UnoObject
 from ..typing import Color, InterfaceNames, LineDash, LineStyle, XPropertySet, XShape
+from ..typing.calc import FillStyle
 from .fill_properties import FillProperties
 from .line_properties import LineProperties
 from .shadow_properties import ShadowProperties
@@ -13,6 +14,7 @@ from .text_properties import TextProperties
 from ..style.character_properties import CharacterProperties
 from ..style.font import Font
 from ..style.line import Line
+from ..style.fill import Fill
 
 
 class Shape(UnoObject):
@@ -380,6 +382,29 @@ class Shape(UnoObject):
             return
         Line(owner=self).apply(**current)
 
+    # Fill proxy
+    @property
+    def fill(self) -> Fill:
+        existing = self.__dict__.get("_fill")
+        if existing is None:
+            existing = Fill(owner=self)
+            object.__setattr__(self, "_fill", existing)
+        return existing
+
+    @fill.setter
+    def fill(self, value: Fill) -> None:
+        current = {}
+        try:
+            current = value._current()  # type: ignore[attr-defined]
+        except Exception:
+            try:
+                current = dict(value)  # type: ignore[arg-type]
+            except Exception:
+                current = {}
+        if not current:
+            return
+        Fill(owner=self).apply(**current)
+
     # LineProperties implementation
     @property
     def LineColor(self) -> int:
@@ -499,7 +524,7 @@ class Shape(UnoObject):
     @FillColor.setter
     def FillColor(self, value: Color) -> None:
         val = Color(value)
-        solid = 1  # com.sun.star.drawing.FillStyle.SOLID
+        solid = int(FillStyle.SOLID)
         try:
             self.fill_properties.FillStyle = solid
         except BaseException:
@@ -508,11 +533,19 @@ class Shape(UnoObject):
 
     @property
     def FillStyle(self) -> Any:
-        return self.fill_properties.FillStyle
+        val = self.fill_properties.FillStyle
+        try:
+            return Fill._coerce_style(val)
+        except Exception:
+            return val
 
     @FillStyle.setter
     def FillStyle(self, value: Any) -> None:
-        self.fill_properties.FillStyle = value
+        try:
+            target_style = Fill._coerce_style(value)
+            self.fill_properties.FillStyle = int(target_style)
+        except Exception:
+            self.fill_properties.FillStyle = value
 
     @property
     def FillTransparence(self) -> int:

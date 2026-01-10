@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from .calc import Color, ShadowLocation
 from .interfaces import StructNames
+from .calc import GradientStyle, HatchStyle
 
 
 def _try_uno_struct(name: str) -> Any | None:
@@ -248,6 +249,52 @@ class ShadowFormat:
 
 
 @dataclass
+class Gradient:
+    Style: GradientStyle = GradientStyle.LINEAR
+    StartColor: Color = 0
+    EndColor: Color = 0
+    Angle: int = 0
+    Border: int = 0
+    XOffset: int = 0
+    YOffset: int = 0
+    StartIntensity: int = 100
+    EndIntensity: int = 100
+    StepCount: int = 0
+    def to_raw(self) -> Any:
+        struct = _try_uno_struct(StructNames.GRADIENT)
+        if struct is None:
+            struct = type("Gradient", (), {})()
+        struct.Style = int(self.Style)
+        struct.StartColor = int(self.StartColor)
+        struct.EndColor = int(self.EndColor)
+        struct.Angle = int(self.Angle)
+        struct.Border = int(self.Border)
+        struct.XOffset = int(self.XOffset)
+        struct.YOffset = int(self.YOffset)
+        struct.StartIntensity = int(self.StartIntensity)
+        struct.EndIntensity = int(self.EndIntensity)
+        struct.StepCount = int(self.StepCount)
+        return struct
+
+
+@dataclass
+class Hatch:
+    Style: HatchStyle = HatchStyle.SINGLE
+    Color: Color = 0
+    Distance: int = 0
+    Angle: int = 0
+    def to_raw(self) -> Any:
+        struct = _try_uno_struct(StructNames.HATCH)
+        if struct is None:
+            struct = type("Hatch", (), {})()
+        struct.Style = int(self.Style)
+        struct.Color = int(self.Color)
+        struct.Distance = int(self.Distance)
+        struct.Angle = int(self.Angle)
+        return struct
+
+
+@dataclass
 class CellProtection:
     IsLocked: bool = False
     IsFormulaHidden: bool = False
@@ -275,4 +322,6 @@ __all__ = [
     "BezierPoint",
     "TableBorder",
     "TableBorder2",
+    "Gradient",
+    "Hatch",
 ]

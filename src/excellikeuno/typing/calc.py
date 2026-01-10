@@ -301,6 +301,35 @@ class LineStyle(IntEnum):
     # Some runtimes expose 8/9 for ROUND/LONGROUND variants; keep strict per IDL here.
 
 
+class FillStyle(IntEnum):
+    NONE = 0
+    SOLID = 1
+    GRADIENT = 2
+    HATCH = 3
+    BITMAP = 4
+
+
+class GradientStyle(IntEnum):
+    LINEAR = 0
+    AXIAL = 1
+    RADIAL = 2
+    ELLIPTICAL = 3
+    SQUARE = 4
+    RECT = 5
+
+
+class HatchStyle(IntEnum):
+    SINGLE = 0
+    DOUBLE = 1
+    TRIPLE = 2
+
+
+class BitmapMode(IntEnum):
+    REPEAT = 0
+    STRETCH = 1
+    NO_REPEAT = 2
+
+
 class FontSlant(IntEnum):
     NONE = 0
     OBLIQUE = 1

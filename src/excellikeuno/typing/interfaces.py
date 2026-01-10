@@ -54,6 +54,8 @@ class StructNames:
     TABLE_BORDER2 = "com.sun.star.table.TableBorder2"
     SHADOW_FORMAT = "com.sun.star.drawing.ShadowFormat"
     CELL_PROTECTION = "com.sun.star.table.CellProtection"
+    GRADIENT = "com.sun.star.drawing.Gradient"
+    HATCH = "com.sun.star.drawing.Hatch"
     
 
 __all__ = ["InterfaceNames", "StructNames"]
