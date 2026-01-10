@@ -7,6 +7,7 @@ from ..core.writer_document import WriterDocument
 from ..typing import InterfaceNames
 from ..table import Sheet
 
+current_desktop: Any = None
 
 def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
     """Open a Calc document and return (desktop, document, first_sheet).
@@ -14,7 +15,7 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
     This is a minimal example that relies on the bundled LibreOffice Python.
     It raises RuntimeError if UNO is not available.
     """
-
+    global current_desktop
     try:
         import uno
         import unohelper
@@ -55,9 +56,11 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
     spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
+    current_desktop = desktop
     return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
 
 def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
+    global current_desktop
     try:
         import uno
         from com.sun.star.beans import PropertyValue
@@ -86,17 +89,19 @@ def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
         spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
         controller = spreadsheet_doc.getCurrentController()
         sheet = controller.getActiveSheet()
-
+        current_desktop = desktop
         return desktop, doc_wrapper, Sheet(sheet, document=doc_wrapper)
     except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
         raise RuntimeError("Failed to connect to Calc") from exc
 
 # XSCRIPTCONTEXT に接続する
 def connect_calc_script(xscriptcontext) -> Tuple[Any, CalcDocument, Sheet]:
+    global current_desktop
     desktop = xscriptcontext.getDesktop()
     doc = CalcDocument(desktop.getCurrentComponent())
     controller = doc.raw.getCurrentController()
     sheet = Sheet(controller.getActiveSheet())
+    current_desktop = desktop
     return desktop, doc, sheet
 
 

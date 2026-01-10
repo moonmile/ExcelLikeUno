@@ -271,6 +271,28 @@ class Shapes:
             raise IndexError("shape index out of range")
         return self._wrap_shape(draw_page.getByIndex(index))
 
+    def remove(self, shape: Any) -> None:
+        """Remove a shape from the sheet draw page.
+
+        Accepts a Shape wrapper, a raw UNO shape, or an index.
+        """
+        draw_page = self.sheet._draw_page()
+
+        target = shape
+        if isinstance(shape, int):
+            count = draw_page.getCount()
+            idx = shape if shape >= 0 else count + shape
+            if idx < 0 or idx >= count:
+                raise IndexError("shape index out of range")
+            target = draw_page.getByIndex(idx)
+        elif hasattr(shape, "raw"):
+            target = getattr(shape, "raw")
+
+        try:
+            draw_page.remove(target)
+        except Exception as exc:
+            raise RuntimeError(f"failed to remove shape: {exc}")
+
     def add_ellipse_shape(
         self,
         x: int,

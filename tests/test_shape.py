@@ -177,6 +177,46 @@ def test_shape_basic_properties_roundtrip():
         draw_page.remove(rect)
 
 
+def test_shape_zorder_reorder_roundtrip():
+    _, doc, sheet, Point, Size = _connect_or_skip()
+    rect1, draw_page = _add_rectangle(doc, sheet, Point, Size)
+    rect2, _ = _add_rectangle(doc, sheet, Point, Size)
+    shape1 = RectangleShape(rect1)
+    shape2 = RectangleShape(rect2)
+    try:
+        shape1.ZOrder = 0
+        shape2.ZOrder = 1
+        assert shape1.ZOrder == 0
+        assert shape2.ZOrder == 1
+
+        shape2.ZOrder = 0
+        shape1.ZOrder = 1
+        assert shape2.ZOrder == 0
+        assert shape1.ZOrder == 1
+    finally:
+        draw_page.remove(rect1)
+        draw_page.remove(rect2)
+
+"""
+def test_shape_to_background_and_foreground():
+    _, doc, sheet, Point, Size = _connect_or_skip()
+    rect1, draw_page = _add_rectangle(doc, sheet, Point, Size)
+    rect2, _ = _add_rectangle(doc, sheet, Point, Size)
+    shape1 = RectangleShape(rect1)
+    shape2 = RectangleShape(rect2)
+    try:
+        shape1.to_background()
+        shape2.to_foreground()
+        assert shape1.ZOrder < shape2.ZOrder
+
+        shape2.to_background()
+        shape1.to_foreground()
+        assert shape2.ZOrder < shape1.ZOrder
+    finally:
+        draw_page.remove(rect1)
+        draw_page.remove(rect2)
+"""
+
 def test_line_shape_start_end_roundtrip():
     _, doc, sheet, Point, Size = _connect_or_skip()
     draw_page = sheet.raw.getDrawPage()
