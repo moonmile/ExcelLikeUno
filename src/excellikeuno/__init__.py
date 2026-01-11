@@ -21,11 +21,13 @@ from .drawing import (
     Shape,
     TextShape,
 )
-from .table import Cell, CellProperties, Sheet
+from .table import Cell, CellProperties, Sheet, Chart, ChartCollection
 
 __all__ = [
     "Cell",
     "CellProperties",
+    "Chart",
+    "ChartCollection",
     "Sheet",
     "Shape",
     "ConnectorShape",

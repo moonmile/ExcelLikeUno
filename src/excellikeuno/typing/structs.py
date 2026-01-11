@@ -75,6 +75,22 @@ class Size:
         return struct
 
 @dataclass
+class Rectangle:
+    X: int = 0
+    Y: int = 0
+    Width: int = 0
+    Height: int = 0
+    def to_raw(self) -> Any:
+        struct = _try_uno_struct(StructNames.RECTANGLE)
+        if struct is None:
+            struct = type("Rectangle", (), {})()
+        struct.X = self.X
+        struct.Y = self.Y
+        struct.Width = self.Width
+        struct.Height = self.Height
+        return struct
+
+@dataclass
 class CellAddress:
     Sheet: int = 0
     Column: int = 0
@@ -315,6 +331,7 @@ __all__ = [
     "BorderLine",
     "BorderLine2",
     "Point",
+    "Rectangle",
     "CellAddress",
     "CellRangeAddress",
     "TableSortField",

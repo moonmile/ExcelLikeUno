@@ -22,6 +22,7 @@ from ..drawing import Shape, EllipseShape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
 from .range import Range, TableRow, TableColumn
+from .chart import ChartCollection
 from .rows import TableRows
 from .columns import TableColumns
 
@@ -117,6 +118,10 @@ class Sheet(UnoObject):
     @property
     def shapes(self) -> "Shapes":
         return Shapes(self)
+
+    @property
+    def charts(self) -> ChartCollection:
+        return ChartCollection(self)
 
     @property
     def name(self) -> str:

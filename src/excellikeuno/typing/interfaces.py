@@ -13,6 +13,9 @@ class InterfaceNames:
     X_DRAW_PAGE_SUPPLIER = "com.sun.star.drawing.XDrawPageSupplier"
     X_SHAPE = "com.sun.star.drawing.XShape"
     X_SHAPES = "com.sun.star.drawing.XShapes"
+    X_TABLE_CHART = "com.sun.star.chart.XTableChart"
+    X_TABLE_CHARTS = "com.sun.star.chart.XTableCharts"
+    X_TABLE_CHARTS_SUPPLIER = "com.sun.star.sheet.XTableChartsSupplier"
     X_MERGEABLE = "com.sun.star.sheet.XMergeable"
     X_MERGEABLE_CELL = "com.sun.star.sheet.XMergeable"  # alias for backward compatibility
     X_MERGEABLE_CELL_RANGE = "com.sun.star.sheet.XMergeable"  # alias for backward compatibility
@@ -47,6 +50,7 @@ class StructNames:
     SIZE = "com.sun.star.awt.Size"
     CELL_ADDRESS = "com.sun.star.table.CellAddress"
     CELL_RANGE_ADDRESS = "com.sun.star.table.CellRangeAddress"
+    RECTANGLE = "com.sun.star.awt.Rectangle"
     TABLE_SORT_FIELD = "com.sun.star.table.TableSortField"
     BAR_CODE = "com.sun.star.drawing.BarCode"
     BEZIER_POINT = "com.sun.star.drawing.BezierPoint"

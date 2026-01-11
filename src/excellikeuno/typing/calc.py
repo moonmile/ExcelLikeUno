@@ -133,6 +133,51 @@ class XShapes(Protocol):
 
 
 @runtime_checkable
+class XTableCharts(Protocol):
+    def getCount(self) -> int:
+        ...
+
+    def hasByName(self, name: str) -> bool:
+        ...
+
+    def getByName(self, name: str) -> Any:
+        ...
+
+    def removeByName(self, name: str) -> None:
+        ...
+
+    def addNewByName(self, name: str, rect: Any, addresses: Any, columnHeaders: bool, rowHeaders: bool) -> None:
+        ...
+
+    def getElementNames(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class XTableChart(Protocol):
+    def getEmbeddedObject(self) -> Any:
+        ...
+
+    def getRangeAddress(self) -> Any:
+        ...
+
+    def setRangeAddress(self, address: Any) -> None:
+        ...
+
+    def getPosition(self) -> Any:
+        ...
+
+    def setPosition(self, pos: Any) -> None:
+        ...
+
+    def getSize(self) -> Any:
+        ...
+
+    def setSize(self, size: Any) -> None:
+        ...
+
+
+@runtime_checkable
 class XDrawPageSupplier(Protocol):
     def getDrawPage(self) -> XDrawPage:
         ...
