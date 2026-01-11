@@ -88,6 +88,57 @@ def test_add_pie_diagram_toggle_legend():
             pass
 
 
+def test_toggle_titles():
+    _, _, sheet = _connect_or_skip()
+    data_range = _seed_sample_data(sheet)
+
+    name = "Chart_Title_Test"
+    charts = sheet.charts
+    try:
+        charts.remove(name)
+    except Exception:
+        pass
+
+    rect = Rectangle(1800, 1800, 6000, 5000)
+    chart = charts.add_pie_diagram(
+        name=name,
+        data_range=data_range,
+        rectangle=rect,
+        column_headers=True,
+        row_headers=True,
+    )
+
+    try:
+        chart.has_main_title = True
+        chart.has_sub_title = True
+        assert chart.has_main_title is True
+        assert chart.has_sub_title is True
+
+        chart.has_main_title = False
+        chart.has_sub_title = False
+        assert chart.has_main_title is False
+        assert chart.has_sub_title is False
+
+        chart.title = "Main"
+        chart.sub_title = "Sub"
+        assert chart.title == "Main"
+        assert chart.sub_title == "Sub"
+        assert chart.has_main_title is True
+        assert chart.has_sub_title is True
+
+        chart.title = ""
+        chart.sub_title = "  "
+        assert chart.title == ""
+        assert chart.sub_title == ""
+        assert chart.has_main_title in (False, None)
+        assert chart.has_sub_title in (False, None)
+    finally:
+        try:
+            charts.remove(name)
+        except Exception:
+            pass
+
+
 def test_remove_is_idempotent_and_checks_existence():
     _, _, sheet = _connect_or_skip()
     data_range = _seed_sample_data(sheet)

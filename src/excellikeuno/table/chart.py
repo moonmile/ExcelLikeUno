@@ -27,6 +27,10 @@ class Chart(UnoObject):
         self._last_column_headers: bool | None = None
         self._last_row_headers: bool | None = None
         self._last_has_legend: bool | None = None
+        self._last_has_main_title: bool | None = None
+        self._last_has_sub_title: bool | None = None
+        self._last_title: str | None = None
+        self._last_sub_title: str | None = None
         self._last_chart_type: str | None = None
 
     @property
@@ -372,6 +376,12 @@ class Chart(UnoObject):
 
     @property
     def has_legend(self) -> bool | None:
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                return bool(chart_doc.getPropertyValue("HasLegend"))
+        except Exception:
+            pass
         try:
             return bool(self.props.getPropertyValue("HasLegend"))
         except Exception:
@@ -380,12 +390,180 @@ class Chart(UnoObject):
     @has_legend.setter
     def has_legend(self, value: bool) -> None:
         target = bool(value)
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                chart_doc.setPropertyValue("HasLegend", target)
+                self._last_has_legend = target
+                return
+        except Exception:
+            pass
         try:
             self.props.setPropertyValue("HasLegend", target)
             self._last_has_legend = target
             return
         except Exception:
             self._last_has_legend = target
+
+    @property
+    def has_main_title(self) -> bool | None:
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                return bool(chart_doc.getPropertyValue("HasMainTitle"))
+        except Exception:
+            pass
+        try:
+            return bool(self.props.getPropertyValue("HasMainTitle"))
+        except Exception:
+            return self._last_has_main_title
+
+    @has_main_title.setter
+    def has_main_title(self, value: bool) -> None:
+        target = bool(value)
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                chart_doc.setPropertyValue("HasMainTitle", target)
+                self._last_has_main_title = target
+                return
+        except Exception:
+            pass
+        try:
+            self.props.setPropertyValue("HasMainTitle", target)
+            self._last_has_main_title = target
+            return
+        except Exception:
+            self._last_has_main_title = target
+
+    @property
+    def has_sub_title(self) -> bool | None:
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                return bool(chart_doc.getPropertyValue("HasSubTitle"))
+        except Exception:
+            pass
+        try:
+            return bool(self.props.getPropertyValue("HasSubTitle"))
+        except Exception:
+            return self._last_has_sub_title
+
+    @has_sub_title.setter
+    def has_sub_title(self, value: bool) -> None:
+        target = bool(value)
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                chart_doc.setPropertyValue("HasSubTitle", target)
+                self._last_has_sub_title = target
+                return
+        except Exception:
+            pass
+        try:
+            self.props.setPropertyValue("HasSubTitle", target)
+            self._last_has_sub_title = target
+            return
+        except Exception:
+            self._last_has_sub_title = target
+
+    @property
+    def title(self) -> str:
+        if self._last_title is not None:
+            return self._last_title
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                title_obj = chart_doc.getTitle()
+                return str(getattr(title_obj, "String", ""))
+        except Exception:
+            pass
+        try:
+            return str(self.props.getPropertyValue("Title"))
+        except Exception:
+            if self._last_title is not None:
+                return self._last_title
+        return ""
+
+    @title.setter
+    def title(self, value: str) -> None:
+        text_raw = str(value or "")
+        text = text_raw.strip()
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                title_obj = chart_doc.getTitle()
+                try:
+                    title_obj.String = text
+                except Exception:
+                    pass
+                try:
+                    chart_doc.setTitle(title_obj)
+                except Exception:
+                    pass
+                try:
+                    chart_doc.setPropertyValue("HasMainTitle", bool(text))
+                    self._last_has_main_title = bool(text)
+                except Exception:
+                    pass
+                self._last_title = text
+                return
+        except Exception:
+            pass
+        try:
+            self.props.setPropertyValue("Title", text)
+            self._last_title = text
+        except Exception:
+            self._last_title = text
+
+    @property
+    def sub_title(self) -> str:
+        if self._last_sub_title is not None:
+            return self._last_sub_title
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                sub_obj = chart_doc.getSubTitle()
+                return str(getattr(sub_obj, "String", ""))
+        except Exception:
+            pass
+        try:
+            return str(self.props.getPropertyValue("SubTitle"))
+        except Exception:
+            if self._last_sub_title is not None:
+                return self._last_sub_title
+        return ""
+
+    @sub_title.setter
+    def sub_title(self, value: str) -> None:
+        text_raw = str(value or "")
+        text = text_raw.strip()
+        chart_doc = self.embedded_document
+        try:
+            if chart_doc is not None:
+                sub_obj = chart_doc.getSubTitle()
+                try:
+                    sub_obj.String = text
+                except Exception:
+                    pass
+                try:
+                    chart_doc.setSubTitle(sub_obj)
+                except Exception:
+                    pass
+                try:
+                    chart_doc.setPropertyValue("HasSubTitle", bool(text))
+                    self._last_has_sub_title = bool(text)
+                except Exception:
+                    pass
+                self._last_sub_title = text
+                return
+        except Exception:
+            pass
+        try:
+            self.props.setPropertyValue("SubTitle", text)
+            self._last_sub_title = text
+        except Exception:
+            self._last_sub_title = text
 
 
 class ChartCollection:
