@@ -16,6 +16,11 @@ class InterfaceNames:
     X_TABLE_CHART = "com.sun.star.chart.XTableChart"
     X_TABLE_CHARTS = "com.sun.star.chart.XTableCharts"
     X_TABLE_CHARTS_SUPPLIER = "com.sun.star.sheet.XTableChartsSupplier"
+    X_DATA_PILOT_TABLES = "com.sun.star.sheet.XDataPilotTables"
+    X_DATA_PILOT_TABLE2 = "com.sun.star.sheet.XDataPilotTable2"
+    X_DATA_PILOT_DESCRIPTOR = "com.sun.star.sheet.XDataPilotDescriptor"
+    X_DATA_PILOT_FIELD = "com.sun.star.sheet.XDataPilotField"
+    X_DATA_PILOT_FIELD_REFERENCE = "com.sun.star.sheet.XDataPilotFieldReference"
     X_MERGEABLE = "com.sun.star.sheet.XMergeable"
     X_MERGEABLE_CELL = "com.sun.star.sheet.XMergeable"  # alias for backward compatibility
     X_MERGEABLE_CELL_RANGE = "com.sun.star.sheet.XMergeable"  # alias for backward compatibility

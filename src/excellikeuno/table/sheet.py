@@ -23,6 +23,7 @@ from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XS
 from .cell import Cell
 from .range import Range, TableRow, TableColumn
 from ..chart import ChartCollection
+from .pivot_table import PivotTables
 from .rows import TableRows
 from .columns import TableColumns
 
@@ -122,6 +123,10 @@ class Sheet(UnoObject):
     @property
     def charts(self) -> ChartCollection:
         return ChartCollection(self)
+
+    @property
+    def pivot_tables(self) -> PivotTables:
+        return PivotTables(self)
 
     @property
     def name(self) -> str:

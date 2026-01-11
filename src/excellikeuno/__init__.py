@@ -21,7 +21,7 @@ from .drawing import (
     Shape,
     TextShape,
 )
-from .table import Cell, CellProperties, Sheet
+from .table import Cell, CellProperties, Sheet, PivotTable, PivotTables
 from .chart import Chart, ChartCollection
 
 __all__ = [
@@ -29,6 +29,8 @@ __all__ = [
     "CellProperties",
     "Chart",
     "ChartCollection",
+    "PivotTable",
+    "PivotTables",
     "Sheet",
     "Shape",
     "ConnectorShape",

@@ -29,7 +29,8 @@ root .
 │       ├── table/         ← Calc シート/セル/レンジ/チャート
 │       │   ├── cell.py, cell_properties.py, range.py, sheet.py
 │       │   ├── columns.py, rows.py
-│       │   └── chart.py   ← Chart/ChartCollection とタイトル/凡例対応
+│       │   ├── chart.py   ← Chart/ChartCollection とタイトル/凡例対応
+│       │   └── pivot_table.py ← PivotTable/PivotTables 追加予定
 │       ├── drawing/       ← シェイプ群
 │       │   ├── shape.py + connector/rectangle/ellipse/line/text/polyline/polypolygon/bezier/group/custom/control/measure/page 等
 │       │   └── text_properties, fill/line/shadow properties

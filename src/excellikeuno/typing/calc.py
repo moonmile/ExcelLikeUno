@@ -178,6 +178,75 @@ class XTableChart(Protocol):
 
 
 @runtime_checkable
+class XDataPilotDescriptor(Protocol):
+    def setSourceRange(self, address: Any) -> None:
+        ...
+
+    def getSourceRange(self) -> Any:
+        ...
+
+    def getDataPilotFields(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class XDataPilotTables(Protocol):
+    def getCount(self) -> int:
+        ...
+
+    def hasByName(self, name: str) -> bool:
+        ...
+
+    def getByName(self, name: str) -> Any:
+        ...
+
+    def removeByName(self, name: str) -> None:
+        ...
+
+    def insertNewByName(self, name: str, output_address: Any, descriptor: Any) -> None:
+        ...
+
+    def createDataPilotDescriptor(self) -> Any:
+        ...
+
+    def getElementNames(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class XDataPilotTable2(Protocol):
+    def refresh(self) -> None:
+        ...
+
+    def getOutputRange(self) -> Any:
+        ...
+
+    def getDataPilotDescriptor(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class XDataPilotField(Protocol):
+    def getName(self) -> str:
+        ...
+
+    def getOrientation(self) -> int:
+        ...
+
+    def setOrientation(self, orientation: int) -> None:
+        ...
+
+
+@runtime_checkable
+class XDataPilotFieldReference(Protocol):
+    def setReferenceType(self, reference_type: int) -> None:
+        ...
+
+    def setReferenceField(self, field: str) -> None:
+        ...
+
+
+@runtime_checkable
 class XDrawPageSupplier(Protocol):
     def getDrawPage(self) -> XDrawPage:
         ...
@@ -322,6 +391,14 @@ class CellVertJustify(IntEnum):
     CENTER = 2
     BOTTOM = 3
     BLOCK = 4
+
+
+class DataPilotFieldOrientation(IntEnum):
+    HIDDEN = 0
+    PAGE = 1
+    ROW = 2
+    COLUMN = 3
+    DATA = 4
 
 
 class CellOrientation(IntEnum):

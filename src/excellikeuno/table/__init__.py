@@ -5,12 +5,15 @@ from .range import Range, TableRow, TableColumn
 from .rows import TableRows
 from .sheet import Sheet
 from ..chart import Chart, ChartCollection
+from .pivot_table import PivotTable, PivotTables
 
 __all__ = [
 	"Cell",
 	"CellProperties",
 	"Chart",
 	"ChartCollection",
+	"PivotTable",
+	"PivotTables",
 	"Sheet",
 	"Range",
 	"TableRows",

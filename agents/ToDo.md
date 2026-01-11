@@ -18,7 +18,7 @@
 - [x] Shape.fill プロパティの実装
 - [x] TextProperties, CharacterProperties の混在を解消
 - [x] Chart の実装
-- [ ] PivodTable の実装
+- [ ] PivotTable の実装
 - [ ] DarwPage の実装
 
 
