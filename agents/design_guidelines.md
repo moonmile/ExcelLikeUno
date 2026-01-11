@@ -97,24 +97,8 @@ CellProperties Service の Public Attributes は Cell のプロパティとし�
 
 # 参照ドキュメント
 
-Spreadsheet Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a23852.html
-CellProperties Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a24712.html
-BorderLine Struct Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a24692.html
-TableBorder Struct Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a24740.html
-BorderLine2 Struct Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a24696.html
-TableBorder2 Struct Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a24744.html
-enum CellHoriJustify: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a13049.html#ab3c576b107bd5018643ab5612438fdf2
-enum CellVertJustify: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a13049.html#a17834bec5bf9ac4432141dee1c03b50b
-enum LineStyle: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a12922.html#a86e0f5648542856159bb40775c854aa7
-
-Shape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a25352.html
-ConnectorShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18256.html
-LineShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18540.html
-RectangleShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18616.html
-EllipseShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18308.html
-PolyLineShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18584.html
-PolyPolygonShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18604.html
-TextShape Service Reference: file:///C:/Program%20Files/LibreOffice/sdk/docs/idl/ref/a18656.html
+uno sdk file:///C:/Program%20Files/LibreOffice/sdk/docs/
+uno api doc https://api.libreoffice.org/docs/idl/ref/index.html
 
 
 
