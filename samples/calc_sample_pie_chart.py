@@ -24,17 +24,7 @@ chart = sheet.charts.add_pie_diagram(
 )
 # 凡例の表示
 chart.has_legend = True
+# タイトルの設定
+chart.title = "パイを5人で分ける問題"
+chart.sub_title = "ただし綾波さんは3人分を食べます"
 
-chart_doc = chart.raw.getEmbeddedObject()
-# タイトルの表示フラグ
-chart_doc.setPropertyValue("HasMainTitle", True)
-chart_doc.setPropertyValue("HasSubTitle", True)
-
-# タイトル文字列
-title = chart_doc.getTitle()
-title.String = "メインタイトル"
-
-sub = chart_doc.getSubTitle()
-sub.String = "サブタイトル"
-
-print("作成したチャート名:", chart.name)

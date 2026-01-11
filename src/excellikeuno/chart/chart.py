@@ -7,11 +7,11 @@ from ..typing import InterfaceNames
 from ..typing.interfaces import StructNames
 from ..typing.calc import XNamed, XPropertySet, XTableChart, XTableCharts
 from ..typing.structs import CellRangeAddress, Point, Rectangle, Size
-from .range import Range
+from ..table.range import Range
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from ..core.calc_document import CalcDocument
-    from .sheet import Sheet
+    from ..table.sheet import Sheet
 
 
 class Chart(UnoObject):
@@ -490,31 +490,42 @@ class Chart(UnoObject):
         text_raw = str(value or "")
         text = text_raw.strip()
         chart_doc = self.embedded_document
-        try:
-            if chart_doc is not None:
+        applied = False
+
+        if chart_doc is not None:
+            flag = bool(text)
+            try:
+                chart_doc.setPropertyValue("HasMainTitle", flag)
+                self._last_has_main_title = flag
+                applied = True
+            except Exception:
+                pass
+
+            try:
                 title_obj = chart_doc.getTitle()
+            except Exception:
+                title_obj = None
+
+            if title_obj is not None:
                 try:
                     title_obj.String = text
+                    applied = True
                 except Exception:
                     pass
                 try:
                     chart_doc.setTitle(title_obj)
+                    applied = True
                 except Exception:
                     pass
-                try:
-                    chart_doc.setPropertyValue("HasMainTitle", bool(text))
-                    self._last_has_main_title = bool(text)
-                except Exception:
-                    pass
-                self._last_title = text
-                return
-        except Exception:
-            pass
-        try:
-            self.props.setPropertyValue("Title", text)
-            self._last_title = text
-        except Exception:
-            self._last_title = text
+
+        if not applied:
+            try:
+                self.props.setPropertyValue("Title", text)
+                applied = True
+            except Exception:
+                pass
+
+        self._last_title = text
 
     @property
     def sub_title(self) -> str:
@@ -539,31 +550,42 @@ class Chart(UnoObject):
         text_raw = str(value or "")
         text = text_raw.strip()
         chart_doc = self.embedded_document
-        try:
-            if chart_doc is not None:
+        applied = False
+
+        if chart_doc is not None:
+            flag = bool(text)
+            try:
+                chart_doc.setPropertyValue("HasSubTitle", flag)
+                self._last_has_sub_title = flag
+                applied = True
+            except Exception:
+                pass
+
+            try:
                 sub_obj = chart_doc.getSubTitle()
+            except Exception:
+                sub_obj = None
+
+            if sub_obj is not None:
                 try:
                     sub_obj.String = text
+                    applied = True
                 except Exception:
                     pass
                 try:
                     chart_doc.setSubTitle(sub_obj)
+                    applied = True
                 except Exception:
                     pass
-                try:
-                    chart_doc.setPropertyValue("HasSubTitle", bool(text))
-                    self._last_has_sub_title = bool(text)
-                except Exception:
-                    pass
-                self._last_sub_title = text
-                return
-        except Exception:
-            pass
-        try:
-            self.props.setPropertyValue("SubTitle", text)
-            self._last_sub_title = text
-        except Exception:
-            self._last_sub_title = text
+
+        if not applied:
+            try:
+                self.props.setPropertyValue("SubTitle", text)
+                applied = True
+            except Exception:
+                pass
+
+        self._last_sub_title = text
 
 
 class ChartCollection:

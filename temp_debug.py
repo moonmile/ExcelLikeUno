@@ -39,7 +39,7 @@ except Exception as exc:
             print("invoke failed", type(exc3), exc3)
             traceback.print_exc()
 
-from excellikeuno.table.chart import ChartCollection
+from excellikeuno.chart import ChartCollection
 col = ChartCollection(sheet)
 try:
     chart = col.add_pie_diagram("__debug_chart2__", data_range, rectangle=Rectangle(6000, 6000, 8000, 6000))

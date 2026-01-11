@@ -1,10 +1,10 @@
 from .cell import Cell
 from .cell_properties import CellProperties
 from .columns import TableColumns
-from .chart import Chart, ChartCollection
 from .range import Range, TableRow, TableColumn
 from .rows import TableRows
 from .sheet import Sheet
+from ..chart import Chart, ChartCollection
 
 __all__ = [
 	"Cell",
