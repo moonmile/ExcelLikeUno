@@ -23,7 +23,7 @@
 
 
 - [ ] DispatchHelper まわりの実装
-    - [ ] Calc の保存/読み込みのサポート
+    - [x] Calc の保存/読み込みのサポート
     - [ ] Sheet.copy/paste の実装
     - [ ] Cell/Range.copy/paste の実装
     - [ ] Shape.copy/paste の実装

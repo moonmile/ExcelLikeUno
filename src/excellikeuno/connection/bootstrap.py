@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Tuple
-from ..core import UnoObject
+
 from ..core.calc_document import CalcDocument
 from ..core.writer_document import WriterDocument
 from ..typing import InterfaceNames
@@ -9,36 +9,34 @@ from ..table import Sheet
 
 current_desktop: Any = None
 
-def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
-    """Open a Calc document and return (desktop, document, first_sheet).
 
-    This is a minimal example that relies on the bundled LibreOffice Python.
-    It raises RuntimeError if UNO is not available.
-    """
-    global current_desktop
+def _make_properties(options: dict[str, Any]) -> tuple[Any, ...]:
+    from com.sun.star.beans import PropertyValue  # type: ignore
+
+    return tuple(PropertyValue(name, 0, value, 0) for name, value in options.items() if value is not None)
+
+
+def _bootstrap_desktop() -> Any:
     try:
-        import uno
-        import unohelper
-        from com.sun.star.beans import PropertyValue
+        import uno  # type: ignore
+        import unohelper  # type: ignore
     except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
         raise RuntimeError("UNO runtime is not available") from exc
 
     ctx = None
     boot_exc = None
     try:
-        # bootstrap spins up a LibreOffice instance and returns a live component context
         ctx = unohelper.Bootstrap.bootstrap()
     except Exception as exc:  # pragma: no cover - defensive guard
         boot_exc = exc
 
     if ctx is None:
         try:
-            # fallback: connect to an already-running soffice accepting sockets
             local_ctx = uno.getComponentContext()
             resolver = local_ctx.ServiceManager.createInstanceWithContext(
-                "com.sun.star.bridge.UnoUrlResolver", local_ctx)
-            ctx = resolver.resolve(
-                "uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+                "com.sun.star.bridge.UnoUrlResolver", local_ctx
+            )
+            ctx = resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
         except Exception:
             pass
 
@@ -47,52 +45,111 @@ def open_calc_document(path: str) -> Tuple[Any, Any, Sheet]:
 
     smgr = ctx.getServiceManager()
     desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+    return desktop
+
+
+def get_desktop() -> Any:
+    """Connect to a running LibreOffice desktop via UNO socket."""
+
+    global current_desktop
+    if current_desktop is not None:
+        return current_desktop
+
+    try:
+        import uno  # type: ignore
+    except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
+        raise RuntimeError("UNO runtime is not available") from exc
+
+    try:
+        local_ctx = uno.getComponentContext()
+        resolver = local_ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.bridge.UnoUrlResolver", local_ctx
+        )
+        ctx = resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+        smgr = ctx.ServiceManager
+        desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+        current_desktop = desktop
+        return desktop
+    except Exception as exc:  # pragma: no cover - depends on runtime
+        raise RuntimeError("Failed to connect to LibreOffice desktop") from exc
+
+
+def new_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Sheet]:
+    desktop = _bootstrap_desktop()
+    global current_desktop
+    current_desktop = desktop
+
+    try:
+        import uno  # type: ignore
+    except ImportError as exc:  # pragma: no cover - depends on runtime
+        raise RuntimeError("UNO runtime is not available") from exc
+
+    properties = _make_properties({"Hidden": hidden})
+    document = desktop.loadComponentFromURL("private:factory/scalc", "_blank", 0, properties)
+
+    doc_wrapper = CalcDocument(document)
+    spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
+    sheets = spreadsheet_doc.getSheets()
+    first_sheet = sheets.getByIndex(0)
+    return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
+
+
+def open_calc_document(
+    path: str,
+    *,
+    hidden: bool = True,
+    read_only: bool = False,
+    as_template: bool = False,
+    filter_name: str | None = None,
+) -> Tuple[Any, CalcDocument, Sheet]:
+    """Open a Calc document and return (desktop, document_wrapper, first_sheet)."""
+
+    desktop = _bootstrap_desktop()
+    global current_desktop
+    current_desktop = desktop
+
+    try:
+        import uno  # type: ignore
+    except ImportError as exc:  # pragma: no cover - depends on runtime
+        raise RuntimeError("UNO runtime is not available") from exc
 
     url = uno.systemPathToFileUrl(path)
-    properties = (PropertyValue("Hidden", 0, True, 0),)
+    properties = _make_properties(
+        {"Hidden": hidden, "ReadOnly": read_only, "AsTemplate": as_template, "FilterName": filter_name}
+    )
     document = desktop.loadComponentFromURL(url, "_blank", 0, properties)
 
     doc_wrapper = CalcDocument(document)
     spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
-    current_desktop = desktop
     return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
 
+
 def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
-    global current_desktop
-    try:
-        import uno
-        from com.sun.star.beans import PropertyValue
-    except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
-        raise RuntimeError("UNO runtime is not available") from exc
+    desktop = get_desktop()
+    doc = desktop.getCurrentComponent()
+    if doc is None:
+        raise RuntimeError("No active Calc document found")
 
-    try:
-        # UNO接続の準備
-        local_ctx = uno.getComponentContext()
-        resolver = local_ctx.ServiceManager.createInstanceWithContext(
-            "com.sun.star.bridge.UnoUrlResolver", local_ctx)
+    doc_wrapper = CalcDocument(doc)
+    spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
+    controller = spreadsheet_doc.getCurrentController()
+    sheet = controller.getActiveSheet()
+    return desktop, doc_wrapper, Sheet(sheet, document=doc_wrapper)
 
-        # LibreOfficeに接続
-        ctx = resolver.resolve(
-            "uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
 
-        smgr = ctx.ServiceManager
-        desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+def active_document() -> CalcDocument:
+    desktop = get_desktop()
+    doc = desktop.getCurrentComponent()
+    if doc is None:
+        raise RuntimeError("No active Calc document found")
+    return CalcDocument(doc)
 
-        # 現在開いているCalcドキュメントを取得し、UnoObject経由でインターフェースを解決
-        doc = desktop.getCurrentComponent()
-        if doc is None:
-            raise RuntimeError("No active Calc document found")
 
-        doc_wrapper = CalcDocument(doc)
-        spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
-        controller = spreadsheet_doc.getCurrentController()
-        sheet = controller.getActiveSheet()
-        current_desktop = desktop
-        return desktop, doc_wrapper, Sheet(sheet, document=doc_wrapper)
-    except Exception as exc:  # pragma: no cover - depends on LibreOffice runtime
-        raise RuntimeError("Failed to connect to Calc") from exc
+def this_document() -> CalcDocument:
+    return active_document()
+
 
 # XSCRIPTCONTEXT に接続する
 def connect_calc_script(xscriptcontext) -> Tuple[Any, CalcDocument, Sheet]:
@@ -100,7 +157,7 @@ def connect_calc_script(xscriptcontext) -> Tuple[Any, CalcDocument, Sheet]:
     desktop = xscriptcontext.getDesktop()
     doc = CalcDocument(desktop.getCurrentComponent())
     controller = doc.raw.getCurrentController()
-    sheet = Sheet(controller.getActiveSheet())
+    sheet = Sheet(controller.getActiveSheet(), document=doc)
     current_desktop = desktop
     return desktop, doc, sheet
 
@@ -115,30 +172,23 @@ def connect_writer() -> Tuple[Any, WriterDocument]:
         RuntimeError: when UNO runtime is unavailable or no Writer document is active.
     """
 
-    try:
-        import uno
-    except ImportError as exc:  # pragma: no cover - depends on LibreOffice runtime
-        raise RuntimeError("UNO runtime is not available") from exc
+    desktop = get_desktop()
+    doc = desktop.getCurrentComponent()
+    if doc is None or not doc.supportsService("com.sun.star.text.TextDocument"):
+        raise RuntimeError("No active Writer document found")
 
-    try:
-        local_ctx = uno.getComponentContext()
-        resolver = local_ctx.ServiceManager.createInstanceWithContext(
-            "com.sun.star.bridge.UnoUrlResolver", local_ctx)
+    return desktop, WriterDocument(doc)
 
-        ctx = resolver.resolve(
-            "uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
 
-        smgr = ctx.ServiceManager
-        desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+def active_sheet() -> Sheet:
+    doc = active_document()
+    controller = doc.raw.getCurrentController()
+    sheet = controller.getActiveSheet()
+    return Sheet(sheet, document=doc)
 
-        doc = desktop.getCurrentComponent()
-        if doc is None or not doc.supportsService("com.sun.star.text.TextDocument"):
-            raise RuntimeError("No active Writer document found")
 
-        # Wrap the Writer document for convenience while still allowing raw access via .raw
-        return desktop, WriterDocument(doc)
-    except Exception as exc:  # pragma: no cover - depends on runtime
-        raise RuntimeError("Failed to connect to Writer") from exc
+def this_sheet() -> Sheet:
+    return active_sheet()
 
 
 def wrap_sheet(sheet_obj: Any) -> Sheet:

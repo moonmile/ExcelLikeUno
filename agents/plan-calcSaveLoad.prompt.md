@@ -44,3 +44,7 @@
 6) ドキュメント
 - README と agents/operation_spec.md に使い方を追記。
 - ToDo を完了・更新するタイミングを合わせる。
+
+8) シートの追加と削除
+- CalcDocument.sheets.add(name) / remove(name) メソッドを追加し、シートの追加・削除をサポートする。
+- Sheet の複製をサポートする場合は、add(name, from_sheet_name) のような形で実装を検討する。

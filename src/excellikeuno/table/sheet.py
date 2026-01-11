@@ -220,6 +220,14 @@ class Sheet(UnoObject):
             return self._document
         raise AttributeError("Sheet has no associated document; construct Sheet with document reference")
 
+    def copy_to(self, new_name: str, index: int | None = None) -> "CalcDocument":
+        """Copy this sheet into the same document under a new name."""
+
+        if self._document is None:
+            raise AttributeError("Sheet has no associated document; cannot copy")
+        self._document.copy_sheet(self.name, new_name, index=index)
+        return self._document
+
 
 class Shapes:
     """Helper for creating and managing shapes on a sheet's draw page."""

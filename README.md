@@ -212,6 +212,36 @@ data = [
 sheet.range("A3:C5").value = data  # 範囲にデータを一括設定
 ```
 
+## Calc ドキュメントの作成・保存・読み込み
+```python
+from pathlib import Path
+from excellikeuno import new_calc_document, open_calc_document, active_document, active_sheet
+
+out_path = Path("C:/temp/excellikeuno_save.ods")
+
+# 新規作成して保存
+_, doc, sheet = new_calc_document(hidden=True)
+sheet.cell(0, 0).value = 100
+sheet.cell(1, 0).text = "saved"
+doc.save_as(str(out_path))
+doc.save_copy(str(out_path.with_stem("excellikeuno_save_copy")))
+
+# 既存ファイルを再オープン（hidden/read_only/as_template/filter_name を指定可）
+_, reopened_doc, reopened_sheet = open_calc_document(str(out_path), hidden=True)
+print(reopened_doc.has_location, reopened_doc.is_modified)
+
+# UI 上のアクティブドキュメント/シートへアクセス
+active_doc = active_document()
+active_sheet_handle = active_sheet()
+
+# シートの追加・コピー・削除
+doc = active_doc
+added = doc.add_sheet("CopiedSheet")
+doc.copy_sheet(added.name, "CopiedSheet2")
+doc.remove_sheet("CopiedSheet2")
+doc.remove_sheet("CopiedSheet")
+```
+
 ![図1: セル操作](./doc/images/calc_sample_cell.jpg)
 
 ## Calc で罫線を引く

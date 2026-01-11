@@ -281,6 +281,24 @@ class XSpreadsheetDocument(Protocol):
     def getSheets(self) -> Any:
         ...
 
+
+@runtime_checkable
+class XStorable(Protocol):
+    def store(self) -> None:
+        ...
+
+    def storeAsURL(self, url: str, args: Any) -> None:
+        ...
+
+    def storeToURL(self, url: str, args: Any) -> None:
+        ...
+
+    def hasLocation(self) -> bool:
+        ...
+
+    def isModified(self) -> bool:
+        ...
+
 @runtime_checkable
 class XMergeable(Protocol):
     def merge(self, other: bool) -> None:

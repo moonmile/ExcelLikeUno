@@ -1,14 +1,51 @@
 from __future__ import annotations
 
-from typing import List, cast
+from typing import Any, List, cast
 
 from ..table import Sheet
-from ..typing import InterfaceNames, XSpreadsheet, XSpreadsheetDocument
+from ..typing import InterfaceNames, XSpreadsheet, XSpreadsheetDocument, XStorable
 from .base import UnoObject
 
 
 class CalcDocument(UnoObject):
     """Wraps a Calc XSpreadsheetDocument."""
+
+    @property
+    def storable(self) -> XStorable:
+        return cast(XStorable, self.iface(InterfaceNames.X_STORABLE))
+
+    @staticmethod
+    def _to_url(path: str) -> str:
+        import uno  # type: ignore
+
+        return uno.systemPathToFileUrl(path)
+
+    @staticmethod
+    def _make_properties(options: dict[str, Any]) -> tuple[Any, ...]:
+        from com.sun.star.beans import PropertyValue  # type: ignore
+
+        return tuple(
+            PropertyValue(name, 0, value, 0) for name, value in options.items() if value is not None
+        )
+
+    def save(self) -> None:
+        self.storable.store()
+
+    def save_as(self, path: str, filter_name: str | None = None, overwrite: bool = True) -> None:
+        options: dict[str, Any] = {"FilterName": filter_name, "Overwrite": overwrite}
+        self.storable.storeAsURL(self._to_url(path), self._make_properties(options))
+
+    def save_copy(self, path: str, filter_name: str | None = None, overwrite: bool = True) -> None:
+        options: dict[str, Any] = {"FilterName": filter_name, "Overwrite": overwrite}
+        self.storable.storeToURL(self._to_url(path), self._make_properties(options))
+
+    @property
+    def is_modified(self) -> bool:
+        return bool(self.storable.isModified())
+
+    @property
+    def has_location(self) -> bool:
+        return bool(self.storable.hasLocation())
 
     def _sheets(self):
         doc = cast(XSpreadsheetDocument, self.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT))
@@ -50,15 +87,42 @@ class CalcDocument(UnoObject):
         except Exception as exc:  # pragma: no cover - depends on runtime
             raise AttributeError("Document cannot create UNO instance") from exc
 
-    def add_sheet(self, name: str, index: int | None = None) -> Sheet:
+    def add_sheet(self, name: str, index: int | None = None, from_sheet_name: str | None = None) -> Sheet:
+        """Add a new sheet.
+
+        When ``from_sheet_name`` is provided and the UNO runtime supports ``copyByName``,
+        duplicate the source sheet into the requested position; otherwise insert a blank sheet.
+        """
+
         sheets = self._sheets()
         position = sheets.getCount() if index is None else int(index)
+
+        if from_sheet_name:
+            copier = getattr(sheets, "copyByName", None)
+            if callable(copier):
+                copier(from_sheet_name, name, position)
+                return self.sheet_by_name(name)
+
         sheets.insertNewByName(name, position)
         return self.sheet_by_name(name)
 
     def remove_sheet(self, name: str) -> None:
         sheets = self._sheets()
         sheets.removeByName(name)
+
+    def copy_sheet(self, source_name: str, new_name: str, index: int | None = None) -> Sheet:
+        """Copy an existing sheet to a new sheet name.
+
+        Uses UNO ``copyByName`` when available; raises AttributeError if the interface is missing.
+        """
+
+        sheets = self._sheets()
+        position = sheets.getCount() if index is None else int(index)
+        copier = getattr(sheets, "copyByName", None)
+        if not callable(copier):
+            raise AttributeError("Underlying sheets object does not support copyByName")
+        copier(source_name, new_name, position)
+        return self.sheet_by_name(new_name)
 
     @property
     def sheet_names(self) -> List[str]:
@@ -71,3 +135,7 @@ class CalcDocument(UnoObject):
         controller = doc.getCurrentController()
         sheet_obj = cast(XSpreadsheet, controller.getActiveSheet())
         return Sheet(sheet_obj, document=self)
+
+    @property
+    def this_sheet(self) -> Sheet:
+        return self.active_sheet

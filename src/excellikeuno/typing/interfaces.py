@@ -9,6 +9,7 @@ class InterfaceNames:
     X_SHEET_CELL_RANGES = "com.sun.star.sheet.XSheetCellRanges"
     X_CELL_RANGE_ADDRESSABLE = "com.sun.star.sheet.XCellRangeAddressable"
     X_COLUMN_ROW_RANGE = "com.sun.star.table.XColumnRowRange"
+    X_STORABLE = "com.sun.star.frame.XStorable"
     X_SPREADSHEET_DOCUMENT = "com.sun.star.sheet.XSpreadsheetDocument"
     X_DRAW_PAGE_SUPPLIER = "com.sun.star.drawing.XDrawPageSupplier"
     X_SHAPE = "com.sun.star.drawing.XShape"

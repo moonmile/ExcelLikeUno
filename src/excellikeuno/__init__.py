@@ -1,4 +1,16 @@
-from .connection import connect_calc, connect_writer, open_calc_document, wrap_sheet, connect_calc_script
+from .connection import (
+    active_document,
+    active_sheet,
+    connect_calc,
+    connect_calc_script,
+    connect_writer,
+    get_desktop,
+    new_calc_document,
+    open_calc_document,
+    this_document,
+    this_sheet,
+    wrap_sheet,
+)
 from .core import UnoObject
 from .core.calc_document import CalcDocument
 from .core.writer_document import WriterDocument
@@ -53,7 +65,14 @@ __all__ = [
     "connect_calc",
     "connect_writer",
     "open_calc_document",
+    "new_calc_document",
+    "get_desktop",
+    "active_document",
+    "this_document",
+    "active_sheet",
+    "this_sheet",
     "wrap_sheet",
+    "connect_calc_script",
     "InterfaceNames",
     "UnoObject",
 ]
