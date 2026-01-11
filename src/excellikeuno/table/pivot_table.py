@@ -5,7 +5,14 @@ from typing import Any, Iterable, List, cast, TYPE_CHECKING
 from ..core import UnoObject
 from ..typing import InterfaceNames
 from ..typing.interfaces import StructNames
-from ..typing.calc import XDataPilotDescriptor, XDataPilotTable2, XDataPilotTables, XNamed
+from ..typing.calc import (
+    DataPilotFieldOrientation,
+    XDataPilotDescriptor,
+    XDataPilotTable2,
+    XDataPilotTables,
+    XNamed,
+    XPropertySet,
+)
 from ..typing.structs import CellAddress, CellRangeAddress
 from .range import Range
 
@@ -142,6 +149,26 @@ class PivotTable(UnoObject):
                 pass
         return None
 
+    @property
+    def output_range(self) -> Any:
+        table2 = None
+        try:
+            table2 = cast(XDataPilotTable2, self.iface(InterfaceNames.X_DATA_PILOT_TABLE2))
+        except Exception:
+            table2 = None
+        if table2 is not None:
+            try:
+                return table2.getOutputRange()
+            except Exception:
+                pass
+        raw_get = getattr(self.raw, "getOutputRange", None)
+        if callable(raw_get):
+            try:
+                return raw_get()
+            except Exception:
+                pass
+        return None
+
 
 class PivotTables:
     def __init__(self, sheet: "Sheet") -> None:
@@ -203,6 +230,10 @@ class PivotTables:
         name: str,
         source_range: Any,
         target_cell: Any,
+        row_fields: list[str] | None = None,
+        column_fields: list[str] | None = None,
+        data_fields: list[str] | None = None,
+        filter_fields: list[str] | None = None,
     ) -> PivotTable:
         tables = self._tables()
 
@@ -211,6 +242,35 @@ class PivotTables:
                 tables.removeByName(name)
         except Exception:
             pass
+
+        target_name = str(name)
+        doc = getattr(self.sheet, "document", None)
+
+        def _has_name_on_any_sheet(candidate: str) -> bool:
+            if doc is None:
+                return False
+            try:
+                sheet_names = doc.sheet_names
+            except Exception:
+                return False
+            for sname in sheet_names:
+                try:
+                    sh = doc.sheet_by_name(sname)
+                    col = PivotTables(sh)
+                    if candidate in col._names():
+                        return True
+                except Exception:
+                    continue
+            return False
+
+        if _has_name_on_any_sheet(target_name):
+            base = f"{target_name}_{getattr(self.sheet, 'name', 'sheet')}"
+            candidate = base
+            suffix = 1
+            while _has_name_on_any_sheet(candidate):
+                suffix += 1
+                candidate = f"{base}_{suffix}"
+            target_name = candidate
 
         source_addr = _coerce_range_address(source_range)
         if hasattr(source_addr, "Sheet"):
@@ -230,10 +290,68 @@ class PivotTables:
         except Exception:
             pass
 
-        try:
-            tables.insertNewByName(str(name), output_addr, descriptor)
-        except Exception as exc:
-            raise RuntimeError(f"failed to insert pivot table '{name}': {exc}")
+        def _set_fields(names: list[str] | None, orientation: DataPilotFieldOrientation) -> None:
+            if not names:
+                return
+            try:
+                fields = descriptor.getDataPilotFields()
+            except Exception:
+                return
+            for fname in names:
+                try:
+                    fld = fields.getByName(fname)
+                except Exception:
+                    continue
+                try:
+                    fld.setOrientation(int(orientation))
+                except Exception:
+                    try:
+                        fld.Orientation = int(orientation)  # type: ignore[attr-defined]
+                    except Exception:
+                        pass
 
-        return self[name]
-*** End Patch
+        _set_fields(row_fields, DataPilotFieldOrientation.ROW)
+        _set_fields(column_fields, DataPilotFieldOrientation.COLUMN)
+        _set_fields(filter_fields, DataPilotFieldOrientation.PAGE)
+
+        if data_fields:
+            try:
+                fields = descriptor.getDataPilotFields()
+            except Exception:
+                fields = None
+            if fields is not None:
+                for fname in data_fields:
+                    try:
+                        fld = fields.getByName(fname)
+                    except Exception:
+                        continue
+                    try:
+                        fld.setOrientation(int(DataPilotFieldOrientation.DATA))
+                    except Exception:
+                        try:
+                            fld.Orientation = int(DataPilotFieldOrientation.DATA)  # type: ignore[attr-defined]
+                        except Exception:
+                            pass
+                    try:
+                        props = cast(XPropertySet, fld)
+                        props.setPropertyValue("Function", 2)  # SUM
+                    except Exception:
+                        pass
+
+        try:
+            tables.insertNewByName(str(target_name), output_addr, descriptor)
+        except Exception as exc:
+            raise RuntimeError(f"failed to insert pivot table '{target_name}': {exc}")
+
+        pivot = self[target_name]
+        try:
+            current_name = pivot.name
+        except Exception:
+            current_name = None
+        if not current_name or str(current_name) != str(target_name):
+            try:
+                pivot.name = target_name
+            except Exception:
+                pass
+
+        return pivot
