@@ -1,0 +1,13 @@
+from typing import Any, Protocol
+from com.sun.star.uno import XInterface
+
+class EventObject:
+    Source: XInterface
+
+class XEventListener:
+    def disposing(self, event: EventObject) -> None: ...
+
+class XComponent(XInterface):
+    def dispose(self) -> None: ...
+    def addEventListener(self, listener: XEventListener) -> None: ...
+    def removeEventListener(self, listener: XEventListener) -> None: ...
