@@ -24,6 +24,12 @@ python tools/idl_to_pyi.py
 - 足りない .pyi は src/stubs-add/com/... に追加してある XInterface など
 
 
+### excellikeuno/table/cell.py のリファクタリング
+
+excellikeuno/table/cell.py を sutbs を使ってリファクタリングする
+XCell, CellProperties をひとまとめにして Cell クラスにする
+
+
 
 
 
