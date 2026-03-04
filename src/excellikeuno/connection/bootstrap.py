@@ -10,6 +10,27 @@ from ..table import Sheet
 current_desktop: Any = None
 
 
+class _LazyAlias:
+    """Resolves the target callable on each access to mimic a live alias."""
+
+    def __init__(self, resolver: Any) -> None:
+        self._resolver = resolver
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self._resolver(*args, **kwargs)
+
+    def __getattr__(self, name: str) -> Any:  # pragma: no cover - simple delegation
+        target = self._resolver()
+        return getattr(target, name)
+
+    def __repr__(self) -> str:  # pragma: no cover - debug aid
+        try:
+            target = self._resolver()
+            return f"<_LazyAlias to {target!r}>"
+        except Exception:
+            return "<_LazyAlias unresolved>"
+
+
 def _make_properties(options: dict[str, Any]) -> tuple[Any, ...]:
     from com.sun.star.beans import PropertyValue  # type: ignore
 
@@ -46,6 +67,12 @@ def _bootstrap_desktop() -> Any:
     smgr = ctx.getServiceManager()
     desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
     return desktop
+
+
+def this_desktop() -> Any:
+    """Alias that returns the current desktop (connects if needed)."""
+
+    return get_desktop()
 
 
 def get_desktop() -> Any:
@@ -92,6 +119,12 @@ def new_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Sheet]:
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
     return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
+
+
+def add_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Sheet]:
+    """Alias for new_calc_document to match desktop-oriented naming."""
+
+    return new_calc_document(hidden=hidden)
 
 
 def open_calc_document(
@@ -147,6 +180,12 @@ def active_document() -> CalcDocument:
     return CalcDocument(doc)
 
 
+def get_active_calc_document() -> CalcDocument:
+    """Alias for active_document to mirror plan naming."""
+
+    return active_document()
+
+
 def this_document() -> CalcDocument:
     return active_document()
 
@@ -185,6 +224,12 @@ def active_sheet() -> Sheet:
     controller = doc.raw.getCurrentController()
     sheet = controller.getActiveSheet()
     return Sheet(sheet, document=doc)
+
+
+# Aliases for naming convenience
+ActiveCalcDocument = _LazyAlias(get_active_calc_document)
+ActiveSheet = _LazyAlias(active_sheet)
+ThisDesktop = _LazyAlias(this_desktop)
 
 
 def this_sheet() -> Sheet:

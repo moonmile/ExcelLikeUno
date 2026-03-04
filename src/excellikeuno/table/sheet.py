@@ -228,6 +228,17 @@ class Sheet(UnoObject):
         self._document.copy_sheet(self.name, new_name, index=index)
         return self._document
 
+    def activate(self) -> None:
+        """Make this sheet the active sheet in its document."""
+
+        if self._document is None:
+            raise AttributeError("Sheet has no associated document; cannot activate")
+        controller = self._document.raw.getCurrentController()
+        setter = getattr(controller, "setActiveSheet", None)
+        if not callable(setter):
+            raise AttributeError("Controller does not support setActiveSheet")
+        setter(self.raw)
+
 
 class Shapes:
     """Helper for creating and managing shapes on a sheet's draw page."""

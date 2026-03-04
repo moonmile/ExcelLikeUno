@@ -47,6 +47,30 @@ class CalcDocument(UnoObject):
     def has_location(self) -> bool:
         return bool(self.storable.hasLocation())
 
+    @property
+    def title(self) -> str:
+        getter = getattr(self.raw, "getTitle", None)
+        if not callable(getter):
+            raise AttributeError("Underlying document does not expose getTitle")
+        return cast(str, getter())
+
+    @property
+    def url(self) -> str:
+        getter = getattr(self.raw, "getURL", None)
+        if not callable(getter):
+            raise AttributeError("Underlying document does not expose getURL")
+        return cast(str, getter())
+
+    def activate(self) -> None:
+        """Bring this document to the foreground when the runtime supports it."""
+
+        controller = getattr(self.raw, "getCurrentController", lambda: None)()
+        frame = getattr(controller, "getFrame", lambda: None)()
+        activate = getattr(frame, "activate", None)
+        if not callable(activate):
+            raise AttributeError("Document frame does not support activate")
+        activate()
+
     def _sheets(self):
         doc = cast(XSpreadsheetDocument, self.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT))
         return doc.getSheets()
@@ -139,3 +163,12 @@ class CalcDocument(UnoObject):
     @property
     def this_sheet(self) -> Sheet:
         return self.active_sheet
+
+
+    # XModel interface methods
+    @property
+    def title(self) -> str:
+        return self.raw.getTitle()
+    @property
+    def url(self) -> str:
+        return self.raw.getURL()

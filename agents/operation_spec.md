@@ -14,6 +14,11 @@
 - `active_document()` / `this_document()` : デスクトップの `getCurrentComponent()` を `CalcDocument` でラップして返す。
 - `active_sheet()` / `this_sheet()` : 現在のコントローラが保持するアクティブシートを `Sheet` で返す。
 - `CalcDocument.active_sheet` / `CalcDocument.this_sheet` : ドキュメントインスタンスから同様のシート取得を行う。
+- `get_active_calc_document()` / `ActiveCalcDocument` : アクティブドキュメント取得の別名。
+- `ActiveSheet` : アクティブシート取得の別名。
+- `ThisDesktop` / `this_desktop()` : 現在のデスクトップへの別名。
+- `CalcDocument.activate()` : ドキュメントをアクティブにする（フレームが activate を実装している場合）。
+- `Sheet.activate()` : シートをアクティブにする（コントローラの setActiveSheet を利用）。
 
 ## シート操作
 
