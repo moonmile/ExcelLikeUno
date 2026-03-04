@@ -28,6 +28,7 @@ python tools/idl_to_pyi.py
 
 excellikeuno/table/cell.py を sutbs を使ってリファクタリングする
 XCell, CellProperties をひとまとめにして Cell クラスにする
+- スタブ (src/stubs) を直接 import して型付けする。InterfaceNames はクエリ用定数に限定し、typing/calc からの import は順次削除する。
 
 
 

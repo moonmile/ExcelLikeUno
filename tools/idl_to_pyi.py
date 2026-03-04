@@ -99,8 +99,19 @@ def parse_methods(body: str) -> list[Method]:
 
 def parse_attributes(body: str) -> list[Attribute]:
     attrs: list[Attribute] = []
-    pattern = re.compile(r"(?:readonly\s+)?attribute\s+([A-Za-z_][\w:<>\s]*)\s+([A-Za-z_][\w]*)\s*;")
-    for match in pattern.finditer(body):
+    # 1) attribute/property keyword forms (interfaces often use this)
+    pattern_attr = re.compile(
+        r"(?:\[[^\]]*\]\s*)?(?:readonly\s+)?(?:attribute|property)\s+([A-Za-z_][\w:<>,\s]*)\s+([A-Za-z_][\w]*)\s*;"
+    )
+    for match in pattern_attr.finditer(body):
+        t_raw, name = match.groups()
+        attrs.append(Attribute(name=name, type_name=map_type(t_raw)))
+
+    # 2) UNO service [property] annotations without an explicit keyword
+    pattern_prop_bracket = re.compile(
+        r"\[[^\]]*property[^\]]*\]\s*([A-Za-z_][\w:<>,\s]*)\s+([A-Za-z_][\w]*)\s*;"
+    )
+    for match in pattern_prop_bracket.finditer(body):
         t_raw, name = match.groups()
         attrs.append(Attribute(name=name, type_name=map_type(t_raw)))
     return attrs
