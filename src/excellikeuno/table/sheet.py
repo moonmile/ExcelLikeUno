@@ -21,11 +21,13 @@ from ..core import UnoObject
 from ..drawing import Shape, EllipseShape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
+from .cell2 import Cell2
 from .range import Range, TableRow, TableColumn
 from ..chart import ChartCollection
 from .pivot_table import PivotTables
 from .rows import TableRows
 from .columns import TableColumns
+
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from ..core.calc_document import CalcDocument
@@ -97,6 +99,17 @@ class Sheet(UnoObject):
             raise ValueError("Row is required when column is numeric")
         return Cell(sheet.getCellByPosition(int(column), int(row)))
     
+    def cell2(self, column: int | str, row: int | None = None) -> Cell2:
+        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
+        if isinstance(column, str):
+            if row is not None:
+                raise ValueError("When using A1 notation, do not pass row separately")
+            column, row = self._a1_to_pos(column)
+        if row is None:
+            raise ValueError("Row is required when column is numeric")
+        return Cell2(sheet.getCellByPosition(int(column), int(row)))
+
+
     def range(
         self,
         start_column: int | str,

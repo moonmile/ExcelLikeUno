@@ -9,6 +9,7 @@ from .pivot_table import PivotTable, PivotTables
 
 __all__ = [
 	"Cell",
+	"Cell2",
 	"CellProperties",
 	"Chart",
 	"ChartCollection",
