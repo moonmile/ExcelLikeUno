@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, List, cast, TYPE_CHECKING
+from typing import Any, List, cast, TYPE_CHECKING, override
 
 from excellikeuno.drawing.closed_bezier_shape import ClosedBezierShape
 from excellikeuno.drawing.connector_shape import ConnectorShape
@@ -28,6 +28,12 @@ from .pivot_table import PivotTables
 from .rows import TableRows
 from .columns import TableColumns
 
+# UNO runtime does not expose all service names as importable modules; keep type-only imports
+if TYPE_CHECKING:
+    from com.sun.star.sheet import Spreadsheet as UNOSpreadsheet
+else:  # type hints only
+    UNOSpreadsheet = Any  # type: ignore
+
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from ..core.calc_document import CalcDocument
@@ -36,6 +42,10 @@ class Sheet(UnoObject):
     def __init__(self, sheet_obj: Any, document: "CalcDocument | None" = None) -> None:
         super().__init__(sheet_obj)
         self._document = document
+
+    @property
+    def raw(self) -> UNOSpreadsheet:
+        return cast(UNOSpreadsheet, super().raw)
 
     def _a1_to_pos(self, ref: str) -> tuple[int, int]:
         match = re.fullmatch(r"\$?([A-Za-z]+)\$?([1-9][0-9]*)", ref)
@@ -100,14 +110,13 @@ class Sheet(UnoObject):
         return Cell(sheet.getCellByPosition(int(column), int(row)))
     
     def cell2(self, column: int | str, row: int | None = None) -> Cell2:
-        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
         if isinstance(column, str):
             if row is not None:
                 raise ValueError("When using A1 notation, do not pass row separately")
             column, row = self._a1_to_pos(column)
         if row is None:
             raise ValueError("Row is required when column is numeric")
-        return Cell2(sheet.getCellByPosition(int(column), int(row)))
+        return Cell2(self.raw.getCellByPosition(int(column), int(row)))
 
 
     def range(
