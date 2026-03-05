@@ -41,13 +41,13 @@ def test_props_passthrough():
 def test_cellproperties_attribute_access():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(2, 0)
-    original_color = cell.CellBackColor
+    original_color = cell.props.CellBackColor
     new_color = 0x223344 if original_color != 0x223344 else 0x556677
     try:
-        cell.CellBackColor = new_color
-        assert cell.CellBackColor == new_color
+        cell.props.CellBackColor = new_color
+        assert cell.props.CellBackColor == new_color
     finally:
-        cell.CellBackColor = original_color
+        cell.props.CellBackColor = original_color
 
 
 def test_cell_a1_alias():

@@ -49,7 +49,7 @@ cell.font.size = 12
 cell.back_color = 0xFFFF00
 
 # UNO ライクな指定
-cell.cell_props.CellBackColor = 0xFFFF00
+cell.props.CellBackColor = 0xFFFF00
 
 ```
 

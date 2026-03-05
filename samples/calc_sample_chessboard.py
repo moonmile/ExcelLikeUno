@@ -14,8 +14,8 @@ for r in range(8):
     for c in range(8):
         cell = ban.cell(c, r)
         # cell.CellBackColor = colors[(r + c) % 2]
-        cell.HoriJustify = 2 # CENTER
-        cell.VertJustify = 2 # CENTER
+        cell.props.HoriJustify = 2 # CENTER
+        cell.props.VertJustify = 2 # CENTER
         piece = ""
         if r == 0 or r == 7:
             piece = "♜♞♝♛♚♝♞♜"[c]

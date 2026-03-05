@@ -14,13 +14,13 @@ def _connect_or_skip():
 def test_cellproperties_get_set_property_methods():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(0, 2)
-    original_color = cell.CellBackColor
+    original_color = cell.props.CellBackColor
     new_color = 0x778899 if original_color != 0x778899 else 0x99aabb
     try:
         cell.CellBackColor = new_color
-        assert cell.CellBackColor == new_color
+        assert cell.props.CellBackColor == new_color
     finally:
-        cell.CellBackColor = original_color
+        cell.props.CellBackColor = original_color
 
 
 def test_cellproperties_uno_method_aliases():
@@ -39,13 +39,13 @@ def test_cellproperties_uno_method_aliases():
 def test_cellproperties_attribute_passthrough():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(2, 2)
-    original_wrap = cell.IsTextWrapped
+    original_wrap = cell.props.IsTextWrapped
     new_wrap = not original_wrap
     try:
-        cell.IsTextWrapped = new_wrap
-        assert cell.IsTextWrapped is new_wrap
+        cell.props.IsTextWrapped = new_wrap
+        assert cell.props.IsTextWrapped is new_wrap
     finally:
-        cell.IsTextWrapped = original_wrap
+        cell.props.IsTextWrapped = original_wrap
 
 
 def test_cell_topborder_roundtrip():
@@ -57,13 +57,13 @@ def test_cell_topborder_roundtrip():
     new_border = BorderLine(Color=0x123456, OuterLineWidth=50)
 
     try:
-        cell.TopBorder = new_border
-        updated = cell.TopBorder
+        cell.props.TopBorder = new_border
+        updated = cell.props.TopBorder
         assert updated.Color == 0x123456
         # LibreOffice may normalize to the nearest supported width; allow small drift.
         assert abs(int(updated.OuterLineWidth) - 50) <= 2
     finally:
-        cell.TopBorder = original_border
+        cell.props.TopBorder = original_border
 
 
 def test_cell_topborder2_roundtrip():

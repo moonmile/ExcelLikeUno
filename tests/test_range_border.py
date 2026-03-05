@@ -19,7 +19,7 @@ def test_range_border_broadcast_via_proxy():
 
     cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
     originals = [
-        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+        (c.borders.top, c.borders.bottom, c.borders.left, c.borders.right) for c in cells
     ]
 
     line = BorderLine(Color=0xC0FFEE, InnerLineWidth=18, OuterLineWidth=36, LineDistance=54)
@@ -28,16 +28,16 @@ def test_range_border_broadcast_via_proxy():
         rng.borders = Borders(all=line)
 
         for cell in cells:
-            assert getattr(cell.TopBorder, "Color", None) == line.Color
-            assert abs(getattr(cell.BottomBorder, "OuterLineWidth", 0) - line.OuterLineWidth) <= 2
-            assert getattr(cell.LeftBorder, "Color", None) == line.Color
-            assert getattr(cell.RightBorder, "Color", None) == line.Color
+            assert getattr(cell.borders.top, "Color", None) == line.Color
+            assert abs(getattr(cell.borders.bottom, "OuterLineWidth", 0) - line.OuterLineWidth) <= 2
+            assert getattr(cell.borders.left, "Color", None) == line.Color
+            assert getattr(cell.borders.right, "Color", None) == line.Color
     finally:
         for cell, (top, bottom, left, right) in zip(cells, originals):
-            cell.TopBorder = top
-            cell.BottomBorder = bottom
-            cell.LeftBorder = left
-            cell.RightBorder = right
+            cell.borders.top = top
+            cell.borders.bottom = bottom
+            cell.borders.left = left
+            cell.borders.right = right
 
 
 def test_range_borderstyle_broadcast_fields():
@@ -46,7 +46,7 @@ def test_range_borderstyle_broadcast_fields():
 
     cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
     originals = [
-        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+        (c.borders.top, c.borders.bottom, c.borders.left, c.borders.right) for c in cells
     ]
 
     try:
@@ -59,10 +59,10 @@ def test_range_borderstyle_broadcast_fields():
             assert abs(cell.borders.left.weight - 30) <= 2
     finally:
         for cell, (top, bottom, left, right) in zip(cells, originals):
-            cell.TopBorder = top
-            cell.BottomBorder = bottom
-            cell.LeftBorder = left
-            cell.RightBorder = right
+            cell.borders.top = top
+            cell.borders.bottom = bottom
+            cell.borders.left = left
+            cell.borders.right = right
 
 
 def test_range_borders_accept_borderstyle_config():
@@ -71,7 +71,7 @@ def test_range_borders_accept_borderstyle_config():
 
     cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
     originals = [
-        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+        (c.borders.top, c.borders.bottom, c.borders.left, c.borders.right) for c in cells
     ]
 
     cfg = Borders(all=BorderStyle(color=0x123456, weight=40, line_style=1))
@@ -86,10 +86,10 @@ def test_range_borders_accept_borderstyle_config():
             assert cell.borders.right.color == 0x123456
     finally:
         for cell, (top, bottom, left, right) in zip(cells, originals):
-            cell.TopBorder = top
-            cell.BottomBorder = bottom
-            cell.LeftBorder = left
-            cell.RightBorder = right
+            cell.borders.top = top
+            cell.borders.bottom = bottom
+            cell.borders.left = left
+            cell.borders.right = right
 
 
 # 外枠の罫線のみ引く場合
@@ -103,7 +103,7 @@ def test_range_borders_around():
         rng.cell(0, 2), rng.cell(1, 2), rng.cell(2, 2), 
         ]
     originals = [
-        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+        (c.borders.top, c.borders.bottom, c.borders.left, c.borders.right) for c in cells
     ]
 
     border_stlye_zero = BorderStyle(color=0xFFFFFF, weight=0, line_style=BorderLineStyle.NONE )
@@ -164,10 +164,10 @@ def test_range_borders_around():
 
     finally:
         for cell, (top, bottom, left, right) in zip(cells, originals):
-            cell.TopBorder = top
-            cell.BottomBorder = bottom
-            cell.LeftBorder = left
-            cell.RightBorder = right
+            cell.borders.top = top
+            cell.borders.bottom = bottom
+            cell.borders.left = left
+            cell.borders.right = right
 
 # 外枠の罫線のみ引く場合（元の罫線は残る）
 def test_range_borders_around_red():
@@ -180,7 +180,7 @@ def test_range_borders_around_red():
         rng.cell(0, 2), rng.cell(1, 2), rng.cell(2, 2), 
         ]
     originals = [
-        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+        (c.borders.top, c.borders.bottom, c.borders.left, c.borders.right) for c in cells
     ]
 
     border_stlye_red = BorderStyle(color=0xFF0000, weight=20, line_style=BorderLineStyle.SOLID )
@@ -212,10 +212,10 @@ def test_range_borders_around_red():
 
     finally:
         for cell, (top, bottom, left, right) in zip(cells, originals):
-            cell.TopBorder = top
-            cell.BottomBorder = bottom
-            cell.LeftBorder = left
-            cell.RightBorder = right
+            cell.borders.top = top
+            cell.borders.bottom = bottom
+            cell.borders.left = left
+            cell.borders.right = right
 
 # 内枠の罫線のみ引く場合
 def test_range_borders_inner():
@@ -228,7 +228,7 @@ def test_range_borders_inner():
         rng.cell(0, 2), rng.cell(1, 2), rng.cell(2, 2), 
         ]
     originals = [
-        (c.TopBorder, c.BottomBorder, c.LeftBorder, c.RightBorder) for c in cells
+        (c.borders.top, c.borders.bottom, c.borders.left, c.borders.right) for c in cells
     ]
 
     border_stlye_zero = BorderStyle(color=0xFFFFFF, weight=0, line_style=BorderLineStyle.NONE )

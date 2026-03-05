@@ -17,10 +17,10 @@ def test_cell_border_roundtrip_via_proxy():
     cell = sheet.cell(0, 8)
 
     originals = {
-        "top": cell.TopBorder,
-        "bottom": cell.BottomBorder,
-        "left": cell.LeftBorder,
-        "right": cell.RightBorder,
+        "top": cell.props.TopBorder,
+        "bottom": cell.props.BottomBorder,
+        "left": cell.props.LeftBorder,
+        "right": cell.props.RightBorder,
     }
 
     top_line = BorderLine(Color=0x112233, InnerLineWidth=20, OuterLineWidth=60, LineDistance=80)
@@ -34,15 +34,15 @@ def test_cell_border_roundtrip_via_proxy():
         cell.borders.left = left_line
         cell.borders.right = right_line
 
-        assert getattr(cell.TopBorder, "Color", None) == top_line.Color
-        assert abs(getattr(cell.BottomBorder, "OuterLineWidth", 0) - bottom_line.OuterLineWidth) <= 2
-        assert getattr(cell.LeftBorder, "Color", None) == left_line.Color
-        assert getattr(cell.RightBorder, "Color", None) == right_line.Color
+        assert getattr(cell.props.TopBorder, "Color", None) == top_line.Color
+        assert abs(getattr(cell.props.BottomBorder, "OuterLineWidth", 0) - bottom_line.OuterLineWidth) <= 2
+        assert getattr(cell.props.LeftBorder, "Color", None) == left_line.Color
+        assert getattr(cell.props.RightBorder, "Color", None) == right_line.Color
     finally:
-        cell.TopBorder = originals["top"]
-        cell.BottomBorder = originals["bottom"]
-        cell.LeftBorder = originals["left"]
-        cell.RightBorder = originals["right"]
+        cell.props.TopBorder = originals["top"]
+        cell.props.BottomBorder = originals["bottom"]
+        cell.props.LeftBorder = originals["left"]
+        cell.props.RightBorder = originals["right"]
 
 
 def test_borderstyle_config_constructor_defaults():
@@ -61,8 +61,8 @@ def test_border_config_holder_reuse_on_cells():
     second = sheet.cell(1, 9)
 
     originals = [
-        (first.TopBorder, first.BottomBorder, first.LeftBorder, first.RightBorder),
-        (second.TopBorder, second.BottomBorder, second.LeftBorder, second.RightBorder),
+        (first.props.TopBorder, first.props.BottomBorder, first.props.LeftBorder, first.props.RightBorder),
+        (second.props.TopBorder, second.props.BottomBorder, second.props.LeftBorder, second.props.RightBorder),
     ]
 
     top_line = BorderLine(Color=0x334455, InnerLineWidth=10, OuterLineWidth=40, LineDistance=60)
@@ -77,24 +77,24 @@ def test_border_config_holder_reuse_on_cells():
         second.borders = border_cfg
     
         for cell in (first, second):
-            assert getattr(cell.TopBorder, "Color", None) == top_line.Color
-            assert getattr(cell.BottomBorder, "Color", None) == bottom_line.Color
-            assert getattr(cell.LeftBorder, "Color", None) == left_line.Color
-            assert getattr(cell.RightBorder, "Color", None) == right_line.Color
+            assert getattr(cell.props.TopBorder, "Color", None) == top_line.Color
+            assert getattr(cell.props.BottomBorder, "Color", None) == bottom_line.Color
+            assert getattr(cell.props.LeftBorder, "Color", None) == left_line.Color
+            assert getattr(cell.props.RightBorder, "Color", None) == right_line.Color
 
         assert border_cfg.top.Color == top_line.Color
         assert border_cfg.bottom.Color == bottom_line.Color
     finally:
         (f_top, f_bottom, f_left, f_right), (s_top, s_bottom, s_left, s_right) = originals
-        first.TopBorder = f_top
-        first.BottomBorder = f_bottom
-        first.LeftBorder = f_left
-        first.RightBorder = f_right
+        first.props.TopBorder = f_top
+        first.props.BottomBorder = f_bottom
+        first.props.LeftBorder = f_left
+        first.props.RightBorder = f_right
 
-        second.TopBorder = s_top
-        second.BottomBorder = s_bottom
-        second.LeftBorder = s_left
-        second.RightBorder = s_right
+        second.props.TopBorder = s_top
+        second.props.BottomBorder = s_bottom
+        second.props.LeftBorder = s_left
+        second.props.RightBorder = s_right
 
 
 def test_border_all_sets_all_sides():
@@ -102,10 +102,10 @@ def test_border_all_sets_all_sides():
     cell = sheet.cell(2, 8)
 
     originals = {
-        "top": cell.TopBorder,
-        "bottom": cell.BottomBorder,
-        "left": cell.LeftBorder,
-        "right": cell.RightBorder,
+        "top": cell.props.TopBorder,
+        "bottom": cell.props.BottomBorder,
+        "left": cell.props.LeftBorder,
+        "right": cell.props.RightBorder,
     }
 
     line = BorderLine(Color=0xABCDEF, InnerLineWidth=12, OuterLineWidth=24, LineDistance=36)
@@ -113,15 +113,15 @@ def test_border_all_sets_all_sides():
     try:
         cell.borders.all = line
 
-        assert getattr(cell.TopBorder, "Color", None) == line.Color
-        assert getattr(cell.BottomBorder, "Color", None) == line.Color
-        assert getattr(cell.LeftBorder, "Color", None) == line.Color
-        assert getattr(cell.RightBorder, "Color", None) == line.Color
+        assert getattr(cell.props.TopBorder, "Color", None) == line.Color
+        assert getattr(cell.props.BottomBorder, "Color", None) == line.Color
+        assert getattr(cell.props.LeftBorder, "Color", None) == line.Color
+        assert getattr(cell.props.RightBorder, "Color", None) == line.Color
     finally:
-        cell.TopBorder = originals["top"]
-        cell.BottomBorder = originals["bottom"]
-        cell.LeftBorder = originals["left"]
-        cell.RightBorder = originals["right"]
+        cell.props.TopBorder = originals["top"]
+        cell.props.BottomBorder = originals["bottom"]
+        cell.props.LeftBorder = originals["left"]
+        cell.props.RightBorder = originals["right"]
 
 
 def test_cell_borderstyle_attribute_updates():
@@ -129,10 +129,10 @@ def test_cell_borderstyle_attribute_updates():
     cell = sheet.cell(3, 8)
 
     originals = {
-        "top": cell.TopBorder,
-        "bottom": cell.BottomBorder,
-        "left": cell.LeftBorder,
-        "right": cell.RightBorder,
+        "top": cell.props.TopBorder,
+        "bottom": cell.props.BottomBorder,
+        "left": cell.props.LeftBorder,
+        "right": cell.props.RightBorder,
     }
 
     try:
@@ -144,10 +144,10 @@ def test_cell_borderstyle_attribute_updates():
         assert abs(cell.borders.top.weight - 40) <= 2
         assert int(cell.borders.top.line_style) == 1
     finally:
-        cell.TopBorder = originals["top"]
-        cell.BottomBorder = originals["bottom"]
-        cell.LeftBorder = originals["left"]
-        cell.RightBorder = originals["right"]
+        cell.props.TopBorder = originals["top"]
+        cell.props.BottomBorder = originals["bottom"]
+        cell.props.LeftBorder = originals["left"]
+        cell.props.RightBorder = originals["right"]
 
 
 
@@ -156,10 +156,10 @@ def test_cell_borderstyle_constructor():
     cell = sheet.cell(3, 8)
 
     originals = {
-        "top": cell.TopBorder,
-        "bottom": cell.BottomBorder,
-        "left": cell.LeftBorder,
-        "right": cell.RightBorder,
+        "top": cell.props.TopBorder,
+        "bottom": cell.props.BottomBorder,
+        "left": cell.props.LeftBorder,
+        "right": cell.props.RightBorder,
     }
 
     try:
@@ -171,7 +171,7 @@ def test_cell_borderstyle_constructor():
         assert abs(cell.borders.top.weight - 40) <= 2
         assert int(cell.borders.top.line_style) == 0
     finally:
-        cell.TopBorder = originals["top"]
-        cell.BottomBorder = originals["bottom"]
-        cell.LeftBorder = originals["left"]
-        cell.RightBorder = originals["right"]
+        cell.props.TopBorder = originals["top"]
+        cell.props.BottomBorder = originals["bottom"]
+        cell.props.LeftBorder = originals["left"]
+        cell.props.RightBorder = originals["right"]

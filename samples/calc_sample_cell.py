@@ -10,8 +10,8 @@ sheet.range("A1:C1").merge(True)  # A1:C1 を結合
 cell.font = Font(name="Arial", size=16, color=0xFF0000)
 
 cell.row_height = 2000  # 行の高さを設定 20 mm
-cell.HoriJustify = CellHoriJustify.CENTER
-cell.VertJustify = CellVertJustify.CENTER
+cell.props.HoriJustify = CellHoriJustify.CENTER
+cell.props.VertJustify = CellVertJustify.CENTER
 
 
 sheet.cell(0,1).text = "id"
