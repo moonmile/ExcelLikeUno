@@ -1,3 +1,6 @@
+from hmac import new
+
+from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 import pytest
 
 from excellikeuno.connection import connect_calc
@@ -44,8 +47,8 @@ def test_cellproperties_attribute_access():
     original_color = cell.props.CellBackColor
     new_color = 0x223344 if original_color != 0x223344 else 0x556677
     try:
-        cell.props.CellBackColor = new_color
-        assert cell.props.CellBackColor == new_color
+        cell.font.backcolor = new_color
+        assert cell.font.backcolor == new_color
     finally:
         cell.props.CellBackColor = original_color
 
@@ -69,3 +72,13 @@ def test_cell_a1_with_dollar():
         assert b3.text == "hello"
     finally:
         b3.text = ""
+
+
+def test_cell_a1_alignment():
+    _, _, sheet = _connect_or_skip()
+    c4 = sheet.cell("C4")
+    c4.text = "test"
+    c4.horizontal_align = CellHoriJustify.CENTER
+    c4.vertical_align = CellVertJustify.CENTER
+    assert c4.horizontal_align == CellHoriJustify.CENTER
+    assert c4.vertical_align == CellVertJustify.CENTER

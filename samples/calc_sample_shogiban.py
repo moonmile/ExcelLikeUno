@@ -20,8 +20,8 @@ for cell in [c for row in ban.cells for c in row]:
 
 
     # センタリング
-    cell.HoriJustify = CellHoriJustify.CENTER
-    cell.VertJustify = CellVertJustify.CENTER
+    cell.horizontal_align = CellHoriJustify.CENTER
+    cell.vertical_align = CellVertJustify.CENTER
 
 # フォントの一括変更（内容設定後に適用）
 ban.font.size = 16.0
@@ -49,7 +49,7 @@ for r in range(9):
     for c in range(9):
         cell = ban.cell(c, r)
         if pieces[r][c] != "" and r < 3:
-            cell.CharRotation = 180  # 180度回転
+            cell.props.RotateAngle = 180*100  # 180度回転
 
 
 

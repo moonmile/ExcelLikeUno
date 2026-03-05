@@ -374,3 +374,18 @@ class Cell(UnoObject):
         cell = cast(XCell, self.iface(InterfaceNames.X_CELL))
         cell.setFormula(text)
 
+
+    @property
+    def vertical_align(self) -> CellVertJustify:
+        return CellVertJustify(self.props.VertJustify)
+    @vertical_align.setter
+    def vertical_align(self, value: CellVertJustify) -> None:
+        self.props.VertJustify = int(value)
+
+    @property
+    def horizontal_align(self) -> CellHoriJustify:
+        return CellHoriJustify(self.props.HoriJustify)
+    @horizontal_align.setter
+    def horizontal_align(self, value: CellHoriJustify) -> None:
+        self.props.HoriJustify = int(value)
+    

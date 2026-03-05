@@ -15,7 +15,7 @@ for cell in [c for row in ban.cells for c in row]:
     borderline.OuterLineWidth = 50
     borderline.InnerLineWidth = 0
     borderline.LineDistance = 0
-    cell.TopBorder = cell.BottomBorder = cell.LeftBorder = cell.RightBorder = borderline
+    cell.borders.all = borderline
 
 # オセロの駒を Shape で配置
 pieces = [

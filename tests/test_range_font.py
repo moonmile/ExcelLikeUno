@@ -1,3 +1,4 @@
+# from com.sun.star.awt.Size import Size
 import pytest
 
 from excellikeuno.connection import connect_calc
@@ -15,7 +16,7 @@ def test_range_font_broadcast_size_and_bold():
     rng = sheet.range(0, 5, 1, 6)  # 2x2 block
 
     cells = [rng.cell(0, 0), rng.cell(1, 0), rng.cell(0, 1), rng.cell(1, 1)]
-    originals = [(c.font.CharHeight, c.font.CharWeight) for c in cells]
+    originals = [(c.char_props.CharHeight, c.char_props.CharWeight) for c in cells]
 
     new_size = 15.0
     new_bold = True
