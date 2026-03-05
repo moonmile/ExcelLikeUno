@@ -30,7 +30,66 @@ excellikeuno/table/cell.py を sutbs を使ってリファクタリングする
 XCell, CellProperties をひとまとめにして Cell クラスにする
 - スタブ (src/stubs) を直接 import して型付けする。InterfaceNames はクエリ用定数に限定し、typing/calc からの import は順次削除する。
 
+### Cell/Shape リファクタリング
 
+- cell.py, shape.py をリファクタリングする
+- Excel ライクな指定は snake_case に統一する。
+- UNO ライクな指定は cell_pros や char_props 経由でアクセスする。
+  - UNO クラスを直接利用する場合は props 経由でアクセスする。
+  - 複数の UNO クラスを統合している場合は、cell_props や char_props を用意する
 
+Cell の指定
 
+```python
+cell = sheet.cell(0, 0)
+
+# Excel ライクな指定
+cell.borders.top.color = 0xFF0000
+cell.font.size = 12
+cell.back_color = 0xFFFF00
+
+# UNO ライクな指定
+cell.cell_props.CellBackColor = 0xFFFF00
+
+```
+
+Shape の指定
+
+```python
+shape = sheet.shape(0)
+# Excel ライクな指定
+shape.line_color = 0xFF0000
+shape.line_width = 50
+# UNO ライクな指定
+shape.props.LineColor = 0xFF0000
+```
+
+- cell.borders.top.color のプロパティを cell に反映する場合はプロキシ型を使う
+
+プロキシ例
+
+```python
+class BorderLineWrapper:
+    def __init__(self, bl, on_change):
+        self._bl = bl
+        self._on_change = on_change
+
+    @property
+    def color(self):
+        return self._bl.Color
+
+    @color.setter
+    def color(self, value):
+        self._bl.Color = value
+        self._on_change(self._bl)
+
+class BorderSide:
+    def _get_wrapper(self):
+        bl = self._props.getPropertyValue(self._prop_name)
+        return BorderLineWrapper(bl, self._apply)
+
+    def _apply(self, bl):
+        self._props.setPropertyValue(self._prop_name, bl)
+
+```
 
