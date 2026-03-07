@@ -44,5 +44,3 @@ Further Considerations
 4. 追加で扱うプロパティの優先順位（NumberFormat/BackColor/Underline 以外に何を先にサポートするか）を整理。
 
     → これは別途、既存のテストコードに合わせて作成する。
-
-

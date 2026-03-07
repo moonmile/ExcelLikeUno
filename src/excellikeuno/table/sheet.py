@@ -21,6 +21,7 @@ from ..core import UnoObject
 from ..drawing import Shape, EllipseShape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from .cell import Cell
+from .sheet_cell import SheetCell
 from .range import Range, TableRow, TableColumn
 from ..chart import ChartCollection
 from .pivot_table import PivotTables
@@ -107,6 +108,16 @@ class Sheet(UnoObject):
         if row is None:
             raise ValueError("Row is required when column is numeric")
         return Cell(sheet.getCellByPosition(int(column), int(row)))
+
+    def sheet_cell(self, column: int | str, row: int | None = None) -> SheetCell:
+        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
+        if isinstance(column, str):
+            if row is not None:
+                raise ValueError("When using A1 notation, do not pass row separately")
+            column, row = self._a1_to_pos(column)
+        if row is None:
+            raise ValueError("Row is required when column is numeric")
+        return SheetCell(sheet.getCellByPosition(int(column), int(row)))
     
     def range(
         self,
