@@ -30,66 +30,75 @@ excellikeuno/table/cell.py を sutbs を使ってリファクタリングする
 XCell, CellProperties をひとまとめにして Cell クラスにする
 - スタブ (src/stubs) を直接 import して型付けする。InterfaceNames はクエリ用定数に限定し、typing/calc からの import は順次削除する。
 
-### Cell/Shape リファクタリング
+### SheetCell の作成
 
-- cell.py, shape.py をリファクタリングする
-- Excel ライクな指定は snake_case に統一する。
-- UNO ライクな指定は cell_pros や char_props 経由でアクセスする。
-  - UNO クラスを直接利用する場合は props 経由でアクセスする。
-  - 複数の UNO クラスを統合している場合は、cell_props や char_props を用意する
-
-Cell の指定
+Excel ライクなアクセス方法
 
 ```python
-cell = sheet.cell(0, 0)
-
-# Excel ライクな指定
+cell = sheet.sheet_cell(0, 0)
 cell.borders.top.color = 0xFF0000
 cell.font.size = 12
 cell.back_color = 0xFFFF00
-
-# UNO ライクな指定
-cell.props.CellBackColor = 0xFFFF00
-
 ```
 
-Shape の指定
+UNO API 経由でアクセスする方法
 
 ```python
-shape = sheet.shape(0)
-# Excel ライクな指定
-shape.line_color = 0xFF0000
-shape.line_width = 50
-# UNO ライクな指定
-shape.props.LineColor = 0xFF0000
+cell.raw.setPropatyValue("CharHeight", 12 )
+cell.raw.setPropatyValue("BackgroundColor", 0xFFFF00)
+cell.raw.setPropatyValue("NumberFormat", 0)
+cell.raw.setPropatyValue("CharUnderline", 0)
 ```
 
-- cell.borders.top.color のプロパティを cell に反映する場合はプロキシ型を使う
-
-プロキシ例
+props 経由でアクセスする方法
+- raw.setPropertyValue, raw.getPropertyValue を内部で呼び出す。
 
 ```python
-class BorderLineWrapper:
-    def __init__(self, bl, on_change):
-        self._bl = bl
-        self._on_change = on_change
-
-    @property
-    def color(self):
-        return self._bl.Color
-
-    @color.setter
-    def color(self, value):
-        self._bl.Color = value
-        self._on_change(self._bl)
-
-class BorderSide:
-    def _get_wrapper(self):
-        bl = self._props.getPropertyValue(self._prop_name)
-        return BorderLineWrapper(bl, self._apply)
-
-    def _apply(self, bl):
-        self._props.setPropertyValue(self._prop_name, bl)
-
+cell.props.CharHeight = 12
+cell.props.BackgroundColor = 0xFFFF00
+cell.props.NumberFormat = 0
+cell.props.CharUnderline = 0
 ```
 
+- 既存の proxy である Font, Borders クラスはそのまま利用する
+
+```mermaid
+classDiagram
+
+class UnoObject {}
+
+class SheetCell {
+    + raw: com.sun.star.sheet.SheetCell
+    + props: RawProps
+    + borders: Borders
+    + font: Font
+}
+
+SheetCell --|> UnoObject
+
+class RawProps {
+    + CharHeight: float
+    + BackgroundColor: int
+    + NumberFormat: int
+    + CharUnderline: int
+}
+```
+
+RawProps は、SheetCell が持つ
+
+- CharacterProperties
+- ParagraphProperties
+- TextProperties
+- FormulaProperties
+
+などをまとめるクラスとして作成する
+
+```pthyon
+def collect_properties(obj):
+    props = []
+    for ps in collect_property_sets(obj):
+        info = ps.getPropertySetInfo()
+        for p in info.getProperties():
+            props.append((p.Name, p.Type))
+    return props
+```
