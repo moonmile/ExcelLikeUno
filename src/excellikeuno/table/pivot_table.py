@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import Any, Iterable, List, cast, TYPE_CHECKING
 
 from ..core import UnoObject
@@ -222,12 +223,15 @@ class PivotTables:
         try:
             raw = tables.getByName(key)
         except Exception as exc:
-            # Fallback: try by index if names are unavailable
+            # Fallback: try available indices if names are unavailable
             try:
                 count = tables.getCount()
-                if count > 0:
-                    raw = tables.getByIndex(count - 1)
-                    return PivotTable(raw)
+                for idx in range(count - 1, -1, -1):
+                    try:
+                        raw = tables.getByIndex(idx)
+                        return PivotTable(raw)
+                    except Exception:
+                        continue
             except Exception:
                 pass
             raise KeyError(f"pivot table not found: {key}") from exc
@@ -288,6 +292,11 @@ class PivotTables:
         output_addr = _coerce_cell_address(target_cell, default_sheet=default_sheet)
 
         descriptor: XDataPilotDescriptor | Any
+        prev_count = 0
+        try:
+            prev_count = self._tables().getCount()
+        except Exception:
+            prev_count = 0
         try:
             descriptor = tables.createDataPilotDescriptor()
         except Exception as exc:
@@ -351,26 +360,8 @@ class PivotTables:
         except Exception as exc:
             raise RuntimeError(f"failed to insert pivot table '{target_name}': {exc}")
 
-        try:
-            pivot = self[target_name]
-        except KeyError:
-            # Some runtimes rename the pivot table or ignore the requested name; pick the newest available.
-            names = self._names()
-            if names:
-                try:
-                    pivot = PivotTable(self._tables().getByName(names[-1]))
-                except Exception:
-                    pivot = PivotTable(self._tables().getByIndex(max(len(names) - 1, 0)))
-            else:
-                # As a last resort, try first index if any tables exist
-                try:
-                    tbls = self._tables()
-                    if tbls.getCount() > 0:
-                        pivot = PivotTable(tbls.getByIndex(tbls.getCount() - 1))
-                    else:
-                        raise
-                except Exception:
-                    raise
+        # Resolve the inserted pivot, tolerating delayed registration/renaming.
+        pivot = self._resolve_pivot_after_insert(target_name, prev_count)
         try:
             current_name = pivot.name
         except Exception:
@@ -386,3 +377,70 @@ class PivotTables:
                 pass
 
         return pivot
+
+    def _resolve_pivot_after_insert(self, target_name: str, prev_count: int) -> PivotTable:
+        tables = self._tables()
+        attempts = 3
+        for attempt in range(attempts):
+            # Try by requested name first.
+            try:
+                return self[target_name]
+            except KeyError:
+                pass
+
+            # Check if a new table appeared; prefer the newest index.
+            try:
+                count = tables.getCount()
+            except Exception:
+                count = 0
+
+            if count > prev_count:
+                for idx in range(count - 1, prev_count - 1, -1):
+                    try:
+                        return PivotTable(tables.getByIndex(idx))
+                    except Exception:
+                        continue
+
+            # Try any available names as a fallback.
+            try:
+                names = self._names()
+            except Exception:
+                names = []
+            for name in reversed(names):
+                try:
+                    return PivotTable(tables.getByName(name))
+                except Exception:
+                    continue
+
+            if attempt < attempts - 1:
+                time.sleep(0.1)
+
+        raise KeyError(f"pivot table not found: {target_name}")
+
+    def _latest_pivot_or_raise(self, target_name: str) -> PivotTable:
+        # Reload tables to pick up any newly inserted entry
+        tbls = self._tables()
+        names = []
+        try:
+            names = self._names()
+        except Exception:
+            names = []
+
+        if names:
+            for name in reversed(names):
+                try:
+                    return PivotTable(tbls.getByName(name))
+                except Exception:
+                    continue
+
+        try:
+            count = tbls.getCount()
+            for idx in range(count - 1, -1, -1):
+                try:
+                    return PivotTable(tbls.getByIndex(idx))
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+        raise KeyError(f"pivot table not found: {target_name}")
