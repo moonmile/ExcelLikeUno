@@ -30,6 +30,36 @@ from .rows import TableRows
 
 
 class Cell(UnoObject):
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return getattr(self.props, name)
+        except Exception:
+            pass
+        try:
+            return getattr(self.raw, name)
+        except Exception as exc:
+            raise AttributeError(name) from exc
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name.startswith("_") or name in ("_obj", "_iface_cache"):
+            object.__setattr__(self, name, value)
+            return
+        descriptor = getattr(self.__class__, name, None)
+        if hasattr(descriptor, "__set__"):
+            descriptor.__set__(self, value)  # type: ignore[misc]
+            return
+        try:
+            setattr(self.props, name, value)
+            return
+        except Exception:
+            pass
+        try:
+            setattr(self.raw, name, value)
+            return
+        except Exception:
+            pass
+        object.__setattr__(self, name, value)
+
     # -- internal border helpers --
     def _as_border_line(self, value: Any, fallback: BorderLine | None = None) -> BorderLine:
         try:

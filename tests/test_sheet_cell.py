@@ -1,6 +1,8 @@
+from calendar import c
+
 import pytest
 
-from excellikeuno.table import SheetCell, RawProps
+from excellikeuno.table import SheetCell, RawProps, SheetCellRange
 from excellikeuno.connection import connect_calc
 
 
@@ -46,3 +48,37 @@ def test_sheet_cell_font_roundtrip():
         assert cell.font.size == 15
     finally:
         cell.font.size = original_size
+
+
+def test_sheet_cell_range_returns_sheetcell():
+    _, _, sheet = _connect_or_skip()
+    rng = sheet.sheet_range(0, 0, 1, 1)
+    assert isinstance(rng, SheetCellRange)
+    cells = rng.getCells()
+    assert isinstance(cells[0][0], SheetCell)
+
+
+def test_sheet_cell_attribute_properties():
+    _, _, sheet = _connect_or_skip()
+    cell = sheet.sheet_cell(3, 0)
+
+    original_backcolor = cell.backcolor  # type: ignore[attr-defined]
+    original_color     = cell.color  # type: ignore[attr-defined]
+    original_vertical_align = cell.vertical_align
+    original_horizontal_align = cell.horizontal_align
+
+    try:
+        cell.backcolor = 0x123456  # type: ignore[attr-defined]
+        cell.color = 0x654321  # type: ignore[attr-defined]
+        cell.vertical_align = 1 # TOP
+        cell.horizontal_align = 1 # LEFT
+
+        assert cell.backcolor == 0x123456  # type: ignore[attr-defined]
+        assert cell.color == 0x654321  # type: ignore[attr-defined]
+        assert cell.vertical_align == 1
+        assert cell.horizontal_align == 1
+    finally:
+        cell.backcolor = original_backcolor  # type: ignore[attr-defined]
+        cell.color = original_color  # type: ignore[attr-defined]
+        cell.vertical_align = original_vertical_align
+        cell.horizontal_align = original_horizontal_align

@@ -1,5 +1,6 @@
 from .cell import Cell
 from .sheet_cell import SheetCell, RawProps
+from .sheet_cell_range import SheetCellRange
 from .cell_properties import CellProperties
 from .columns import TableColumns
 from .range import Range, TableRow, TableColumn
@@ -16,6 +17,7 @@ __all__ = [
 	"SheetCell",
 	"Cell2",
 	"RawProps",
+	"SheetCellRange",
 	"CellProperties",
 	"Chart",
 	"ChartCollection",
