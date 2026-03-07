@@ -2,7 +2,7 @@
 from re import X
 from typing import Any, Tuple
 from excellikeuno import connect_calc_script
-from excellikeuno.table.sheet import Sheet 
+from excellikeuno.sheet.spreadsheet import Spreadsheet 
 
 def hello_to_cell():
     ( _, _, sheet ) = connect_calc_script(XSCRIPTCONTEXT)

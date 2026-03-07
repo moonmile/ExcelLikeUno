@@ -35,6 +35,13 @@ class RawProps:
     def set_property(self, name: str, value: Any) -> None:
         self._props().setPropertyValue(name, value)
 
+    # UNO-style helpers
+    def getPropertyValue(self, name: str) -> Any:  # noqa: N802 - UNO naming
+        return self.get_property(name)
+
+    def setPropertyValue(self, name: str, value: Any) -> None:  # noqa: N802 - UNO naming
+        self.set_property(name, value)
+
     def __getattr__(self, name: str) -> Any:
         try:
             return self.get_property(name)

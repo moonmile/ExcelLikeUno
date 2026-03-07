@@ -21,8 +21,8 @@ from ..core import UnoObject
 from ..drawing import Shape, EllipseShape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from ..table.cell import Cell
-from ..sheet.sheet_cell import SheetCell
-from ..sheet.sheet_cell_range import SheetCellRange
+from .sheet_cell import SheetCell
+from .sheet_cell_range import SheetCellRange
 from ..table.range import Range, TableRow, TableColumn
 from ..chart import ChartCollection
 from ..table.pivot_table import PivotTables
@@ -104,17 +104,7 @@ class Spreadsheet(UnoObject):
 
         return sc, sr, ec, er
 
-    def cell(self, column: int | str, row: int | None = None) -> Cell:
-        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
-        if isinstance(column, str):
-            if row is not None:
-                raise ValueError("When using A1 notation, do not pass row separately")
-            column, row = self._a1_to_pos(column)
-        if row is None:
-            raise ValueError("Row is required when column is numeric")
-        return Cell(sheet.getCellByPosition(int(column), int(row)))
-
-    def sheet_cell(self, column: int | str, row: int | None = None) -> SheetCell:
+    def cell(self, column: int | str, row: int | None = None) -> SheetCell:
         sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
         if isinstance(column, str):
             if row is not None:
@@ -123,19 +113,8 @@ class Spreadsheet(UnoObject):
         if row is None:
             raise ValueError("Row is required when column is numeric")
         return SheetCell(sheet.getCellByPosition(int(column), int(row)))
-    
-    def range(
-        self,
-        start_column: int | str,
-        start_row: int | None = None,
-        end_column: int | str | None = None,
-        end_row: int | None = None,
-    ) -> Range:
-        sc, sr, ec, er = self._normalize_range_args(start_column, start_row, end_column, end_row)
-        sheet = cast(XSpreadsheet, self.iface(InterfaceNames.X_SPREADSHEET))
-        return Range(sheet.getCellRangeByPosition(sc, sr, ec, er))
 
-    def sheet_range(
+    def range(
         self,
         start_column: int | str,
         start_row: int | None = None,

@@ -21,8 +21,8 @@ from ..core import UnoObject
 from ..drawing import Shape, EllipseShape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
 from ..table.cell import Cell
-from ..sheet.sheet_cell import SheetCell
-from ..sheet.sheet_cell_range import SheetCellRange
+from .sheet_cell import SheetCell
+from .sheet_cell_range import SheetCellRange
 from ..table.range import Range, TableRow, TableColumn
 from ..chart import ChartCollection
 from ..table.pivot_table import PivotTables

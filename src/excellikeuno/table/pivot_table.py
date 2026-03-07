@@ -17,7 +17,7 @@ from ..typing.structs import CellAddress, CellRangeAddress
 from .range import Range
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from .sheet import Sheet
+    from ..sheet import Spreadsheet
 
 
 def _coerce_range_address(target: Any) -> Any:
@@ -171,7 +171,7 @@ class PivotTable(UnoObject):
 
 
 class PivotTables:
-    def __init__(self, sheet: "Sheet") -> None:
+    def __init__(self, sheet: "Spreadsheet") -> None:
         self.sheet = sheet
 
     def _tables(self) -> XDataPilotTables:

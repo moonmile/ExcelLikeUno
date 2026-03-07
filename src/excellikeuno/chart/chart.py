@@ -11,7 +11,7 @@ from ..table.range import Range
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from ..core.calc_document import CalcDocument
-    from ..table.sheet import Sheet
+    from ..sheet import Spreadsheet
 
 
 class Chart(UnoObject):
@@ -591,7 +591,7 @@ class Chart(UnoObject):
 class ChartCollection:
     """Helper for managing charts on a sheet."""
 
-    def __init__(self, sheet: "Sheet") -> None:
+    def __init__(self, sheet: "Spreadsheet") -> None:
         self.sheet = sheet
 
     def _charts(self) -> XTableCharts:

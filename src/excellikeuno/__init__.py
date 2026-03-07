@@ -39,7 +39,8 @@ from .drawing import (
     Shape,
     TextShape,
 )
-from .table import Cell, CellProperties, Sheet, PivotTable, PivotTables
+from .table import Cell, CellProperties, PivotTable, PivotTables
+from .sheet import Spreadsheet, SheetCell, SheetCellRange
 from .chart import Chart, ChartCollection
 
 __all__ = [
@@ -49,7 +50,9 @@ __all__ = [
     "ChartCollection",
     "PivotTable",
     "PivotTables",
-    "Sheet",
+    "Spreadsheet",
+    "SheetCell",
+    "SheetCellRange",
     "Shape",
     "ConnectorShape",
     "LineShape",

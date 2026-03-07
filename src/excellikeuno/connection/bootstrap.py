@@ -5,7 +5,7 @@ from typing import Any, Tuple
 from ..core.calc_document import CalcDocument
 from ..core.writer_document import WriterDocument
 from ..typing import InterfaceNames
-from ..table import Sheet
+from ..sheet import Spreadsheet
 
 current_desktop: Any = None
 
@@ -101,7 +101,7 @@ def get_desktop() -> Any:
         raise RuntimeError("Failed to connect to LibreOffice desktop") from exc
 
 
-def new_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Sheet]:
+def new_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Spreadsheet]:
     desktop = _bootstrap_desktop()
     global current_desktop
     current_desktop = desktop
@@ -118,10 +118,10 @@ def new_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Sheet]:
     spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
-    return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
+    return desktop, doc_wrapper, Spreadsheet(first_sheet, document=doc_wrapper)
 
 
-def add_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Sheet]:
+def add_calc_document(hidden: bool = True) -> Tuple[Any, CalcDocument, Spreadsheet]:
     """Alias for new_calc_document to match desktop-oriented naming."""
 
     return new_calc_document(hidden=hidden)
@@ -134,7 +134,7 @@ def open_calc_document(
     read_only: bool = False,
     as_template: bool = False,
     filter_name: str | None = None,
-) -> Tuple[Any, CalcDocument, Sheet]:
+) -> Tuple[Any, CalcDocument, Spreadsheet]:
     """Open a Calc document and return (desktop, document_wrapper, first_sheet)."""
 
     desktop = _bootstrap_desktop()
@@ -156,10 +156,10 @@ def open_calc_document(
     spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
     sheets = spreadsheet_doc.getSheets()
     first_sheet = sheets.getByIndex(0)
-    return desktop, doc_wrapper, Sheet(first_sheet, document=doc_wrapper)
+    return desktop, doc_wrapper, Spreadsheet(first_sheet, document=doc_wrapper)
 
 
-def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
+def connect_calc() -> Tuple[Any, CalcDocument, Spreadsheet]:
     desktop = get_desktop()
     doc = desktop.getCurrentComponent()
     if doc is None:
@@ -169,7 +169,7 @@ def connect_calc() -> Tuple[Any, CalcDocument, Sheet]:
     spreadsheet_doc = doc_wrapper.iface(InterfaceNames.X_SPREADSHEET_DOCUMENT)
     controller = spreadsheet_doc.getCurrentController()
     sheet = controller.getActiveSheet()
-    return desktop, doc_wrapper, Sheet(sheet, document=doc_wrapper)
+    return desktop, doc_wrapper, Spreadsheet(sheet, document=doc_wrapper)
 
 
 def active_document() -> CalcDocument:
@@ -191,12 +191,12 @@ def this_document() -> CalcDocument:
 
 
 # XSCRIPTCONTEXT に接続する
-def connect_calc_script(xscriptcontext) -> Tuple[Any, CalcDocument, Sheet]:
+def connect_calc_script(xscriptcontext) -> Tuple[Any, CalcDocument, Spreadsheet]:
     global current_desktop
     desktop = xscriptcontext.getDesktop()
     doc = CalcDocument(desktop.getCurrentComponent())
     controller = doc.raw.getCurrentController()
-    sheet = Sheet(controller.getActiveSheet(), document=doc)
+    sheet = Spreadsheet(controller.getActiveSheet(), document=doc)
     current_desktop = desktop
     return desktop, doc, sheet
 
@@ -219,11 +219,11 @@ def connect_writer() -> Tuple[Any, WriterDocument]:
     return desktop, WriterDocument(doc)
 
 
-def active_sheet() -> Sheet:
+def active_sheet() -> Spreadsheet:
     doc = active_document()
     controller = doc.raw.getCurrentController()
     sheet = controller.getActiveSheet()
-    return Sheet(sheet, document=doc)
+    return Spreadsheet(sheet, document=doc)
 
 
 # Aliases for naming convenience
@@ -232,10 +232,10 @@ ActiveSheet = _LazyAlias(active_sheet)
 ThisDesktop = _LazyAlias(this_desktop)
 
 
-def this_sheet() -> Sheet:
+def this_sheet() -> Spreadsheet:
     return active_sheet()
 
 
-def wrap_sheet(sheet_obj: Any) -> Sheet:
+def wrap_sheet(sheet_obj: Any) -> Spreadsheet:
     """Wrap an existing UNO sheet object in a Sheet helper."""
-    return Sheet(sheet_obj)
+    return Spreadsheet(sheet_obj)

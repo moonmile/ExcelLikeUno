@@ -7,8 +7,8 @@ from ..typing import InterfaceNames, XCell, XSheetCellRange, XCellRangeAddressab
 from ..style.font import Font
 from ..style.border import Borders
 from .sheet_cell import SheetCell
-from .rows import TableRows
-from .columns import TableColumns
+from ..table.rows import TableRows
+from ..table.columns import TableColumns
 
 
 class SheetCellRange(UnoObject):

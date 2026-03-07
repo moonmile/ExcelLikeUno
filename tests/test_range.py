@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from excellikeuno.table import Sheet
+from excellikeuno.table import Spreadsheet
 from excellikeuno.connection import connect_calc
 
 
