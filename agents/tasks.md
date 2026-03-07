@@ -27,9 +27,9 @@ token は ~/.pypirc に保存してある。
 ```
 
 ## パッケージの作成
+プロジェクトルート（pyproject.toml があるディレクトリ）で実行すること。パッケージ直下で実行すると stdlib の typing を上書きし ImportError になる。
 
 ```
-cd excellikeuno
 python -m build
 ```
 
