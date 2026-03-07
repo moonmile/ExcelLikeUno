@@ -222,6 +222,14 @@ class PivotTables:
         try:
             raw = tables.getByName(key)
         except Exception as exc:
+            # Fallback: try by index if names are unavailable
+            try:
+                count = tables.getCount()
+                if count > 0:
+                    raw = tables.getByIndex(count - 1)
+                    return PivotTable(raw)
+            except Exception:
+                pass
             raise KeyError(f"pivot table not found: {key}") from exc
         return PivotTable(raw)
 
@@ -343,7 +351,26 @@ class PivotTables:
         except Exception as exc:
             raise RuntimeError(f"failed to insert pivot table '{target_name}': {exc}")
 
-        pivot = self[target_name]
+        try:
+            pivot = self[target_name]
+        except KeyError:
+            # Some runtimes rename the pivot table or ignore the requested name; pick the newest available.
+            names = self._names()
+            if names:
+                try:
+                    pivot = PivotTable(self._tables().getByName(names[-1]))
+                except Exception:
+                    pivot = PivotTable(self._tables().getByIndex(max(len(names) - 1, 0)))
+            else:
+                # As a last resort, try first index if any tables exist
+                try:
+                    tbls = self._tables()
+                    if tbls.getCount() > 0:
+                        pivot = PivotTable(tbls.getByIndex(tbls.getCount() - 1))
+                    else:
+                        raise
+                except Exception:
+                    raise
         try:
             current_name = pivot.name
         except Exception:
@@ -351,6 +378,10 @@ class PivotTables:
         if not current_name or str(current_name) != str(target_name):
             try:
                 pivot.name = target_name
+            except Exception:
+                pass
+            try:
+                pivot._last_name = target_name  # type: ignore[attr-defined]
             except Exception:
                 pass
 

@@ -5,7 +5,7 @@ from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLin
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "将棋盤"
 ban = sheet.range("A1:I9");
-ban.CellBackColor = 0xFFFACD  # 背景色を薄い黄色に設定
+ban.backcolor = 0xFFFACD  # 背景色を薄い黄色に設定
 ban.row_height = 1000  # 行の高さを設定 20 mm
 ban.column_width = 1000  # 列の幅を設定 20 mm
 # 罫線を設定
@@ -49,7 +49,7 @@ for r in range(9):
     for c in range(9):
         cell = ban.cell(c, r)
         if pieces[r][c] != "" and r < 3:
-            cell.props.RotateAngle = 180*100  # 180度回転
+            cell.rotate = 180  # 180度回転
 
 
 

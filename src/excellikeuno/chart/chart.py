@@ -77,6 +77,12 @@ class Chart(UnoObject):
                 candidate = addrable.getRangeAddress()
             except Exception:
                 candidate = target
+        elif hasattr(target, "iface"):
+            try:
+                addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)
+                candidate = addrable.getRangeAddress()
+            except Exception:
+                candidate = target
         elif hasattr(target, "to_raw"):
             try:
                 candidate = target.to_raw()

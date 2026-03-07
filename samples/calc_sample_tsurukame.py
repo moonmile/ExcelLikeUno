@@ -5,7 +5,7 @@ from excellikeuno.typing.structs import BorderLine
 (desktop, doc, sheet) = connect_calc()
 # sheet.name = "鶴亀オセロ"
 ban = sheet.range("A1:H8");
-ban.CellBackColor = 0x006400  # 背景色を濃い緑色に
+ban.backcolor = 0x006400  # 背景色を濃い緑色に
 ban.row_height = 1000  # 行の高さを設定 10 mm
 ban.column_width = 1000  # 列の幅を設定 10 mm
 # 罫線を設定

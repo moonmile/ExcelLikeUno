@@ -15,8 +15,8 @@ def test_cell_font_size_and_bold_roundtrip():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(0, 4)
 
-    original_size = float(cell.font.size)
-    original_weight = float(cell.font._current().get("size", cell.font.size))
+    original_size = float(cell.props.CharHeight)
+    original_weight = float(cell.props.CharWeight)
 
     new_size = 16.0 if abs(original_size - 16.0) > 0.01 else 14.0
     new_bold = False if original_weight >= 150.0 else True
@@ -28,6 +28,9 @@ def test_cell_font_size_and_bold_roundtrip():
         assert cell.font.bold is new_bold
     finally:
         cell.font.apply(size=original_size, bold=(original_weight >= 150.0))
+
+        cell.props.setPropertyValue("CharHeight", original_size)
+        cell.props.setPropertyValue("CharWeight", original_weight)
 
 
 def test_cell_font_color_and_backcolor_roundtrip():

@@ -126,6 +126,58 @@ class SheetCell(UnoObject):
         except Exception:
             return BorderLine2()
 
+    # geometry helpers
+    @property
+    def position(self) -> Any:
+        try:
+            return getattr(self.raw, "Position")
+        except Exception:
+            pass
+        try:
+            return self.props.get_property("Position")
+        except Exception as exc:
+            raise AttributeError("position") from exc
+
+    @property
+    def column_width(self) -> int:
+        try:
+            addr = self.raw.getCellAddress()
+            sheet = getattr(self.raw, "Spreadsheet", None) or self.raw.getSpreadsheet()
+            column = sheet.getColumns().getByIndex(addr.Column)
+            return int(getattr(column, "Width"))
+        except Exception as exc:
+            raise AttributeError("column_width") from exc
+
+    @column_width.setter
+    def column_width(self, width: int) -> None:
+        try:
+            addr = self.raw.getCellAddress()
+            sheet = getattr(self.raw, "Spreadsheet", None) or self.raw.getSpreadsheet()
+            column = sheet.getColumns().getByIndex(addr.Column)
+            column.Width = int(width)
+        except Exception as exc:
+            raise AttributeError("column_width") from exc
+
+    @property
+    def row_height(self) -> int:
+        try:
+            addr = self.raw.getCellAddress()
+            sheet = getattr(self.raw, "Spreadsheet", None) or self.raw.getSpreadsheet()
+            row = sheet.getRows().getByIndex(addr.Row)
+            return int(getattr(row, "Height"))
+        except Exception as exc:
+            raise AttributeError("row_height") from exc
+
+    @row_height.setter
+    def row_height(self, height: int) -> None:
+        try:
+            addr = self.raw.getCellAddress()
+            sheet = getattr(self.raw, "Spreadsheet", None) or self.raw.getSpreadsheet()
+            row = sheet.getRows().getByIndex(addr.Row)
+            row.Height = int(height)
+        except Exception as exc:
+            raise AttributeError("row_height") from exc
+
     def _border_getter(self) -> dict[str, BorderLine]:
         def prefer_line2(name: str) -> BorderLine:
             try:

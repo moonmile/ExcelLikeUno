@@ -11,8 +11,8 @@ def hello_to_cell():
     sheet.cell(0,0).column_width = 10000  # 幅を設定
 
     cell = sheet.cell(0,1)
-    cell.CellBackColor = 0x006400  # 濃い緑に設定
-    cell.CharColor = 0xFFFFFF  # 文字色を白に設定
+    cell.backcolor = 0x006400  # 濃い緑に設定
+    cell.color = 0xFFFFFF  # 文字色を白に設定
 
 g_exportedScripts = (
     hello_to_cell,

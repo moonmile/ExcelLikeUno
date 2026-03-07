@@ -268,6 +268,23 @@ class SheetCellRange(UnoObject):
             cells.append(row_cells)
         return cells
 
+    # merge/unmerge
+    def merge(self, merged: bool = True) -> None:
+        raw_merge = getattr(self.raw, "merge", None)
+        if callable(raw_merge):
+            raw_merge(bool(merged))
+            return
+        raise AttributeError("merge not supported on this range")
+
+    def unmerge(self) -> None:
+        self.merge(False)
+
+    def is_merged(self) -> bool:
+        raw_is_merged = getattr(self.raw, "isMerged", None)
+        if callable(raw_is_merged):
+            return bool(raw_is_merged())
+        raise AttributeError("isMerged not supported on this range")
+
     @property
     def cells(self) -> list[list[SheetCell]]:
         return self.getCells()
