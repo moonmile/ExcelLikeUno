@@ -21,7 +21,7 @@ class TableRows(UnoObject):
         rows = cast(XTableRows, self.raw)
         rows.removeByIndex(int(index), int(count))
 
-    def getByIndex(self, index: int) -> "TableRow":
+    def getByIndex(self, index: int) -> TableRow:
         rows = cast(XTableRows, self.raw)
         row_obj = rows.getByIndex(int(index))
         return TableRow(row_obj)
@@ -32,5 +32,3 @@ class TableRows(UnoObject):
 
 class TableRow(UnoObject):
     """Lightweight wrapper for a single table row."""
-
-    # Additional methods and properties for TableRow can be added here

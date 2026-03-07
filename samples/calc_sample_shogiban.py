@@ -6,8 +6,8 @@ from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLin
 # sheet.name = "将棋盤"
 ban = sheet.range("A1:I9");
 ban.backcolor = 0xFFFACD  # 背景色を薄い黄色に設定
-ban.row_height = 1000  # 行の高さを設定 20 mm
-ban.column_width = 1000  # 列の幅を設定 20 mm
+ban.row_height = 1000  # 行の高さを設定 10 mm
+ban.column_width = 1000  # 列の幅を設定 10 mm
 # 罫線を設定
 for cell in [c for row in ban.cells for c in row]:
 

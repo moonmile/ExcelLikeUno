@@ -1,14 +1,16 @@
-# チェスボードのサンプル
+# sample chessboard
 import uno
 from excellikeuno import connect_calc
 from excellikeuno.drawing.shape import Shape 
-from excellikeuno.table.cell import Cell
-from com.sun.star.beans import PropertyValue  # type: ignore
+from excellikeuno.sheet import Cell
+
 (desktop, doc, sheet) = connect_calc()
-# sheet.name = "チェスボード"
+
+# sheet.name = "chess board"
+
 ban = sheet.range("A1:H8")
-ban.row_height = 1000  # 行の高さを設定 10 mm
-ban.column_width = 1000  # 列の幅を設定 10 mm
+ban.row_height = 1000  # row height 10 mm
+ban.column_width = 1000  # column width 10 mm
 colors = [0xFFFFFF, 0x000000]
 for r in range(8):
     for c in range(8):
@@ -27,7 +29,7 @@ for r in range(8):
         if 0 <= r <= 2:
             cell.font.color = 0xFFFFFF
 
-# RectangleShape を作成し、背景にビットマップを表示
+# make RectangleShape, display to background by bitmap
 shape_white = sheet.shapes.add_rectangle_shape(
     x=0,
     y=0,
@@ -44,10 +46,6 @@ shape_black.fill.bitmap_name = "Parchment Paper"
 
 def copy_behind(cell : Cell, shape: Shape):
 
-    # cell の位置を取得
-    # shape をコピー
-    # cell の位置に shape を移動する
-    # 背景に移動する
     x = cell.position.X
     y = cell.position.Y
     w = cell.column_width
@@ -55,12 +53,12 @@ def copy_behind(cell : Cell, shape: Shape):
     shape_copy = sheet.shapes.add_rectangle_shape(x,y, w, h )
     shape_copy.fill.style = shape.fill.style
     shape_copy.fill.bitmap_name = shape.fill.bitmap_name
-    # UI の「配置→背景へ」と同等の dispatcher 呼び出し
+    # set background by dispatcher call
     shape_copy.to_background()
 
     return shape_copy
 
-# shape_white と shape_back を sheet.range("A1:H8") にコピーしてい配置
+# set shape_white and shape_back to sheet.range("A1:H8") 
 for r in range(8):
     for c in range(8):
         cell = ban.cell(c, r)
@@ -69,7 +67,7 @@ for r in range(8):
         else:
             copy_behind(cell, shape_black)
 
-# 元の shape_white と shape_black を削除
+# delete the original shape_white and shape_black
 sheet.shapes.remove(shape_white)
 sheet.shapes.remove(shape_black)
 

@@ -1,3 +1,4 @@
+git clone <this-repo-url>
 # Excel Like UNO
 
 Provides an Excel/VBA-like programming experience to LibreOffice Calc through a Python wrapper over the UNO API. The goal is to make migration from Excel macros easier.
@@ -10,20 +11,6 @@ Provides an Excel/VBA-like programming experience to LibreOffice Calc through a 
 - Wrap Calc concepts (sheets, cells, ranges, shapes, etc.) as Python classes
 - Ship rich type hints to support IDE completion and static analysis
 - Support VBA-like code such as `sheet.cell(col, row).value` to help migrate macros
-
-# Design Principles
-
-- One wrapper class per Calc concept, all built on a shared `UnoObject` cache of queried interfaces
-- UNO-derived names stay PascalCase; newly added Python helpers use snake_case (shortcuts like `value`, `formula`, `text` kept lowercase)
-- Prefer interface-name constants and Protocol-based type hints to improve IDE completion and avoid typos
-- Provide Excel/VBA-like convenience such as `sheet.cell(col, row)` and `range.borders` to simplify migration
-
-# Project Layout
-
-- `src/excellikeuno/`: library code (connection/bootstrap, core base, Calc/table wrappers, drawing/shapes, utils, typing)
-- `samples/`: runnable examples; use `samples/xluno.ps1` with the LibreOffice-bundled Python
-- `tests/`: pytest cases targeting the LibreOffice runtime (UNO server required)
-- `agents/`: design docs and prompts (single source of truth for architecture and naming)
 
 # Prerequisites (Windows)
 
@@ -55,10 +42,10 @@ A pip package is available (under development):
 & 'C:\Program Files\LibreOffice\program\python' -m pip install excellikeuno
 ```
 
-LibreOffice currently bundles Python 3.11, so the package is installed under a user site-packages directory similar to:
+LibreOffice currently bundles Python 3.12, so the package is installed under a user site-packages directory similar to:
 
 ```powershell
-C:\Users\<UserName>\AppData\Roaming\Python\Python311\site-packages\
+C:\Users\<UserName>\AppData\Roaming\Python\Python312\site-packages\
 ```
 
 For local development, clone this repository and add `src` to `PYTHONPATH` instead of using the installed package:
@@ -105,19 +92,17 @@ C:\Users\<UserName>\AppData\Roaming\LibreOffice\4\user\Scripts\python\
 The library provides `connect_calc_script()`, which uses `XSCRIPTCONTEXT` to connect to the active Calc document. Add your macro function to `g_exportedScripts` so it is visible under "Tools" → "Macros" → "Run Macro":
 
 ```python
-from typing import Any, Tuple
-from excellikeuno.table.sheet import Sheet 
 from excellikeuno import connect_calc_script
 
 def hello_to_cell():
     (_, _, sheet) = connect_calc_script(XSCRIPTCONTEXT)
     sheet.cell(0, 0).text = "Hello Excel Like for Python!"
     sheet.cell(0, 1).text = "こんにちは、Excel Like for Python!"
-    sheet.cell(0,0).column_width = 10000  # set width
+    sheet.cell(0, 0).column_width = 10000  # set width
 
-    cell = sheet.cell(0,1)
-    cell.CellBackColor = 0x006400  # dark green
-    cell.CharColor = 0xFFFFFF  # white text
+    cell = sheet.cell(0, 1)
+    cell.backcolor = 0x006400  # dark green
+    cell.color = 0xFFFFFF      # white text
 
 g_exportedScripts = (
     hello_to_cell,
@@ -132,11 +117,9 @@ To enable code completion in VS Code, add the following to `.vscode/settings.jso
 
 ```json
 {
-    // existing settings...
-
     "python.analysis.autoImportCompletions": true,
     "python.analysis.extraPaths": [
-        "C:/Users/masuda/AppData/Roaming/Python/Python311/site-packages"
+        "C:/Users/masuda/AppData/Roaming/Python/Python312/site-packages"
     ]
 }
 ```
@@ -185,7 +168,7 @@ Work in progress
 from excellikeuno import connect_calc
 from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify
 
-(desktop, doc, sheet) = connect_calc() 
+(desktop, doc, sheet) = connect_calc()
 cell = sheet.cell(0, 0)  # A1
 cell.text = "Hello, World!"
 sheet.range("A1:C1").merge(True)
@@ -198,9 +181,9 @@ cell.row_height = 2000  # 20 mm
 cell.HoriJustify = CellHoriJustify.CENTER
 cell.VertJustify = CellVertJustify.CENTER
 
-sheet.cell(0,1).text = "id"
-sheet.cell(1,1).text = "name"
-sheet.cell(2,1).text = "address"
+sheet.cell(0, 1).text = "id"
+sheet.cell(1, 1).text = "name"
+sheet.cell(2, 1).text = "address"
 sheet.range("A2:C2").CellBackColor = 0xFFBF00  # header background
 
 data = [
@@ -211,59 +194,124 @@ data = [
 sheet.range("A3:C5").value = data  # bulk assign
 ```
 
+## Create, save, and reopen Calc documents
+
+```python
+from pathlib import Path
+from excellikeuno import new_calc_document, open_calc_document, active_document, active_sheet
+
+out_path = Path("C:/temp/excellikeuno_save.ods")
+
+# Create and save
+_, doc, sheet = new_calc_document(hidden=True)
+sheet.cell(0, 0).value = 100
+sheet.cell(1, 0).text = "saved"
+doc.save_as(str(out_path))
+doc.save_copy(str(out_path.with_stem("excellikeuno_save_copy")))
+
+# Re-open (hidden/read_only/as_template/filter_name are available)
+_, reopened_doc, reopened_sheet = open_calc_document(str(out_path), hidden=True)
+print(reopened_doc.has_location, reopened_doc.is_modified)
+
+# Access the UI-active document/sheet
+active_doc = active_document()
+active_sheet_handle = active_sheet()
+
+# Add/copy/remove sheets
+doc = active_doc
+added = doc.add_sheet("CopiedSheet")
+doc.copy_sheet(added.name, "CopiedSheet2")
+doc.remove_sheet("CopiedSheet2")
+doc.remove_sheet("CopiedSheet")
+```
+
 ![Cell operations](./doc/images/calc_sample_cell.jpg)
 
 ## Draw borders in Calc
 
 ```python
+# sample chessboard
+import uno
 from excellikeuno import connect_calc
-from excellikeuno.typing.calc import CellHoriJustify, CellVertJustify, BorderLineStyle
+from excellikeuno.drawing.shape import Shape 
+from excellikeuno.sheet import Cell
 
 (desktop, doc, sheet) = connect_calc()
 
-ban = sheet.range("A1:I9")
-ban.CellBackColor = 0xFFFACD  # light yellow
-ban.row_height = 1000
-ban.column_width = 1000
+# sheet.name = "chess board"
 
-for cell in [c for row in ban.cells for c in row]:
-    cell.borders.all.color = 0x000000
-    cell.borders.all.weight = 50
-    cell.borders.all.line_style = BorderLineStyle.SOLID
-    cell.HoriJustify = CellHoriJustify.CENTER
-    cell.VertJustify = CellVertJustify.CENTER
-
-ban.font.size = 16.0
-ban.font.color = 0x000000
-
-pieces = [
-    ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
-    ["", "飛", "", "", "", "", "", "角", ""],
-    ["歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩"],
-    ["", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", ""],
-    ["歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩", "歩"],
-    ["", "角", "", "", "", "", "", "飛", ""],
-    ["香", "桂", "銀", "金", "王", "金", "銀", "桂", "香"],
-]
-ban.value = pieces
-
-for r in range(9):
-    for c in range(9):
+ban = sheet.range("A1:H8")
+ban.row_height = 1000  # row height 10 mm
+ban.column_width = 1000  # column width 10 mm
+colors = [0xFFFFFF, 0x000000]
+for r in range(8):
+    for c in range(8):
         cell = ban.cell(c, r)
-        if pieces[r][c] != "" and r < 3:
-            cell.CharRotation = 180
+        # cell.CellBackColor = colors[(r + c) % 2]
+        cell.horizontal_align = 2 # CENTER
+        cell.vertical_align = 2 # CENTER
+        piece = ""
+        if r == 0 or r == 7:
+            piece = "♜♞♝♛♚♝♞♜"[c]
+        elif r == 1 or r == 6:
+            piece = "♟"[0] 
+        cell.value = piece
+        cell.font.size = 20
+        cell.font.name = "Arial Unicode MS"
+        if 0 <= r <= 2:
+            cell.font.color = 0xFFFFFF
+
+# make RectangleShape, display to background by bitmap
+shape_white = sheet.shapes.add_rectangle_shape(
+    x=0,
+    y=0,
+    width=1000,
+    height=1000 )
+shape_white.fill.bitmap_name = "Concrete"
+
+shape_black = sheet.shapes.add_rectangle_shape(
+    x=1000,
+    y=1000,
+    width=1000,
+    height=1000 )
+shape_black.fill.bitmap_name = "Parchment Paper"
+
+def copy_behind(cell : Cell, shape: Shape):
+
+    x = cell.position.X
+    y = cell.position.Y
+    w = cell.column_width
+    h = cell.row_height
+    shape_copy = sheet.shapes.add_rectangle_shape(x,y, w, h )
+    shape_copy.fill.style = shape.fill.style
+    shape_copy.fill.bitmap_name = shape.fill.bitmap_name
+    # set background by dispatcher call
+    shape_copy.to_background()
+
+    return shape_copy
+
+# set shape_white and shape_back to sheet.range("A1:H8") 
+for r in range(8):
+    for c in range(8):
+        cell = ban.cell(c, r)
+        if (r + c) % 2 == 0:
+            copy_behind(cell, shape_white)
+        else:
+            copy_behind(cell, shape_black)
+
+# delete the original shape_white and shape_black
+sheet.shapes.remove(shape_white)
+sheet.shapes.remove(shape_black)
 ```
 
-![Shogi board](./doc/images/calc_sample_shogiban.jpg)
+![Chess board](./doc/images/calc_sample_chessboard.jpg)
 
 Sample code is under `samples/` and can be run via `xluno.ps1`:
 
 ```powershell
 cd samples
 ./xluno.ps1 ./calc_sample_cell.py
-./xluno.ps1 ./calc_sample_shogiban.py
+./xluno.ps1 ./calc_sample_chessboard.py
 ./xluno.ps1 ./writer_sample_text.py
 ```
 
@@ -275,7 +323,7 @@ cd samples
 The task uses the LibreOffice-bundled Python to run `pytest tests`.
 
 Recommended flow:
-- Start the UNO server (see below)
+- Start the UNO server (see above)
 - Ensure `PYTHONPATH` includes `src`
 - Run the `Test (LibreOffice Python)` task or the equivalent command below
 
@@ -294,7 +342,7 @@ $env:PYTHONPATH='H:\LibreOffice-ExcelLike\src\'
 
 # Documentation / UNO API Reference
 
-- Project design and specs live under `agents/` (update these first when changing behavior):
+- Project design and specs live under `agents/` (single source of truth):
   - `agents/class_design.md` (class responsibilities)
   - `agents/design_guidelines.md` (wrapping patterns and naming rules)
   - `agents/folder_structure.md` (module layout)
@@ -311,6 +359,7 @@ $env:PYTHONPATH='H:\LibreOffice-ExcelLike\src\'
 
 # Version
 
+- 0.3.0 (2026-03-07): Internally renamed wrappers (Sheet/Range/Cell -> Spreadsheet/SheetCellRange/SheetCell) and cleaned up CellProperties-related APIs
 - 0.2.0 (2025-01-09): Added `font` on Cell/Range/Shape and `borders` on Cell/Range
 - 0.1.1 (2025-01-06): Built pip package
 - 0.1.0 (2025-01-05): Pre-release

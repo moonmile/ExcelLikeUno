@@ -21,7 +21,7 @@ class TableColumns(UnoObject):
         cols = cast(XTableColumns, self.raw)
         cols.removeByIndex(int(index), int(count))
 
-    def getByIndex(self, index: int) -> "TableColumn":
+    def getByIndex(self, index: int) -> TableColumn:
         cols = cast(XTableColumns, self.raw)
         col_obj = cols.getByIndex(int(index))
         return TableColumn(col_obj)
