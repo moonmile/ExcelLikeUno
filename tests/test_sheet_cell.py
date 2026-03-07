@@ -2,7 +2,8 @@ from calendar import c
 
 import pytest
 
-from excellikeuno.table import SheetCell, RawProps, SheetCellRange
+from excellikeuno.sheet import SheetCell, SheetCellRange
+from excellikeuno.sheet.sheet_cell import RawProps
 from excellikeuno.connection import connect_calc
 
 
@@ -15,7 +16,7 @@ def _connect_or_skip():
 
 def test_sheet_cell_value_roundtrip():
     _, _, sheet = _connect_or_skip()
-    cell = sheet.sheet_cell(0, 0)
+    cell = sheet.cell(0, 0)
     assert isinstance(cell, SheetCell)
     original = cell.value
     cell.value = 42.5
@@ -27,7 +28,7 @@ def test_sheet_cell_value_roundtrip():
 
 def test_sheet_cell_props_background_color():
     _, _, sheet = _connect_or_skip()
-    cell = sheet.sheet_cell(1, 0)
+    cell = sheet.cell(1, 0)
     props = cell.props
     assert isinstance(props, RawProps)
     original_color = props.CellBackColor  # type: ignore[attr-defined]
@@ -41,7 +42,7 @@ def test_sheet_cell_props_background_color():
 
 def test_sheet_cell_font_roundtrip():
     _, _, sheet = _connect_or_skip()
-    cell = sheet.sheet_cell(2, 0)
+    cell = sheet.cell(2, 0)
     original_size = cell.font.size
     cell.font.size = 15
     try:
@@ -52,7 +53,7 @@ def test_sheet_cell_font_roundtrip():
 
 def test_sheet_cell_range_returns_sheetcell():
     _, _, sheet = _connect_or_skip()
-    rng = sheet.sheet_range(0, 0, 1, 1)
+    rng = sheet.range(0, 0, 1, 1)
     assert isinstance(rng, SheetCellRange)
     cells = rng.getCells()
     assert isinstance(cells[0][0], SheetCell)
@@ -60,7 +61,7 @@ def test_sheet_cell_range_returns_sheetcell():
 
 def test_sheet_cell_attribute_properties():
     _, _, sheet = _connect_or_skip()
-    cell = sheet.sheet_cell(3, 0)
+    cell = sheet.cell(3, 0)
 
     original_backcolor = cell.backcolor  # type: ignore[attr-defined]
     original_color     = cell.color  # type: ignore[attr-defined]

@@ -53,24 +53,24 @@ def test_cell_topborder_roundtrip():
     cell = sheet.cell(3, 2)
 
     # capture original border and prepare a new one
-    original_border = cell.TopBorder
+    original_border = cell.borders.top.line
     new_border = BorderLine(Color=0x123456, OuterLineWidth=50)
 
     try:
-        cell.props.TopBorder = new_border
-        updated = cell.props.TopBorder
-        assert updated.Color == 0x123456
-        # LibreOffice may normalize to the nearest supported width; allow small drift.
-        assert abs(int(updated.OuterLineWidth) - 50) <= 2
+        cell.borders.apply(top=new_border)
+        updated = cell.borders.top.line
+        assert int(getattr(updated, "Color", 0)) == 0x123456
+        # LibreOffice may normalize width; allow small drift.
+        assert abs(int(getattr(updated, "OuterLineWidth", 0)) - 50) <= 2
     finally:
-        cell.props.TopBorder = original_border
+        cell.borders.apply(top=original_border)
 
 
 def test_cell_topborder2_roundtrip():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(4, 2)
 
-    original_border = cell.TopBorder2
+    original_border = getattr(cell, "TopBorder2", None)
     new_border = BorderLine2(Color=0x654321, OuterLineWidth=60, LineWidth=60)
 
     try:
@@ -80,7 +80,8 @@ def test_cell_topborder2_roundtrip():
         assert abs(int(updated.OuterLineWidth) - 60) <= 2
         assert abs(int(updated.LineWidth) - 60) <= 2
     finally:
-        cell.TopBorder2 = original_border
+        if original_border is not None:
+            cell.TopBorder2 = original_border
 
 
 def test_cell_horijustify_enum_roundtrip():
@@ -92,7 +93,9 @@ def test_cell_horijustify_enum_roundtrip():
     new_value = CellHoriJustify.LEFT if original != CellHoriJustify.LEFT else CellHoriJustify.RIGHT
     try:
         cell.HoriJustify = new_value
-        assert cell.HoriJustify == new_value
+        # UNO enums do not match the Python IntEnum type; compare by name instead.
+        enum_value = getattr(cell.HoriJustify, "value", None) or str(cell.HoriJustify)
+        assert str(enum_value) == new_value.name
     finally:
         cell.HoriJustify = original
 

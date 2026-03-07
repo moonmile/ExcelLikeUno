@@ -15,46 +15,38 @@ def test_cell_font_size_and_bold_roundtrip():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(0, 4)
 
-    original_size = float(cell.char_props.CharHeight)
-    original_weight = float(cell.char_props.CharWeight)
+    original_size = float(cell.font.size)
+    original_weight = float(cell.font._current().get("size", cell.font.size))
 
     new_size = 16.0 if abs(original_size - 16.0) > 0.01 else 14.0
     new_bold = False if original_weight >= 150.0 else True
 
     try:
-        cell.font.size = new_size
-        cell.font.bold = new_bold
+        cell.font.apply(size=new_size, bold=new_bold)
 
-        assert abs(cell.char_props.CharHeight - new_size) <= 0.5
-        assert (cell.char_props.CharWeight >= 150.0) is new_bold
+        assert abs(cell.font.size - new_size) <= 0.5
+        assert cell.font.bold is new_bold
     finally:
-        cell.char_props.CharHeight = original_size
-        cell.char_props.CharWeight = original_weight
+        cell.font.apply(size=original_size, bold=(original_weight >= 150.0))
 
 
 def test_cell_font_color_and_backcolor_roundtrip():
     _, _, sheet = _connect_or_skip()
     cell = sheet.cell(1, 4)
 
-    original_color = cell.char_props.CharColor
-    try:
-        original_back = cell.char_props.CellBackColor
-    except Exception:
-        original_back = None
+    original_color = cell.font.color
+    original_back = cell.font.backcolor
 
     new_color = 0x112233 if original_color != 0x112233 else 0x445566
     new_back = 0xAABBCC if original_back != 0xAABBCC else 0xCCBBAA
 
     try:
-        cell.font.color = new_color
-        cell.font.backcolor = new_back
+        cell.font.apply(color=new_color, backcolor=new_back)
 
-        assert cell.char_props.CharColor == new_color
+        assert cell.font.color == new_color
         assert cell.font.backcolor == new_back
     finally:
-        cell.char_props.CharColor = original_color
-        if original_back is not None:
-            cell.char_props.CellBackColor = original_back
+        cell.font.apply(color=original_color, backcolor=original_back)
 
 
 def test_font_as_config_holder_without_setter():
@@ -91,8 +83,8 @@ def test_font_without_owner_reusable_on_multiple_cells():
     c2 = sheet.cell(2, 7)
 
     originals = [
-        (float(c1.char_props.CharHeight), float(c1.char_props.CharWeight)),
-        (float(c2.char_props.CharHeight), float(c2.char_props.CharWeight)),
+        (float(c1.font.size), bool(c1.font.bold)),
+        (float(c2.font.size), bool(c2.font.bold)),
     ]
 
     font = Font(size=13, bold=True)
@@ -101,17 +93,15 @@ def test_font_without_owner_reusable_on_multiple_cells():
         c1.font = font
         c2.font = font
 
-        assert abs(c1.char_props.CharHeight - 13.0) <= 0.5
-        assert c1.char_props.CharWeight >= 150.0
-        assert abs(c2.char_props.CharHeight - 13.0) <= 0.5
-        assert c2.char_props.CharWeight >= 150.0
+        assert abs(c1.font.size - 13.0) <= 0.5
+        assert c1.font.bold is True
+        assert abs(c2.font.size - 13.0) <= 0.5
+        assert c2.font.bold is True
 
         # font remains reusable/config-holder after applications
         assert font.size == 13
         assert font.bold is True
     finally:
-        (c1_height, c1_weight), (c2_height, c2_weight) = originals
-        c1.char_props.CharHeight = c1_height
-        c1.char_props.CharWeight = c1_weight
-        c2.char_props.CharHeight = c2_height
-        c2.char_props.CharWeight = c2_weight
+        (c1_height, c1_bold), (c2_height, c2_bold) = originals
+        c1.font.apply(size=c1_height, bold=c1_bold)
+        c2.font.apply(size=c2_height, bold=c2_bold)

@@ -1,7 +1,6 @@
 import os
 import pytest
 
-from excellikeuno.table import Spreadsheet
 from excellikeuno.connection import connect_calc
 
 
@@ -14,17 +13,17 @@ def _connect_or_skip():
 
 def test_range_cell_access():
     _, doc, sheet = _connect_or_skip()
-    sheet.sheet_range(0, 0).text = "id"
-    sheet.sheet_range(1, 1).value = 1
+    sheet.range(0, 0, 0, 0).text = "id"
+    sheet.range(1, 1, 1, 1).value = 1
     rng = sheet.range(0, 0, 1, 1)
     assert rng.cell(0, 0).text == "id"
     assert rng.cell(1, 1).value == 1
 
 def test_range_subrange_and_aliases():
     _, doc, sheet = _connect_or_skip()
-    sheet.sheet_range(0, 0).text = "A1"
-    sheet.sheet_range(1, 0).text = "B1"
-    sheet.sheet_range(2, 1).text = "C2"
+    sheet.range(0, 0, 0, 0).text = "A1"
+    sheet.range(1, 0, 1, 0).text = "B1"
+    sheet.range(2, 1, 2, 1).text = "C2"
 
     rng = sheet.range(0, 0, 2, 2)
     sub = rng.subrange(0, 0, 0, 0)
@@ -36,9 +35,9 @@ def test_range_subrange_and_aliases():
     
 def test_range_a1_notation():
     _, doc, sheet = _connect_or_skip()
-    sheet.sheet_range("A1").text = "top-left"
-    sheet.sheet_range("B2").text = "center"
-    sheet.sheet_range("C3").text = "bottom-right"
+    sheet.range("A1").text = "top-left"
+    sheet.range("B2").text = "center"
+    sheet.range("C3").text = "bottom-right"
 
     rng = sheet.range("A1:C3")
     assert rng.cell(0, 0).text == "top-left"
