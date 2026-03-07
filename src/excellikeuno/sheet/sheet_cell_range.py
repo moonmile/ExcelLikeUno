@@ -10,7 +10,6 @@ from .sheet_cell import SheetCell
 from ..table.rows import TableRows
 from ..table.columns import TableColumns
 
-
 class SheetCellRange(UnoObject):
     """SheetCell ベースの範囲ラッパー。Range と同等の API で SheetCell を返す。"""
 

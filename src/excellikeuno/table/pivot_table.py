@@ -15,18 +15,27 @@ from ..typing.calc import (
     XPropertySet,
 )
 from ..typing.structs import CellAddress, CellRangeAddress
-from .range import Range
-
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..sheet import Spreadsheet
 
 
 def _coerce_range_address(target: Any) -> Any:
     candidate = target
-    if isinstance(target, Range):
+    if isinstance(target, UnoObject):
         try:
             addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)
             candidate = addrable.getRangeAddress()
+        except Exception:
+            candidate = target
+    elif hasattr(target, "iface"):
+        try:
+            addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)  # type: ignore[attr-defined]
+            candidate = addrable.getRangeAddress()
+        except Exception:
+            candidate = target
+    elif hasattr(target, "getRangeAddress"):
+        try:
+            candidate = target.getRangeAddress()
         except Exception:
             candidate = target
     elif hasattr(target, "to_raw"):
@@ -61,10 +70,23 @@ def _coerce_range_address(target: Any) -> Any:
 def _coerce_cell_address(target: Any, default_sheet: int = 0) -> Any:
     if isinstance(target, CellAddress):
         return target.to_raw()
-    if isinstance(target, Range):
+    if isinstance(target, UnoObject):
         try:
             addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)
             raddr = addrable.getRangeAddress()
+            return CellAddress(Sheet=raddr.Sheet, Column=raddr.StartColumn, Row=raddr.StartRow).to_raw()
+        except Exception:
+            pass
+    elif hasattr(target, "iface"):
+        try:
+            addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)  # type: ignore[attr-defined]
+            raddr = addrable.getRangeAddress()
+            return CellAddress(Sheet=raddr.Sheet, Column=raddr.StartColumn, Row=raddr.StartRow).to_raw()
+        except Exception:
+            pass
+    elif hasattr(target, "getRangeAddress"):
+        try:
+            raddr = target.getRangeAddress()
             return CellAddress(Sheet=raddr.Sheet, Column=raddr.StartColumn, Row=raddr.StartRow).to_raw()
         except Exception:
             pass

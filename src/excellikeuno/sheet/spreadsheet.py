@@ -20,14 +20,12 @@ from excellikeuno.typing.structs import Point, Size
 from ..core import UnoObject
 from ..drawing import Shape, EllipseShape
 from ..typing import InterfaceNames, XDrawPageSupplier, XNamed, XPropertySet, XSpreadsheet, XTableRows, XTableColumns
-from ..table.cell import Cell
 from .sheet_cell import SheetCell
 from .sheet_cell_range import SheetCellRange
-from ..table.range import Range, TableRow, TableColumn
 from ..chart import ChartCollection
 from ..table.pivot_table import PivotTables
-from ..table.rows import TableRows
-from ..table.columns import TableColumns
+from ..table.rows import TableRows, TableRow
+from ..table.columns import TableColumns, TableColumn
 
 # UNO runtime does not expose all service names as importable modules; keep type-only imports
 if TYPE_CHECKING:

@@ -7,11 +7,10 @@ from ..typing import InterfaceNames
 from ..typing.interfaces import StructNames
 from ..typing.calc import XNamed, XPropertySet, XTableChart, XTableCharts
 from ..typing.structs import CellRangeAddress, Point, Rectangle, Size
-from ..table.range import Range
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from ..core.calc_document import CalcDocument
-    from ..sheet import Spreadsheet
+    from ..sheet import Spreadsheet, SheetCellRange
 
 
 class Chart(UnoObject):
@@ -71,7 +70,7 @@ class Chart(UnoObject):
     def _coerce_range_address(target: Any) -> Any:
         """Normalize range-like input to a UNO CellRangeAddress struct."""
         candidate = target
-        if isinstance(target, Range):
+        if isinstance(target, UnoObject):
             try:
                 addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)
                 candidate = addrable.getRangeAddress()
@@ -79,8 +78,13 @@ class Chart(UnoObject):
                 candidate = target
         elif hasattr(target, "iface"):
             try:
-                addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)
+                addrable = target.iface(InterfaceNames.X_CELL_RANGE_ADDRESSABLE)  # type: ignore[attr-defined]
                 candidate = addrable.getRangeAddress()
+            except Exception:
+                candidate = target
+        elif hasattr(target, "getRangeAddress"):
+            try:
+                candidate = target.getRangeAddress()
             except Exception:
                 candidate = target
         elif hasattr(target, "to_raw"):
@@ -768,7 +772,7 @@ class ChartCollection:
             target_name = candidate
 
         rect_raw = self._coerce_rectangle(rectangle, position, size)
-        if isinstance(data_range, Range):
+        if hasattr(data_range, "raw") and hasattr(getattr(data_range, "raw"), "getRangeAddress"):
             try:
                 addr = data_range.raw.getRangeAddress()
             except Exception:

@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from ..core import UnoObject
 from ..typing import XTableColumns
-
-if TYPE_CHECKING:  # for type hints only
-    from .range import TableColumn
-
 
 class TableColumns(UnoObject):
     """Lightweight wrapper for XTableColumns with friendly aliases."""
@@ -26,8 +22,6 @@ class TableColumns(UnoObject):
         cols.removeByIndex(int(index), int(count))
 
     def getByIndex(self, index: int) -> "TableColumn":
-        from .range import TableColumn  # local import to avoid circular dependency
-
         cols = cast(XTableColumns, self.raw)
         col_obj = cols.getByIndex(int(index))
         return TableColumn(col_obj)

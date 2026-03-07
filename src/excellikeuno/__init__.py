@@ -39,13 +39,11 @@ from .drawing import (
     Shape,
     TextShape,
 )
-from .table import Cell, CellProperties, PivotTable, PivotTables
+from .table import PivotTable, PivotTables
 from .sheet import Spreadsheet, SheetCell, SheetCellRange
 from .chart import Chart, ChartCollection
 
 __all__ = [
-    "Cell",
-    "CellProperties",
     "Chart",
     "ChartCollection",
     "PivotTable",

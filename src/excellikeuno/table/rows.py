@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from ..core import UnoObject
 from ..typing import XTableRows
-
-if TYPE_CHECKING:  # for type hints only
-    from .range import TableRow
-
 
 class TableRows(UnoObject):
     """Lightweight wrapper for XTableRows with friendly aliases."""
@@ -26,8 +22,6 @@ class TableRows(UnoObject):
         rows.removeByIndex(int(index), int(count))
 
     def getByIndex(self, index: int) -> "TableRow":
-        from .range import TableRow  # local import to avoid circular dependency
-
         rows = cast(XTableRows, self.raw)
         row_obj = rows.getByIndex(int(index))
         return TableRow(row_obj)
